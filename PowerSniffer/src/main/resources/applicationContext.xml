@@ -49,7 +49,7 @@ http://www.springframework.org/schema/aop/spring-aop.xsd">
 	</bean>
 	
 	<bean class="com.uf.stock.data.bean.ConfigInfo">
-		<property name="isUseProxy" value="true"></property>
+		<property name="isUseProxy" value="false"></property>
 		<property name="proxyAddress" value="10.5.157.46"></property>
 		<property name="proxyPort" value="80"></property>
 	</bean>

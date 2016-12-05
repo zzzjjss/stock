@@ -10,6 +10,7 @@ public class StockInfo {
 	private String symbol;
 	private Float totalAAmount;
 	private Float peRatio;
+	private Boolean isInAlarmMonitor;
 	private Float downPercentToLowest;
 
 	public Float getPeRatio() {
@@ -60,4 +61,12 @@ public class StockInfo {
 		this.downPercentToLowest = downPercentToLowest;
 	}
 
+	public Boolean getIsInAlarmMonitor() {
+		return isInAlarmMonitor;
+	}
+
+	public void setIsInAlarmMonitor(Boolean isInAlarmMonitor) {
+		this.isInAlarmMonitor = isInAlarmMonitor;
+	}
+	
 }

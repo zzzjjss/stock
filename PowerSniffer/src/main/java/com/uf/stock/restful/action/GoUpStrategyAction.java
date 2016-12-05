@@ -59,7 +59,7 @@ public class GoUpStrategyAction {
         GoUpStrategyResponseData item=new GoUpStrategyResponseData();
         item.setDownPercent(downPercent);
         item.setPeRatio(power.getStockPeRatio());
-        item.setPower(power.getPowerValue());
+        item.setPower(power.getUpdownPowerValue());
         item.setStockName(power.getStockName());
         item.setUpDownRate(power.getTradeInfo().getUpDownRate());
         item.setStockSymbol(power.getTradeInfo().getStockSymbol());

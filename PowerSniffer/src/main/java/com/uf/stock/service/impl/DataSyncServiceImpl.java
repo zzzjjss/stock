@@ -96,10 +96,15 @@ public class DataSyncServiceImpl implements DataSyncService {
       tradeInfo.setTurnoverRate(((float) (tradeInfo.getTradeAmount() / stock.getTotalAAmount())) * 100);
       float power = 0f;
       if (tradeInfo.getTurnoverRate() != 0) {
-        power = tradeInfo.getUpDownRate() / tradeInfo.getTurnoverRate();
+        power =Math.abs(tradeInfo.getUpDownRate() / tradeInfo.getTurnoverRate());
       }
       UpDownPower powerObj = new UpDownPower();
-      powerObj.setPowerValue(power);
+      powerObj.setUpdownPowerValue(power);
+      if(tradeInfo.getUpDownRate()>0){
+    	  powerObj.setUpPower(true);
+      }else{
+    	  powerObj.setUpPower(false);
+      }
       powerObj.setStockPeRatio(stock.getPeRatio());
       powerObj.setStockName(stock.getName());
       powerObj.setTradeInfo(tradeInfo);

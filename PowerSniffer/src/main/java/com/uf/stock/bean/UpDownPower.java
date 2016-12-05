@@ -5,7 +5,8 @@ import com.uf.stock.data.bean.StockTradeInfo;
 
 
 public class UpDownPower implements Comparable<UpDownPower> {
-  private Float powerValue;
+  private Float updownPowerValue;
+  private boolean isUpPower;
   private String stockName;
   private Float stockPeRatio;
   private StockTradeInfo tradeInfo;
@@ -19,18 +20,23 @@ public class UpDownPower implements Comparable<UpDownPower> {
     this.tradeInfo = tradeInfo;
   }
 
-  public Float getPowerValue() {
-    return powerValue;
-  }
+public Float getUpdownPowerValue() {
+	return updownPowerValue;
+}
 
-  public void setPowerValue(Float powerValue) {
-    this.powerValue = powerValue;
-  }
+public void setUpdownPowerValue(Float updownPowerValue) {
+	this.updownPowerValue = updownPowerValue;
+}
 
+public boolean isUpPower() {
+	return isUpPower;
+}
 
- 
+public void setUpPower(boolean isUpPower) {
+	this.isUpPower = isUpPower;
+}
 
-  public String getStockName() {
+public String getStockName() {
     return stockName;
   }
 
@@ -40,12 +46,12 @@ public class UpDownPower implements Comparable<UpDownPower> {
 
   @Override
   public int compareTo(UpDownPower o) {
-    return o.getPowerValue().compareTo(powerValue);
+    return o.getUpdownPowerValue().compareTo(updownPowerValue);
   }
 
   @Override
   public String toString() {
-    return stockName+ ":" + powerValue.toString()+":  "+tradeInfo.getUpDownRate()+"%";
+		  return stockName+ ":"+updownPowerValue.toString()+" :  "+tradeInfo.getUpDownRate()+"%";
   }
 
   public Float getStockPeRatio() {
