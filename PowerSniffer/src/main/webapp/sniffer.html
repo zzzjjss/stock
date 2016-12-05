@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript" src="jquery/jquery-3.1.1.min.js"></script>
+<script type="text/javascript"
+	src="jquery/jquery.dataTables/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="jquery/jquery.dataTables/jquery.dataTables.min.css" />
+<link rel="stylesheet" type="text/css"
+	href="bootstrap-3.3.5/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css"
+	href="bootstrap-3.3.5/css/bootstrap-theme.min.css" />
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<script type="text/javascript">
+var socket;
+$(document).ready(function() {
+	var webSocketUrl='ws://' + window.location.host + '/PowerSniffer/alarm';
+	socket=new WebSocket(webSocketUrl);
+	socket.onmessage = function (message) {
+			                console.log(message.data);
+			            };
+
+});
+
+</script>
+</body>
+</html>

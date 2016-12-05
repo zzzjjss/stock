@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript" src="jquery/jquery-3.1.1.min.js"></script>
+<script type="text/javascript"
+	src="jquery/jquery.dataTables/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="jquery/jquery.dataTables/jquery.dataTables.min.css" />
+<link rel="stylesheet" type="text/css"
+	href="bootstrap-3.3.5/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css"
+	href="bootstrap-3.3.5/css/bootstrap-theme.min.css" />
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<ul class="nav nav-tabs">
+		<li class="active"><a href="#upPower" data-toggle="tab">趁势追高</a></li>
+		<li><a href="#lowPrice" data-toggle="tab">低价抄底</a></li>
+		<li><a href="#downMakeT" data-toggle="tab">大跌做T</a></li>
+	</ul>
+	<br>
+	<div class="tab-content">
+		<div class="tab-pane active" id="upPower">
+			<div class="row">
+				<div class=col-lg-6>
+					<div class="input-group">
+						<span class="input-group-addon">市营率范围</span> <input type="text"
+							class="form-control" placeholder="MinPE" value="1"
+							id="minPeRatio"> <input type="text" class="form-control"
+							placeholder="MaxPE" value="100" id="maxPeRatio">
+					</div>
+				</div>
+				<div class=col-lg-6>
+					<div class="input-group">
+						<span class="input-group-addon">目标价最大跌幅</span> <input type="text"
+							class="form-control" placeholder="MaxDownPercent" value="30"
+							id="maxDownPercent">
+					</div>
+					<button type="button" class="btn btn-default " id="queryPowerBtn">查询</button>
+					<button type="button" class="btn btn-default " data-toggle="modal"
+						data-target="#myModal">同步每天交易</button>
+					<button type="button" class="btn btn-default " data-toggle="modal"
+						data-target="#avgAnalyseModal">分析日均线</button>
+				</div>
+
+			</div>
+
+			<br>
+
+			<table id="upPowerTable" class="display" width="100%"></table>
+
+		</div>
+		<div class="tab-pane" id="lowPrice">
+			<div class="row">
+				<button type="button" class="btn btn-default " id="getDownPercentBtn">查询</button>
+				<button type="button" class="btn btn-default " id="syncAllStocksBtn">同步所有股票</button>
+				<button type="button" class="btn btn-default " data-toggle="modal" data-target="#periodLowestModal">阶段性底价</button>
+			</div>
+			<table id="lowPriceBuyTb" class="display" width="100%"></table>
+		</div>
+		<div class="tab-pane" id="downMakeT"></div>
+	</div>
+	<br>
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">Console</h3>
+		</div>
+		<div class="panel-body" id="console"  style="max-height: 300px;overflow-y: scroll;"></div>
+	</div>
+
+
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">同步股票每天交易数据</h4>
+				</div>
+				<div class="modal-body">
+					<div class="input-group">
+						<span class="input-group-addon">同步所有</span> <input type="checkbox"
+							id="isSyncAll" >
+					</div>
+					<div class="input-group">
+						<span class="input-group-addon">股票代码</span> <input type="text"
+							class="form-control" placeholder="股票代码" id="stockCode">
+					</div>
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					<button type="button" class="btn btn-primary" id="syncTradeInfoBtn">同步</button>
+				</div>
+			</div>
+		</div>
+		</div>
+		
+		
+		
+		<div class="modal fade" id="avgAnalyseModal" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">均线分析（底价反弹）</h4>
+				</div>
+				<div class="modal-body">
+					
+					<div class="input-group">
+						<span class="input-group-addon">日周期</span>
+						 <input type="text" class="form-control" placeholder="" id="shortTerm" value="5">
+						 <input type="text" class="form-control" placeholder="" id="mediumTerm" value="10">
+						 <input type="text" class="form-control" placeholder="" id="longTerm" value="20">
+					</div>
+					
+					<div class="input-group">
+						 <span class="input-group-addon">周期天数</span>
+						 <input type="text" class="form-control" placeholder="" id="analysicDays" value="30">
+						 <span class="input-group-addon">到最低价最大跌幅</span>
+						 <input type="text" class="form-control" placeholder="" id="downPercentToLowestPrice" value="5">
+						 <span class="input-group-addon">%</span>
+					</div>
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					<button type="button" class="btn btn-primary" id="analyseBtn">开始分析</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+		<div class="modal fade" id="periodLowestModal" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">阶段性底价参数</h4>
+				</div>
+				<div class="modal-body">
+					
+					<div class="input-group">
+						<span class="input-group-addon">周期(天)</span>
+						<input type="text" class="form-control" placeholder="" id="periodicDays" value="30">
+					</div>
+
+					<div class="input-group">
+						<span class="input-group-addon">到最低价最大跌幅</span>
+						<input type="text" class="form-control" placeholder="" id="maxDownPercentToLowest" value="1">
+						<span class="input-group-addon">%</span>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					<button type="button" class="btn btn-primary" id="calculatePeriodLowestPriceBtn">开始分析</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</body>
+<script type="text/javascript">
+	var restfulContext = "/PowerSniffer/rest";
+
+	$(document).ready(function() {
+		fetchUpstockData();
+		$("#queryPowerBtn").on("click", function() {
+			$(this).prop('disabled', true);
+			fetchUpstockData()
+
+		});
+
+		$("#getDownPercentBtn").on("click", function() {
+			$(this).prop('disabled', true);
+			fetchDownPercentData();
+		});
+		$("#syncAllStocksBtn").on("click", function() {
+			var btn = $(this);
+			$(this).prop('disabled', true);
+
+			$.ajax({
+				url : restfulContext + "/lowPriceBuyStrategy/syncAllStock"
+			}).done(function(data) {
+				btn.prop('disabled', false);
+				alertCommonResponse(data);
+			});
+		});
+		$("#syncTradeInfoBtn").on("click", function() {
+			var btn = $(this);
+			$(this).prop('disabled', true);
+			var stockCode=$("#stockCode").val();		
+			var isSyncAll=$("#isSyncAll").is(':checked');
+			$.ajax({
+				url : restfulContext + "/goUpStrategy/syncStockTradeInfo?isSyncAll="+isSyncAll+"&stockCode="+stockCode
+			}).done(function(data) {
+				btn.prop('disabled', false);
+				alertCommonResponse(data);
+			});
+		});
+		$("#analyseBtn").on("click",function(){
+			var btn = $(this);
+			$(this).prop('disabled', true);
+			var shortTerm=$("#shortTerm").val();
+			var mediumTerm=$("#mediumTerm").val();
+			var longTerm=$("#longTerm").val();
+			var analysicDays=$("#analysicDays").val();
+			var downPercentToLowestPrice=$("#downPercentToLowestPrice").val();
+			$.ajax({
+				url : restfulContext + "/goUpStrategy/analyseAvgPrice?shortTerm="+shortTerm+"&mediumTerm="+mediumTerm+"&longTerm="+longTerm+"&analysicDays="+analysicDays+"&downPercentToLowestPrice="+downPercentToLowestPrice
+			}).done(function(data) {
+				btn.prop('disabled', false);
+				appendToConsole("低价启动--分析结果");
+				for(var i=0;i<data.length;i++){
+					var stock=data[i];
+					appendToConsole(stock.name+"-->"+stock.peRatio+"  toLowestDown:"+stock.downPercentToLowest);
+				}
+				
+			});
+		});
+		
+		$("#calculatePeriodLowestPriceBtn").on("click",function(){
+			var btn = $(this);
+			$(this).prop('disabled', true);
+			var periodicDays=$("#periodicDays").val();
+			var maxDownPercentToLowest=$("#maxDownPercentToLowest").val();
+			$.ajax({
+				url : restfulContext + "/lowPriceBuyStrategy/calculatePeriodicLowPriceStocks?periodicDays="+periodicDays+"&maxDownPercentToLowest="+maxDownPercentToLowest
+			}).done(function(data) {
+				btn.prop('disabled', false);
+				appendToConsole("阶段性底价--分析结果");
+				for(var i=0;i<data.length;i++){
+					var stock=data[i];
+					appendToConsole(stock.name+"-->"+stock.peRatio+"  toLowestDown:"+stock.downPercentToLowest);
+				}
+				
+			});			
+		});
+		
+		//setInterval(function(){fetchAlarmStocks();}, 3000);
+	});
+	function fetchDownPercentData() {
+		var table = $('#lowPriceBuyTb').DataTable(
+				{
+					"ajax" : restfulContext
+							+ "/lowPriceBuyStrategy/getStocksDownPercent",
+					"columns" : [ {
+						title : "股票名称",
+						data : "stockName"
+					}, {
+						title : "买价",
+						data : "alarmBuyPrice"
+					}, {
+						title : "卖价",
+						data : "alarmSellPrice"
+					}, {
+						name : "downPercent",
+						title : "底价跌幅",
+						data : "downPercent"
+					} ],
+					destroy : true
+				});
+		table.column([ "downPercent:name" ]).order("desc").draw();
+		table.on('xhr.dt', function() {
+			$("#getDownPercentBtn").prop('disabled', false);
+		});
+
+	}
+	function fetchUpstockData() {
+		var minPeRatio = $("#minPeRatio").val();
+		var maxPeRatio = $("#maxPeRatio").val();
+		var maxDownPercent = $("#maxDownPercent").val();
+		var table = $('#upPowerTable')
+				.DataTable(
+						{
+							"ajax" : restfulContext+ "/goUpStrategy/getGoUpStockInfo?minPeRatio="+ minPeRatio + "&maxPeRatio=" + maxPeRatio
+									+ "&maxDownPercent=" + maxDownPercent,
+							"columns" : [
+									{
+										title : "股票名称",
+										render:function(cellData, type,rowData, meta){
+											return '<a  target="_blank" href="http://q.stock.sohu.com/cn/'+rowData.stockSymbol.substring(2)+'/index.shtml">'+rowData.stockName+'</a>'
+										}
+									},
+									{
+										name : "power",
+										title : "上涨力道",
+										data : "power"
+									},
+									{
+										title : "涨幅",
+										data : "upDownRate"
+									},
+									{
+										title : "市盈率",
+										data : "peRatio"
+									},
+									{
+										name : "downPercent",
+										title : "底价跌幅",
+										data : "downPercent"
+									},
+									{
+										title : "操作",
+										"orderable" : false,
+										render : function(cellData, type,
+												rowData, meta) {
+											return '<button name="sycTradeInfoBtn" id="'
+													+ rowData.stockSymbol
+													+ '" onclick="syncStockTradeInfo(this)">同步数据</button>';
+										}
+									} ],
+							destroy : true
+						});
+		table.column([ "power:name", "downPercent:name" ]).order("desc").draw();
+		table.on('xhr.dt', function() {
+			$("#queryPowerBtn").prop('disabled', false);
+		});
+	}
+	function syncStockTradeInfo(btn) {
+		var stockSymbol = $(btn).prop("id")
+		$.ajax(
+				{
+					url : restfulContext+ "/goUpStrategy/syncStockTradeInfo?stockSymbol="+ stockSymbol,
+				}).done(function(data) {
+			if (!data.success) {
+				alert(data.error.msg);
+			}
+		});
+	}
+	function alertCommonResponse(data) {
+		if (data.success == true) {
+			alert(data.msg);
+		} else {
+			alert(data.error.msg);
+		}
+	}
+	function fetchAlarmStocks() {
+		$.ajax({
+			url : restfulContext + "/lowPriceBuyStrategy/getAlarmStocks",
+		}).done(function(data) {
+			if (data != "") {
+				alert(data);
+			}
+		});
+	}
+	
+	function appendToConsole(content){
+		var maxLine=1000;
+		var lineSize=$("#console span").length;
+		if(lineSize>maxLine){
+			$("#console span:lt(1)").remove();
+		}
+		$("#console").append("<span>"+content+"<br></span>");
+	}
+</script>
+</html>

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.uf.stock.data.bean.StockInfo" table="stock_info">
+		<id name="code" type="int">
+			<column name="code" />
+			<generator class="assigned" />
+		</id>
+		<property name="name" type="string">
+			<column name="name" />
+		</property>
+		<property name="symbol" type="string">
+			<column name="symbol" />
+		</property>
+		<property name="totalAAmount" type="float">
+			<column name="total_a_amount" />
+		</property>
+		<property name="peRatio" type="float">
+			<column name="pe_ratio" />
+		</property>
+		
+	</class>
+</hibernate-mapping>

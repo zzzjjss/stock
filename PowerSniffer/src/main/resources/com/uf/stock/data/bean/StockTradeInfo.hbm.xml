@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.uf.stock.data.bean.StockTradeInfo" table="stock_trade_info">
+		<id name="id" type="long">
+			<column name="id" />
+			<generator class="identity" />
+		</id>
+		<property name="tradeDate" type="timestamp">
+			<column name="trade_date" />
+		</property>
+
+		<property name="openPrice" type="float">
+			<column name="open_price" />
+		</property>
+		<property name="highestPrice" type="float">
+			<column name="highest_price" />
+		</property>
+		<property name="closePrice" type="float">
+			<column name="close_price" />
+		</property>
+		<property name="lowestPrice" type="float">
+			<column name="lowest_price" />
+		</property>
+		<property name="tradeAmount" type="long">
+			<column name="trade_amount" />
+		</property>
+		<property name="tradeMoney" type="long">
+			<column name="trade_money" />
+		</property>
+		
+		<property name="turnoverRate" type="float">
+			<column name="turnover_rate" />
+		</property>
+		<property name="upDownPrice" type="float">
+			<column name="up_down_price" />
+		</property>
+		<property name="upDownRate" type="float">
+			<column name="up_down_rate" />
+		</property>
+		<property name="stockSymbol" type="string">
+			<column name="stock_symbol" />
+		</property>
+		<many-to-one name="stock" column="stock_code"
+			class="com.uf.stock.data.bean.StockInfo" lazy="false"></many-to-one>
+
+	</class>
+</hibernate-mapping>

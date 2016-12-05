@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.uf.stock.data.bean.AlarmStock" table="alarm_stock">
+		<id name="id" type="int">
+			<column name="id" />
+			<generator class="identity" />
+		</id>
+		<property name="stockCode" type="int">
+			<column name="stock_code" />
+		</property>
+		<property name="stockName" type="string">
+			<column name="stock_name" />
+		</property>
+		<property name="alarmBuyPrice" type="float">
+			<column name="alarm_buy_price" />
+		</property>
+		<property name="alarmSellPrice" type="float">
+			<column name="alarm_sell_price" />
+		</property>
+	</class>
+</hibernate-mapping>

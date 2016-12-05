@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="debug" strict="true" >
+  <Properties>
+    <Property name="filename">c:/jason/log/restful.log</Property>
+  </Properties>
+ 
+  <Appenders>
+    <Appender type="Console" name="STDOUT">
+      <Layout type="PatternLayout" pattern="%m MDC%X%n"/>
+    </Appender>
+    
+    <Appender type="File" name="File" fileName="${filename}">
+      <Layout type="PatternLayout">
+        <Pattern>%d %p %C{1.} [%t] %m%n</Pattern>
+      </Layout>
+    </Appender>
+  </Appenders>
+ 
+  <Loggers>
+   
+    <Root level="info">
+      <AppenderRef ref="STDOUT"/>
+      <AppenderRef ref="File"></AppenderRef>
+    </Root>
+  </Loggers>
+ 
+</Configuration>
