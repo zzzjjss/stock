@@ -10,6 +10,4 @@ public interface StockAnalysisService {
 	public Boolean calculateStockIsDayAverageGoldX(StockInfo stock,int shortTerm,int mediumTerm ,int longTerm); 
 	public Float calculateStockPeriodicToLowestPriceDownPercent(StockInfo stock,int periodicDays);
 	public StockStage analyseStockStage(List<StageDefinition> stageDefines,StockInfo stock);
-	public Float calculateStockUpPower(Integer stockCode);
-	public Float calculateStockDownPower(Integer stockCode);
 }

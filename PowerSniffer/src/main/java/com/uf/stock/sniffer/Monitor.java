@@ -1,26 +1,26 @@
 package com.uf.stock.sniffer;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.uf.stock.data.bean.StockTradeInfo;
+import com.uf.stock.bean.UpDownPower;
+import com.uf.stock.data.bean.StockInfo;
 import com.uf.stock.service.DataSyncService;
+import com.uf.stock.service.StockAnalysisService;
 import com.uf.stock.sniffer.alarm.Alarm;
+import com.uf.stock.sniffer.alarm.bean.StockUpDownPowerMsg;
 
 public class Monitor extends Thread {
   private boolean isStarted = false;
-  private List<Alarm> alarms=new ArrayList<Alarm>();
+  private List<Alarm> alarms = new ArrayList<Alarm>();
   @Autowired
   private DataSyncService dataSyncService;
-  
-  
-  
+  @Autowired
+  private StockAnalysisService analyseService;
+
+
   public void startMonitor() {
     isStarted = true;
     this.start();
@@ -30,16 +30,39 @@ public class Monitor extends Thread {
   public void run() {
     while (isStarted) {
       try {
-        Map<String, StockTradeInfo> current=dataSyncService.getCurrentStocksTradeInfo(Arrays.asList("sz000004"));
-        Iterator<StockTradeInfo> currentInfos=current.values().iterator();
-        for(Alarm alarm:alarms){
-          alarm.alarm(Arrays.asList(String.valueOf(current.size())));
+        List<StockInfo> stocks = dataSyncService.findStocksInMonitor();
+        System.out.println("monitor stocks size:" + stocks.size());
+        if (stocks != null && stocks.size() > 0) {
+          List<UpDownPower> powers = dataSyncService.calculateStocksCurrentPower(stocks);
+          List<StockUpDownPowerMsg> msgs = new ArrayList<StockUpDownPowerMsg>();
+          for (UpDownPower power : powers) {
+            if (power.isUpPower() && power.getUpdownPowerValue() > 1 && power.getTradeInfo().getUpDownRate() > 1) {
+              StockUpDownPowerMsg msg = new StockUpDownPowerMsg();
+              msg.setIsUpPower(true);
+              msg.setPower(power.getUpdownPowerValue());
+              msg.setStockName(power.getStockName());
+              msg.setStockSymbol(power.getTradeInfo().getStockSymbol());
+              msgs.add(msg);
+            }
+            if (!power.isUpPower() && power.getUpdownPowerValue() > 1 && power.getTradeInfo().getUpDownRate() < -1) {
+              StockUpDownPowerMsg msg = new StockUpDownPowerMsg();
+              msg.setIsUpPower(false);
+              msg.setPower(power.getUpdownPowerValue());
+              msg.setStockName(power.getStockName());
+              msg.setStockSymbol(power.getTradeInfo().getStockSymbol());
+              msgs.add(msg);
+            }
+          }
+          for (Alarm alarm : alarms) {
+            alarm.alarm(msgs);
+          }
         }
-        Thread.sleep(1000 * 3);
-      } catch (InterruptedException e) {
+        Thread.sleep(1000 * 5);
+      } catch (Exception e) {
         e.printStackTrace();
       }
     }
+
   }
 
   public void stopMonitor() {
@@ -54,5 +77,5 @@ public class Monitor extends Thread {
     this.alarms = alarms;
   }
 
-  
+
 }

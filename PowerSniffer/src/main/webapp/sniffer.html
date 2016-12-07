@@ -15,17 +15,47 @@
 <title>Insert title here</title>
 </head>
 <body>
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">Dashboard</h3>
+		</div>
+		<div class="panel-body" id="dashboard"  style="max-height: 600px;overflow-y: scroll;"></div>
+	</div>
+</body>
 <script type="text/javascript">
 var socket;
 $(document).ready(function() {
 	var webSocketUrl='ws://' + window.location.host + '/PowerSniffer/alarm';
 	socket=new WebSocket(webSocketUrl);
 	socket.onmessage = function (message) {
-			                console.log(message.data);
+							//alert(message.data);
+							refreshDashboard(JSON.parse(message.data));
+			                //console.log(message.data);
 			            };
 
 });
-
+function refreshDashboard(alarmDatas){
+	var alertMsg="";
+	for(var i=0;i<alarmDatas.length;i++){
+		var stock=alarmDatas[i];
+		if($("span[id="+stock.stockSymbol+"]").length==0){
+			alertMsg=alertMsg+","+stock.stockSymbol;
+		}	
+	}
+	if(alertMsg!=""){
+		alert(alertMsg);
+	}
+	$("#dashboard span").remove();
+	for(var i=0;i<alarmDatas.length;i++){
+		var stock=alarmDatas[i];
+		var upDown;
+		if(stock.isUpPower){
+			upDown="Up";
+		}else{
+			upDown="Down";
+		}
+		$("#dashboard").append('<span id="'+stock.stockSymbol+'"><a  target="_blank" href="http://q.stock.sohu.com/cn/'+stock.stockSymbol.substring(2)+'/index.shtml">'+stock.stockName+'</a>--->'+upDown+'--->'+stock.power+'<br></span>');
+	}
+}
 </script>
-</body>
 </html>

@@ -79,15 +79,5 @@ public class StockAnalysisServiceImpl implements StockAnalysisService {
     }
     return null;
   }
-@Override
-public Float calculateStockUpPower(Integer stockCode) {
-	
-	return null;
-}
-@Override
-public Float calculateStockDownPower(Integer stockCode) {
-	// TODO Auto-generated method stub
-	return null;
-}
 
 }

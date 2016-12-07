@@ -11,7 +11,7 @@ import com.uf.stock.data.bean.StockTradeInfo;
 public interface DataSyncService {
     public int syncAllStocksBaseInfo();
     public List<StockInfo>  findStocksPeRatioBetween(Float min,Float max);
-    
+    public List<StockInfo>  findStocksInMonitor();
     public AlarmStock findAlarmStockInfoByStockCode(Integer  stockCode);
     public List<AlarmStock> findAllAlarmStocks();
     public List<UpDownPower> calculateStocksCurrentPower(List<StockInfo> stocks);

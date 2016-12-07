@@ -5,10 +5,11 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.uf.stock.sniffer.alarm.Alarm;
+import com.uf.stock.sniffer.alarm.bean.StockUpDownPowerMsg;
 
 public class EmailAlarm implements Alarm{
 
-  public void alarm(List<String> infos) {
+  public void alarm(List<StockUpDownPowerMsg> infos) {
     //TODO if  infos  is as same as  pre-infos ,don't send email
     String content=StringUtils.join(infos, "\r\n");
     MailSender sender=new MailSender();

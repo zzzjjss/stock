@@ -290,4 +290,9 @@ public int syncAllStocksTradeInfo() {
 	return syncTotalCount;
 }
 
+@Override
+public List<StockInfo> findStocksInMonitor() {
+  return (List<StockInfo>)stockInfoDao.findByHql("from StockInfo s where s.isInAlarmMonitor=?", true);
+}
+
 }

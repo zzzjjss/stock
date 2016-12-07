@@ -18,8 +18,8 @@
 		<property name="peRatio" type="float">
 			<column name="pe_ratio" />
 		</property>
-		<property name="isInAlarmMonitor" type="yes_no">
-			<column name="is_in_alarm_monitor" />
+		<property name="isInAlarmMonitor" type="boolean">
+			<column name="is_in_alarm_monitor" default="false"/>
 		</property>
 	</class>
 </hibernate-mapping>

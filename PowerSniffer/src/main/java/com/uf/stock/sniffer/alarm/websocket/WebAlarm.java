@@ -6,18 +6,21 @@ import java.util.List;
 
 import javax.websocket.Session;
 
-import org.apache.commons.lang3.StringUtils;
-
+import com.google.gson.Gson;
 import com.uf.stock.sniffer.alarm.Alarm;
+import com.uf.stock.sniffer.alarm.bean.StockUpDownPowerMsg;
 
 public class WebAlarm implements Alarm{
-  public void alarm(List<String> infos) {
+  public void alarm(List<StockUpDownPowerMsg> infos) {
     Iterator<Session> sessions=WebSocketServer.connections.iterator();
     while(sessions.hasNext()){
       Session session=sessions.next();
       if(session.isOpen()){
         try {
-          session.getBasicRemote().sendText(StringUtils.join(infos, "\r\n"));
+          if(infos.size()>0){
+            Gson gson=new Gson();
+            session.getBasicRemote().sendText(gson.toJson(infos));
+          }
         } catch (IOException e) {
           e.printStackTrace();
           sessions.remove();
