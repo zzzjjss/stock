@@ -2,6 +2,7 @@ package com.uf.stock.restful.bean;
 
 public class LowPriceBuyStrategyResponseData {
   private String stockName;
+  private String stockSymbol;
   private float alarmBuyPrice=0.0f;
   private float alarmSellPrice=0.0f;
   private float downPercent=0.0f;
@@ -28,6 +29,12 @@ public class LowPriceBuyStrategyResponseData {
   }
   public void setDownPercent(float downPercent) {
     this.downPercent = downPercent;
+  }
+  public String getStockSymbol() {
+    return stockSymbol;
+  }
+  public void setStockSymbol(String stockSymbol) {
+    this.stockSymbol = stockSymbol;
   }
  
 }

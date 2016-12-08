@@ -254,7 +254,9 @@
 							+ "/lowPriceBuyStrategy/getStocksDownPercent",
 					"columns" : [ {
 						title : "股票名称",
-						data : "stockName"
+						render:function(cellData, type,rowData, meta){
+							return '<a  target="_blank" href="http://q.stock.sohu.com/cn/'+rowData.stockSymbol.substring(2)+'/index.shtml">'+rowData.stockName+'</a>'
+						}
 					}, {
 						title : "买价",
 						data : "alarmBuyPrice"

@@ -75,6 +75,7 @@ private StockAnalysisService analyseService=SpringBeanFactory.getBean(StockAnaly
           bd = bd.setScale(2, RoundingMode.HALF_UP);
           rsData.setDownPercent(bd.floatValue());
           rsData.setStockName(alarm.getStockName());
+          rsData.setStockSymbol(symbol);
           data.add(rsData);
         }
       }
