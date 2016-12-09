@@ -47,7 +47,7 @@ public class Monitor extends Thread {
                 msg.setStockSymbol(power.getTradeInfo().getStockSymbol());
                 msgs.add(msg);
               }
-              if (!power.isUpPower() && power.getUpdownPowerValue() > 1 && power.getTradeInfo().getUpDownRate() < -1) {
+              if (!power.isUpPower() && power.getUpdownPowerValue() > 1 && power.getTradeInfo().getUpDownRate() < -2) {
                 StockUpDownPowerMsg msg = new StockUpDownPowerMsg();
                 msg.setIsUpPower(false);
                 msg.setPower(power.getUpdownPowerValue());

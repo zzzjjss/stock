@@ -11,5 +11,5 @@ public interface StockTradeInfoDao extends CommonDao<StockTradeInfo>{
   public Float calculateDaysHighestPriceBeforeDate(int days,Date date,Integer stockCode);
   public Float calculateDaysLowestPriceBeforeDate(int days,Date date,Integer stockCode);
   public Float calculateAveragePriceBeforeDate(int limit,Date date,Integer stockCode);
-  
+  public int exrightBeforeDate(Integer stockCode,Date date,Float exPercent);
 }

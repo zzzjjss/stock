@@ -26,21 +26,22 @@ public class SynchronizerTest {
      float maxDownPercent=30;
     
     DataSyncService service=SpringBeanFactory.getBean(DataSyncService.class);
-    List<StockInfo> stocks=service.findStocksPeRatioBetween(minPeRatio,maxPeRation);
-    stocks=service.findStocksPeRatioBetween(minPeRatio,maxPeRation);
-    
-    List<UpDownPower> powers=service.calculateStocksCurrentPower(stocks);
-    Collections.sort(powers);
-    for(UpDownPower power:powers){
-      
-      AlarmStock alarm=service.findAlarmStockInfoByStockCode(StockUtil.parseStockSymbolToStockCode(power.getTradeInfo().getStockSymbol()));
-      float  downPercent=((power.getTradeInfo().getClosePrice()-alarm.getAlarmBuyPrice())/power.getTradeInfo().getClosePrice())*100;
-      if(power.getTradeInfo().getUpDownRate()<1||downPercent>maxDownPercent){
-        continue;
-      }
-        
-      System.out.println(power.toString()+":  "+downPercent+"%");
-    }
+    service.syncStockTradeInfos("sz002565");
+//    List<StockInfo> stocks=service.findStocksPeRatioBetween(minPeRatio,maxPeRation);
+//    stocks=service.findStocksPeRatioBetween(minPeRatio,maxPeRation);
+//    
+//    List<UpDownPower> powers=service.calculateStocksCurrentPower(stocks);
+//    Collections.sort(powers);
+//    for(UpDownPower power:powers){
+//      
+//      AlarmStock alarm=service.findAlarmStockInfoByStockCode(StockUtil.parseStockSymbolToStockCode(power.getTradeInfo().getStockSymbol()));
+//      float  downPercent=((power.getTradeInfo().getClosePrice()-alarm.getAlarmBuyPrice())/power.getTradeInfo().getClosePrice())*100;
+//      if(power.getTradeInfo().getUpDownRate()<1||downPercent>maxDownPercent){
+//        continue;
+//      }
+//        
+//      System.out.println(power.toString()+":  "+downPercent+"%");
+//    }
    // service.syncAllStocksBaseInfo();
     //syn.syncStocksCurrentTradeInfo(Arrays.asList("603005"));
     //List<StockInfo> result=syn.syncAllStocksInfo();
@@ -48,16 +49,16 @@ public class SynchronizerTest {
   }
   @Test
   public void testSoHuSync(){
-    ConfigInfo config=SpringBeanFactory.getBean(ConfigInfo.class);
-    SoHuDataSynchronizer syn=new SoHuDataSynchronizer(config);
-    DateFormat format = new SimpleDateFormat("yyyyMMdd");
-    try {
-      List<StockTradeInfo> datas=syn.syncStockDateTradeInfos("sz300146", format.parse("20140214"), format.parse("20140314"));
-      System.out.println(datas.size());
-    } catch (Exception e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+//    ConfigInfo config=SpringBeanFactory.getBean(ConfigInfo.class);
+//    SoHuDataSynchronizer syn=new SoHuDataSynchronizer(config);
+//    DateFormat format = new SimpleDateFormat("yyyyMMdd");
+//    try {
+//      List<StockTradeInfo> datas=syn.syncStockDateTradeInfos("sz300146", format.parse("20140214"), format.parse("20140314"));
+//      System.out.println(datas.size());
+//    } catch (Exception e) {
+//      // TODO Auto-generated catch block
+//      e.printStackTrace();
+//    }
   }
 
 }

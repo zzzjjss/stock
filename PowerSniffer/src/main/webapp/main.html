@@ -255,7 +255,8 @@
 					"columns" : [ {
 						title : "股票名称",
 						render:function(cellData, type,rowData, meta){
-							return '<a  target="_blank" href="http://q.stock.sohu.com/cn/'+rowData.stockSymbol.substring(2)+'/index.shtml">'+rowData.stockName+'</a>'
+							//return '<a  target="_blank" href="http://q.stock.sohu.com/cn/'+rowData.stockSymbol.substring(2)+'/index.shtml">'+rowData.stockName+'</a>'
+							return '<a  target="_blank" href="http://finance.sina.com.cn/realstock/company/'+rowData.stockSymbol+'/nc.shtml">'+rowData.stockName+'</a>'
 						}
 					}, {
 						title : "买价",
@@ -289,7 +290,8 @@
 									{
 										title : "股票名称",
 										render:function(cellData, type,rowData, meta){
-											return '<a  target="_blank" href="http://q.stock.sohu.com/cn/'+rowData.stockSymbol.substring(2)+'/index.shtml">'+rowData.stockName+'</a>'
+//											return '<a  target="_blank" href="http://q.stock.sohu.com/cn/'+rowData.stockSymbol.substring(2)+'/index.shtml">'+rowData.stockName+'</a>'
+											return '<a  target="_blank" href="http://finance.sina.com.cn/realstock/company/'+rowData.stockSymbol+'/nc.shtml">'+rowData.stockName+'</a>'
 										}
 									},
 									{

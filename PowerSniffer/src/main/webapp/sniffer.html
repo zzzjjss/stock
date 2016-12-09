@@ -54,7 +54,8 @@ function refreshDashboard(alarmDatas){
 		}else{
 			upDown="Down";
 		}
-		$("#dashboard").append('<span id="'+stock.stockSymbol+'"><a  target="_blank" href="http://q.stock.sohu.com/cn/'+stock.stockSymbol.substring(2)+'/index.shtml">'+stock.stockName+'</a>--->'+upDown+'--->'+stock.power+'<br></span>');
+		//$("#dashboard").append('<span id="'+stock.stockSymbol+'"><a  target="_blank" href="http://q.stock.sohu.com/cn/'+stock.stockSymbol.substring(2)+'/index.shtml">'+stock.stockName+'</a>--->'+upDown+'--->'+stock.power+'<br></span>');
+		$("#dashboard").append('<span id="'+stock.stockSymbol+'"><a  target="_blank" href="http://finance.sina.com.cn/realstock/company/'+stock.stockSymbol+'/nc.shtml">'+stock.stockName+'</a>--->'+upDown+'--->'+stock.power+'<br></span>');
 	}
 }
 </script>

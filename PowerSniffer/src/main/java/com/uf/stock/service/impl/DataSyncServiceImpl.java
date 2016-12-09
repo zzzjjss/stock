@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -231,8 +232,19 @@ public class DataSyncServiceImpl implements DataSyncService {
         tradeInfos = dataSyncher.syncStockDateTradeInfos(stockSymbol, start, end);
         logger.info("start:"+startDate.toString()+" to  end:"+end.toString()+" ,result:"+tradeInfos.size()+" stockSymbol:"+stockSymbol);
         if (tradeInfos != null && tradeInfos.size() > 0) {
+          StockTradeInfo beforeTradeInfo=latestTi;
+          Collections.sort(tradeInfos);
           for (StockTradeInfo info : tradeInfos) {
-            tradeInfoDao.insert(info);
+//            System.out.println(format.format(info.getTradeDate()));
+            if(beforeTradeInfo!=null){
+              float downPercent=(beforeTradeInfo.getClosePrice()-info.getOpenPrice())/beforeTradeInfo.getClosePrice();
+              if(downPercent>=0.2){
+                logger.info(stockSymbol+" is ex-right ,the ex-right date is "+format.format(info.getTradeDate()));
+                tradeInfoDao.exrightBeforeDate(info.getStock().getCode(), info.getTradeDate(), downPercent);
+              }
+            }
+           tradeInfoDao.insert(info);
+           beforeTradeInfo=info;
             totalRecord++;
           }
         }

@@ -2,7 +2,7 @@ package com.uf.stock.data.bean;
 
 import java.util.Date;
 
-public class StockTradeInfo {
+public class StockTradeInfo implements Comparable<StockTradeInfo>{
   private Long id;
   private Date tradeDate;
   private Float openPrice;
@@ -120,6 +120,14 @@ public class StockTradeInfo {
 
   public void setStock(StockInfo stock) {
     this.stock = stock;
+  }
+
+  @Override
+  public int compareTo(StockTradeInfo o) {
+    if(this.tradeDate!=null&&o.getTradeDate()!=null){
+      return (int)(this.tradeDate.getTime()-o.getTradeDate().getTime()); 
+    }
+    return 0;
   }
 
 }

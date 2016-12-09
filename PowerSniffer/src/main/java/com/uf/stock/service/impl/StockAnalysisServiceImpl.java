@@ -23,6 +23,7 @@ public class StockAnalysisServiceImpl implements StockAnalysisService {
 	private StockTradeInfoDao tradeInfoDao;
 	@Autowired
 	private StockInfoDao stockInfoDao;
+  private Calendar instance;
 	
 	public Boolean calculateStockIsDayAverageGoldX(StockInfo stock,int shortTerm,int mediumTerm ,int longTerm){
 		Calendar calen=Calendar.getInstance();
@@ -78,6 +79,21 @@ public class StockAnalysisServiceImpl implements StockAnalysisService {
       return downPercent;
     }
     return null;
+  }
+  @Override
+  public Boolean isDayAverageGoldX(StockInfo stock, Date date, int shortTerm, int longTerm) {
+    Calendar calen = Calendar.getInstance();
+    calen.setTime(date);
+    calen.add(Calendar.DATE, -1);
+    Date before = calen.getTime();
+    Float beforeShortAvg = tradeInfoDao.calculateAveragePriceBeforeDate(shortTerm, before, stock.getCode());
+    Float beforeMedAvg = tradeInfoDao.calculateAveragePriceBeforeDate(longTerm, before, stock.getCode());
+    Float shortAvg = tradeInfoDao.calculateAveragePriceBeforeDate(shortTerm, date, stock.getCode());
+    Float medAvg = tradeInfoDao.calculateAveragePriceBeforeDate(longTerm, date,stock.getCode());
+    if (shortAvg > medAvg && beforeShortAvg <= beforeMedAvg) {
+      return true;
+    }
+    return false;
   }
 
 }

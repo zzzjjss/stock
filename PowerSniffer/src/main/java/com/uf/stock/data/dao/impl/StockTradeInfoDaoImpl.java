@@ -57,6 +57,15 @@ public Float calculateDaysLowestPriceBeforeDate(int limit, Date date, Integer st
   return (Float)query.uniqueResult();
 }
 
+@Override
+public int exrightBeforeDate(Integer stockCode, Date date,Float exPercent) {
+  HibernateTemplate temp=this.getHibernateTemplate();
+  SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd");
+  SQLQuery query=temp.getSessionFactory().getCurrentSession().createSQLQuery("update stock_trade_info set open_price=open_price*"+exPercent+",close_price=close_price*"+exPercent+",highest_price=highest_price*"+exPercent+",lowest_price=lowest_price*"+exPercent+"  where stock_code="+stockCode+" and trade_date <'"+format.format(date)+"'");
+  return query.executeUpdate();
+}
+
+
 
 
 
