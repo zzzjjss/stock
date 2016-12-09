@@ -95,5 +95,15 @@ public class StockAnalysisServiceImpl implements StockAnalysisService {
     }
     return false;
   }
+  @Override
+  public int howManyDaysToTargetPrice(String stockSymbol,Date fromDate, float targetPrice) {
+    List<StockTradeInfo> result= tradeInfoDao.findLimitByHql("from StockTradeInfo s where s.stockSymbol=? and  s.tradeDate>? and s.highestPrice>=? order by s.tradeDate asc",1, stockSymbol,fromDate,targetPrice);
+    if(result!=null&&result.size()>0){
+      StockTradeInfo info=result.get(0);
+      long targetTime=info.getTradeDate().getTime();
+      return (int)((targetTime-fromDate.getTime())/(1000*3600*24));
+    }
+    return 0;
+  }
 
 }

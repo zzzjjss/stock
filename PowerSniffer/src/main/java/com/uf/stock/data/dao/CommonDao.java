@@ -11,5 +11,6 @@ public interface CommonDao<T> {
 	public List<T> findAll(Class<T> entity);
 	public void saveOrUpdate(T obj);
 	public List<T> findByHql(String hql, Object... paramValues);
+	public List<T> findLimitByHql(String hql, int limit,Object... paramValues);
 	public Integer executeUpdateHql(final String hql, final Object... paramValues);
 }

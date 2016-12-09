@@ -31,7 +31,11 @@ public Float calculateAveragePriceBeforeDate(int limit, Date date,Integer stockC
 	SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd");
 	SQLQuery query=temp.getSessionFactory().getCurrentSession().createSQLQuery("select avg(close_price) from (select * from stock_trade_info where  stock_code="+stockCode+" and trade_date <='"+format.format(date)+"' order by trade_date desc  limit "+limit+") as a;");
 	Double avg=(Double)query.uniqueResult();
-	return avg.floatValue();
+	if(avg!=null){
+	  return avg.floatValue();
+	}else{
+	  return 0f;
+	}
 }
 
 @Override

@@ -1,5 +1,6 @@
 package com.uf.stock.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -19,4 +20,7 @@ public interface DataSyncService {
     public int syncStockTradeInfos(String stockSymbol);
     public int syncAllStocksTradeInfo();
     public String transToStockSymbolFromStockCode(Integer stockCode);
+    public StockTradeInfo findOldestStockTradeInfo(Integer stockCode);
+    public StockInfo findStockInfoByStockSymbol(String stockSymbol);
+    public StockTradeInfo findOneDayTradeInfo(Integer stockCode,Date date);
 }

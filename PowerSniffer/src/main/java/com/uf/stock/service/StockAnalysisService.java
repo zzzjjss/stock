@@ -12,5 +12,5 @@ public interface StockAnalysisService {
 	public Boolean isDayAverageGoldX(StockInfo stock,Date date,int shortTerm,int longTerm);
 	public Float calculateStockPeriodicToLowestPriceDownPercent(StockInfo stock,int periodicDays);
 	public StockStage analyseStockStage(List<StageDefinition> stageDefines,StockInfo stock);
-	
+	public int howManyDaysToTargetPrice(String stockSymbol,Date fromDate, float targetPrice);
 }

@@ -307,4 +307,31 @@ public List<StockInfo> findStocksInMonitor() {
   return (List<StockInfo>)stockInfoDao.findByHql("from StockInfo s where s.isInAlarmMonitor=?", true);
 }
 
+@Override
+public StockTradeInfo findOldestStockTradeInfo(Integer stockCode) {
+  List<StockTradeInfo> infos=tradeInfoDao.findLimitByHql("from StockTradeInfo t where t.stock.code=? order by t.tradeDate asc", 1, stockCode);
+  if(infos!=null&&infos.size()>0){
+    return infos.get(0);
+  }
+  return null;
+}
+
+@Override
+public StockInfo findStockInfoByStockSymbol(String stockSymbol) {
+  List<StockInfo> stocks=(List<StockInfo>)stockInfoDao.findByHql("from StockInfo s where s.symbol=?",stockSymbol);
+  if(stocks!=null&&stocks.size()>0){
+    return stocks.get(0);
+  }
+  return null;
+}
+
+@Override
+public StockTradeInfo findOneDayTradeInfo(Integer stockCode, Date date) {
+  List<StockTradeInfo> infos=tradeInfoDao.findLimitByHql("from StockTradeInfo t where t.stock.code=? and t.tradeDate=?", 1, stockCode,date);
+  if(infos!=null&&infos.size()>0){
+    return infos.get(0);
+  }
+  return null;
+}
+
 }

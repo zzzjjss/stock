@@ -1,5 +1,7 @@
 package com.uf.stock.sniffer;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,5 +37,17 @@ public class AnalysisServiceTest {
 //    stock.setSymbol("sz000055");
 //    analyseService.analyseCurrentStockStage(stock, 30);
   }
-
+  @Test
+  public void testHowManyDaysToTargetPrice(){
+    StockAnalysisService analyseService=SpringBeanFactory.getBean(StockAnalysisService.class);
+    SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd");
+    
+    try {
+      int days=analyseService.howManyDaysToTargetPrice("sz002565", format.parse("2014-04-25"), 100.0f);
+      System.out.println(days);
+    } catch (ParseException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
 }
