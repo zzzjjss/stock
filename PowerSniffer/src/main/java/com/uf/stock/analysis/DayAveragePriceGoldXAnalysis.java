@@ -41,7 +41,7 @@ public class DayAveragePriceGoldXAnalysis {
       }
       if(hitNum+nohitNum!=0){
         System.out.println("hitNum:"+hitNum+" noHitNum:"+nohitNum);
-        return hitNum/(hitNum+nohitNum);
+        return (float)((float)hitNum/(float)(hitNum+nohitNum));
       }else{
         return 0f;
       }
