@@ -11,6 +11,7 @@ import com.uf.stock.data.bean.StockInfo;
 import com.uf.stock.data.bean.StockTradeInfo;
 import com.uf.stock.data.dao.StockInfoDao;
 import com.uf.stock.data.dao.StockTradeInfoDao;
+import com.uf.stock.service.DataSyncService;
 import com.uf.stock.service.StockAnalysisService;
 import com.uf.stock.service.bean.StableStage;
 import com.uf.stock.service.bean.StableStageDefinition;
@@ -23,8 +24,8 @@ public class StockAnalysisServiceImpl implements StockAnalysisService {
 	private StockTradeInfoDao tradeInfoDao;
 	@Autowired
 	private StockInfoDao stockInfoDao;
-  private Calendar instance;
-	
+	@Autowired
+	private DataSyncService service;
 	public Boolean calculateStockIsDayAverageGoldX(StockInfo stock,int shortTerm,int mediumTerm ,int longTerm){
 		Calendar calen=Calendar.getInstance();
 		StockTradeInfo latestInfo=tradeInfoDao.findLatestDateStockTradeInfo(stock.getSymbol());
@@ -105,5 +106,16 @@ public class StockAnalysisServiceImpl implements StockAnalysisService {
     }
     return 0;
   }
+@Override
+public Boolean isPowerUp(StockInfo stock, Date date) {
+	StockTradeInfo tradeInfo=service.findOneDayTradeInfo(stock.getCode(), date);	
+	if(tradeInfo!=null&&tradeInfo.getUpDownRate()>0){
+		float power=tradeInfo.getUpDownRate()/tradeInfo.getTurnoverRate();
+		if(power>2){
+			return true;
+		}
+	}
+	return false;
+}
 
 }

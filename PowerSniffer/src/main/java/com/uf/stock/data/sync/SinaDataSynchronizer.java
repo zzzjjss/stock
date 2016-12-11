@@ -70,6 +70,7 @@ public class SinaDataSynchronizer {
         String responseContent = EntityUtils.toString(response.getEntity());
         if (responseContent != null && responseContent.length() > 1) {
           String jsonStr = responseContent.substring(1, responseContent.length() - 1);
+          System.out.println(jsonStr);
           JsonParser parser = new JsonParser();
           JsonElement root = parser.parse(jsonStr);
           JsonArray items = root.getAsJsonObject().get("items").getAsJsonArray();
@@ -90,7 +91,7 @@ public class SinaDataSynchronizer {
           }
           totalPage = root.getAsJsonObject().get("page_total").getAsInt();
           pageIndex++;
-          // System.out.println(jsonStr);
+          Thread.sleep(1000);
         } else {
           break;
         }

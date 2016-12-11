@@ -1,5 +1,6 @@
 package com.uf.stock.analysis;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -13,7 +14,8 @@ public class DayAveragePriceGoldXAnalysis {
     private StockAnalysisService analyseService=SpringBeanFactory.getBean(StockAnalysisService.class);
     private DataSyncService service=SpringBeanFactory.getBean(DataSyncService.class);
     public float analyseAccuracy(){
-      TargetDefinition targetDefinition=new TargetDefinition(7,0.01f);
+      TargetDefinition targetDefinition=new TargetDefinition(7,0.05f);
+      SimpleDateFormat formate=new SimpleDateFormat("yyyy-MM-dd");
       int hitNum=0,nohitNum=0;
       StockInfo stock=service.findStockInfoByStockSymbol("sz002565");
       StockTradeInfo info=service.findOldestStockTradeInfo(stock.getCode());
@@ -23,13 +25,14 @@ public class DayAveragePriceGoldXAnalysis {
         ca.setTime(begin);
         Date now=new Date();
         while(ca.getTime().getTime()<now.getTime()){
-          System.out.println(ca.getTime());
-          boolean isPoint=analyseService.isDayAverageGoldX(stock, ca.getTime(), 5, 10);
-          if(isPoint){
-            System.out.println("isGoldX day:"+ca.getTime());
+        	boolean isPoint1=analyseService.isDayAverageGoldX(stock, ca.getTime(), 2, 5);
+        	boolean isPoint2=analyseService.isPowerUp(stock, ca.getTime());
+          if(isPoint1&&isPoint2){
+            System.out.println("DOUBLE point:"+formate.format(ca.getTime()));
             float closePrice=service.findOneDayTradeInfo(stock.getCode(), ca.getTime()).getClosePrice();
             float targetPrice=closePrice*(1+targetDefinition.getUpPercent());
             int days=analyseService.howManyDaysToTargetPrice(stock.getSymbol(), ca.getTime(), targetPrice);
+            System.out.println("days:"+days);
             if(days<=targetDefinition.getDays()){
               hitNum++;
             }else{
