@@ -334,4 +334,24 @@ public StockTradeInfo findOneDayTradeInfo(Integer stockCode, Date date) {
   return null;
 }
 
+@Override
+public float calculateAvgPriceBeforeDate(Integer stockCode, Date date) {
+  return tradeInfoDao.calculateAvgPriceBeforeDate(stockCode, date);
+}
+
+@Override
+public void setAlarmStock(StockInfo stock) {
+  float lowest=tradeInfoDao.calculateLowestPrice(stock.getCode());
+  AlarmStock  alarm=alarmStockDao.findByStockCode(stock.getCode());
+  if(alarm!=null){
+    alarm.setAlarmBuyPrice(lowest);
+  }else{
+    alarm=new AlarmStock();
+    alarm.setAlarmBuyPrice(lowest);
+    alarm.setStockCode(stock.getCode());
+    alarm.setStockName(stock.getName());
+  }
+  alarmStockDao.saveOrUpdate(alarm);
+}
+
 }

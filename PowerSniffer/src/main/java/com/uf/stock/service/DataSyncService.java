@@ -23,4 +23,6 @@ public interface DataSyncService {
     public StockTradeInfo findOldestStockTradeInfo(Integer stockCode);
     public StockInfo findStockInfoByStockSymbol(String stockSymbol);
     public StockTradeInfo findOneDayTradeInfo(Integer stockCode,Date date);
+    public float calculateAvgPriceBeforeDate(Integer stockCode,Date date);
+    public void setAlarmStock(StockInfo stock);
 }

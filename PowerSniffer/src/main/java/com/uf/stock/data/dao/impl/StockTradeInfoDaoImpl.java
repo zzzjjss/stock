@@ -69,6 +69,56 @@ public int exrightBeforeDate(Integer stockCode, Date date,Float exPercent) {
   return query.executeUpdate();
 }
 
+@Override
+public float calculateAvgPriceBeforeDate(Integer stockCode, Date date) {
+  HibernateTemplate temp=this.getHibernateTemplate();
+  SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd");
+  SQLQuery query=temp.getSessionFactory().getCurrentSession().createSQLQuery("select avg(close_price) from stock_trade_info where  stock_code="+stockCode+" and trade_date <='"+format.format(date)+"'");
+  Double avg=(Double)query.uniqueResult();
+  if(avg!=null){
+    return avg.floatValue();
+  }else{
+    return 0f;
+  }  
+}
+
+@Override
+public float calculateLowestPrice(Integer stockCode) {
+  HibernateTemplate temp=this.getHibernateTemplate();
+  SQLQuery query=temp.getSessionFactory().getCurrentSession().createSQLQuery("select min(lowest_price) from stock_trade_info where  stock_code="+stockCode);
+  Float lowest=(Float)query.uniqueResult();
+  if(lowest!=null){
+    return lowest.floatValue();
+  }else{
+    return 0f;
+  }
+}
+
+@Override
+public float calculateLowestPriceBeforeDate(Integer stockCode, Date date) {
+  HibernateTemplate temp=this.getHibernateTemplate();
+  SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd");
+  SQLQuery query=temp.getSessionFactory().getCurrentSession().createSQLQuery("select min(lowest_price) from stock_trade_info where  stock_code="+stockCode+" and trade_date <='"+format.format(date)+"'");
+  Float lowest=(Float)query.uniqueResult();
+  if(lowest!=null){
+    return lowest.floatValue();
+  }else{
+    return 0f;
+  }
+}
+
+@Override
+public float calculateAvgTurnoverRate(Integer stockCode) {
+  HibernateTemplate temp=this.getHibernateTemplate();
+  SQLQuery query=temp.getSessionFactory().getCurrentSession().createSQLQuery("select avg(turnover_rate) from stock_trade_info where  stock_code="+stockCode);
+  Double avg=(Double)query.uniqueResult();
+  if(avg!=null){
+    return avg.floatValue();
+  }else{
+    return 0f;
+  }  
+}
+
 
 
 

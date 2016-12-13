@@ -26,7 +26,7 @@ public class SynchronizerTest {
      float maxDownPercent=30;
     
     DataSyncService service=SpringBeanFactory.getBean(DataSyncService.class);
-    service.syncStockTradeInfos("sz002565");
+    //service.syncStockTradeInfos("sz002565");
 //    List<StockInfo> stocks=service.findStocksPeRatioBetween(minPeRatio,maxPeRation);
 //    stocks=service.findStocksPeRatioBetween(minPeRatio,maxPeRation);
 //    
@@ -59,6 +59,14 @@ public class SynchronizerTest {
 //      // TODO Auto-generated catch block
 //      e.printStackTrace();
 //    }
+  }
+  @Test
+  public void testSetAlarmStock(){
+    DataSyncService service=SpringBeanFactory.getBean(DataSyncService.class);
+    List<StockInfo> stocks=service.findStocksPeRatioBetween(-1f, Float.MAX_VALUE);
+    for(StockInfo info:stocks){
+      service.setAlarmStock(info);
+    }
   }
 
 }

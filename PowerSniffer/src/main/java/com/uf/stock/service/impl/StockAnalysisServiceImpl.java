@@ -109,13 +109,42 @@ public class StockAnalysisServiceImpl implements StockAnalysisService {
 @Override
 public Boolean isPowerUp(StockInfo stock, Date date) {
 	StockTradeInfo tradeInfo=service.findOneDayTradeInfo(stock.getCode(), date);	
+//	if(tradeInfo!=null&&tradeInfo.getTurnoverRate()>tradeInfoDao.calculateAvgTurnoverRate(stock.getCode())&&tradeInfo.getUpDownRate()>0){
+//	  float lowest=tradeInfoDao.calculateLowestPriceBeforeDate(stock.getCode(),date);
+//	  float downPercent=(tradeInfo.getClosePrice()-lowest)/tradeInfo.getClosePrice();
+//	  if(downPercent<0.2){
+//	    return true;
+//	  }
+//	}
 	if(tradeInfo!=null&&tradeInfo.getUpDownRate()>0){
 		float power=tradeInfo.getUpDownRate()/tradeInfo.getTurnoverRate();
-		if(power>2){
+		System.out.println("power:"+power);
+		if(power>2.5){
 			return true;
 		}
 	}
 	return false;
+}
+@Override
+public Boolean isCurrentAtLowPrice(StockInfo stock, Date date) {
+ StockTradeInfo tradeInfo=service.findOneDayTradeInfo(stock.getCode(), date);
+//  if(tradeInfo!=null&&tradeInfo.getUpDownRate()>0){
+//    float lowest=tradeInfoDao.calculateLowestPriceBeforeDate(stock.getCode(),date);
+//    float downPercent=(tradeInfo.getClosePrice()-lowest)/tradeInfo.getClosePrice();
+//    if(downPercent<0.2){
+//      return true;
+//    }
+//  }
+//  return false;
+  if(tradeInfo!=null){
+    Float avg=tradeInfoDao.calculateAvgPriceBeforeDate( stock.getCode(),date);
+    if(avg!=null&&avg.floatValue()!=0&&tradeInfo.getClosePrice()<avg.floatValue()){
+      return true;
+    }else{
+      return false;
+    }
+  }
+  return false;
 }
 
 }
