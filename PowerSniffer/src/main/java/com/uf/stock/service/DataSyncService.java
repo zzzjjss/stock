@@ -18,7 +18,6 @@ public interface DataSyncService {
     public List<UpDownPower> calculateStocksCurrentPower(List<StockInfo> stocks);
     public Map<String, StockTradeInfo> getCurrentStocksTradeInfo(List<String> stockSymbols);
     public int syncStockTradeInfos(String stockSymbol);
-    public int syncAllStocksTradeInfo();
     public String transToStockSymbolFromStockCode(Integer stockCode);
     public StockTradeInfo findOldestStockTradeInfo(Integer stockCode);
     public StockInfo findStockInfoByStockSymbol(String stockSymbol);

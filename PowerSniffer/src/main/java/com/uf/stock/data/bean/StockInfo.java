@@ -11,6 +11,7 @@ public class StockInfo {
 	private Float totalAAmount;
 	private Float peRatio;
 	private boolean isInAlarmMonitor;
+	private Float alarmSellPrice;
 	private Float downPercentToLowest;
 
 	public Float getPeRatio() {
@@ -68,5 +69,13 @@ public class StockInfo {
 	public void setIsInAlarmMonitor(boolean isInAlarmMonitor) {
 		this.isInAlarmMonitor = isInAlarmMonitor;
 	}
+
+  public Float getAlarmSellPrice() {
+    return alarmSellPrice;
+  }
+
+  public void setAlarmSellPrice(Float alarmSellPrice) {
+    this.alarmSellPrice = alarmSellPrice;
+  }
 	
 }

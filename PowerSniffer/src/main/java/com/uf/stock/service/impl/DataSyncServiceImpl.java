@@ -273,7 +273,6 @@ public String transToStockSymbolFromStockCode(Integer stockCode) {
 	return symbol;
 }
 
-@Override
 public int syncAllStocksTradeInfo() {
 	
 	int syncTotalCount=0;

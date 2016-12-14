@@ -8,10 +8,10 @@ import javax.websocket.Session;
 
 import com.google.gson.Gson;
 import com.uf.stock.sniffer.alarm.Alarm;
-import com.uf.stock.sniffer.alarm.bean.StockUpDownPowerMsg;
+import com.uf.stock.sniffer.alarm.bean.StockBuySellAlarmMsg;
 
 public class WebAlarm implements Alarm{
-  public void alarm(List<StockUpDownPowerMsg> infos) {
+  public void alarm(List<StockBuySellAlarmMsg> infos) {
     Iterator<Session> sessions=WebSocketServer.connections.iterator();
     while(sessions.hasNext()){
       Session session=sessions.next();

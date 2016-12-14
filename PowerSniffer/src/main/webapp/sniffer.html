@@ -39,7 +39,7 @@ function refreshDashboard(alarmDatas){
 	for(var i=0;i<alarmDatas.length;i++){
 		var stock=alarmDatas[i];
 		if($("span[id="+stock.stockSymbol+"]").length==0){
-			alertMsg=alertMsg+","+stock.stockSymbol;
+			alertMsg=alertMsg+stock.msgType+":"+stock.stockSymbol+"\n";
 		}	
 	}
 	if(alertMsg!=""){
@@ -48,14 +48,8 @@ function refreshDashboard(alarmDatas){
 	$("#dashboard span").remove();
 	for(var i=0;i<alarmDatas.length;i++){
 		var stock=alarmDatas[i];
-		var upDown;
-		if(stock.isUpPower){
-			upDown="Up";
-		}else{
-			upDown="Down";
-		}
 		//$("#dashboard").append('<span id="'+stock.stockSymbol+'"><a  target="_blank" href="http://q.stock.sohu.com/cn/'+stock.stockSymbol.substring(2)+'/index.shtml">'+stock.stockName+'</a>--->'+upDown+'--->'+stock.power+'<br></span>');
-		$("#dashboard").append('<span id="'+stock.stockSymbol+'"><a  target="_blank" href="http://finance.sina.com.cn/realstock/company/'+stock.stockSymbol+'/nc.shtml">'+stock.stockName+'</a>--->'+upDown+'--->'+stock.power+'<br></span>');
+		$("#dashboard").append('<span id="'+stock.stockSymbol+'"><a  target="_blank" href="http://finance.sina.com.cn/realstock/company/'+stock.stockSymbol+'/nc.shtml">'+stock.stockName+'</a>--->'+stock.msgType+'<br></span>');
 	}
 }
 </script>

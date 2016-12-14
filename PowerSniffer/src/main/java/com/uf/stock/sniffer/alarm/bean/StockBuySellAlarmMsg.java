@@ -1,10 +1,9 @@
 package com.uf.stock.sniffer.alarm.bean;
 
-public class StockUpDownPowerMsg {
+public class StockBuySellAlarmMsg {
   private String stockName;
   private String stockSymbol;
-  private Float power;
-  private Boolean isUpPower;
+  private AlarmMsgType msgType;
   public String getStockName() {
     return stockName;
   }
@@ -17,17 +16,12 @@ public class StockUpDownPowerMsg {
   public void setStockSymbol(String stockSymbol) {
     this.stockSymbol = stockSymbol;
   }
-  public Float getPower() {
-    return power;
+  public AlarmMsgType getMsgType() {
+    return msgType;
   }
-  public void setPower(Float power) {
-    this.power = power;
+  public void setMsgType(AlarmMsgType msgType) {
+    this.msgType = msgType;
   }
-  public Boolean getIsUpPower() {
-    return isUpPower;
-  }
-  public void setIsUpPower(Boolean isUpPower) {
-    this.isUpPower = isUpPower;
-  }
+  
   
 }
