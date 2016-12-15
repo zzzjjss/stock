@@ -46,7 +46,7 @@ public class Monitor extends Thread {
             List<StockBuySellAlarmMsg> msgs = new ArrayList<StockBuySellAlarmMsg>();
             for (UpDownPower power : powers) {
               String symbol=power.getTradeInfo().getStockSymbol();
-              if (power.isUpPower() && power.getUpdownPowerValue() >1.5&& power.getTradeInfo().getUpDownRate() > 1) {
+              if (power.isUpPower() && power.getUpdownPowerValue() >2&& power.getTradeInfo().getUpDownRate() > 1) {
                 StockBuySellAlarmMsg msg = new StockBuySellAlarmMsg();
                 msg.setStockName(power.getStockName());
                 msg.setStockSymbol(symbol);

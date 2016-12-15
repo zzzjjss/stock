@@ -83,15 +83,16 @@ public class StockAnalysisServiceImpl implements StockAnalysisService {
   }
   @Override
   public Boolean isDayAverageGoldX(StockInfo stock, Date date, int shortTerm, int longTerm) {
-    Calendar calen = Calendar.getInstance();
-    calen.setTime(date);
-    calen.add(Calendar.DATE, -1);
-    Date before = calen.getTime();
-    Float beforeShortAvg = tradeInfoDao.calculateAveragePriceBeforeDate(shortTerm, before, stock.getCode());
-    Float beforeMedAvg = tradeInfoDao.calculateAveragePriceBeforeDate(longTerm, before, stock.getCode());
+//    Calendar calen = Calendar.getInstance();
+//    calen.setTime(date);
+//    calen.add(Calendar.DATE, -1);
+//    Date before = calen.getTime();
+//    Float beforeShortAvg = tradeInfoDao.calculateAveragePriceBeforeDate(shortTerm, before, stock.getCode());
+//    Float beforeMedAvg = tradeInfoDao.calculateAveragePriceBeforeDate(longTerm, before, stock.getCode());
     Float shortAvg = tradeInfoDao.calculateAveragePriceBeforeDate(shortTerm, date, stock.getCode());
     Float medAvg = tradeInfoDao.calculateAveragePriceBeforeDate(longTerm, date,stock.getCode());
-    if (shortAvg > medAvg && beforeShortAvg <= beforeMedAvg) {
+//    if (shortAvg > medAvg && beforeShortAvg <= beforeMedAvg) {
+    if (shortAvg > medAvg ) {
       return true;
     }
     return false;
@@ -107,7 +108,7 @@ public class StockAnalysisServiceImpl implements StockAnalysisService {
     return 0;
   }
 @Override
-public Boolean isPowerUp(StockInfo stock, Date date) {
+public Boolean isPowerUp(StockInfo stock, Date date,float upPowerDefine) {
 	StockTradeInfo tradeInfo=service.findOneDayTradeInfo(stock.getCode(), date);	
 //	if(tradeInfo!=null&&tradeInfo.getTurnoverRate()>tradeInfoDao.calculateAvgTurnoverRate(stock.getCode())&&tradeInfo.getUpDownRate()>0){
 //	  float lowest=tradeInfoDao.calculateLowestPriceBeforeDate(stock.getCode(),date);
@@ -118,8 +119,7 @@ public Boolean isPowerUp(StockInfo stock, Date date) {
 //	}
 	if(tradeInfo!=null&&tradeInfo.getUpDownRate()>0){
 		float power=tradeInfo.getUpDownRate()/tradeInfo.getTurnoverRate();
-		System.out.println("power:"+power);
-		if(power>2.5){
+		if(power>upPowerDefine){
 			return true;
 		}
 	}

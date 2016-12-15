@@ -4,17 +4,27 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.uf.stock.analysis.filter.DayAverageGoldXFilter;
+import com.uf.stock.analysis.filter.LowPriceFilter;
+import com.uf.stock.analysis.filter.PowerUpFilter;
 import com.uf.stock.data.bean.StockInfo;
 import com.uf.stock.data.bean.StockTradeInfo;
 import com.uf.stock.service.DataSyncService;
 import com.uf.stock.service.StockAnalysisService;
 import com.uf.stock.util.SpringBeanFactory;
 
-public class DayAveragePriceGoldXAnalysis {
+public class LowPriceUpPointStatistics {
     private StockAnalysisService analyseService=SpringBeanFactory.getBean(StockAnalysisService.class);
+    private Logger logger = LogManager.getLogger(LowPriceUpPointStatistics.class);
     private DataSyncService service=SpringBeanFactory.getBean(DataSyncService.class);
+    private TargetDefinition targetDefin;
+    public LowPriceUpPointStatistics(TargetDefinition targetDefin){
+      this.targetDefin=targetDefin;
+    }
     public float analyseAccuracy(){
-      TargetDefinition targetDefinition=new TargetDefinition(7,0.03f);
       SimpleDateFormat formate=new SimpleDateFormat("yyyy-MM-dd");
       int hitNum=0,nohitNum=0;
       StockInfo stock=service.findStockInfoByStockSymbol("sz000850");
@@ -24,6 +34,10 @@ public class DayAveragePriceGoldXAnalysis {
         Calendar ca=Calendar.getInstance();
         ca.setTime(begin);
         Date now=new Date();
+        LowPriceUpStockFilterChain  chain=new LowPriceUpStockFilterChain();
+        chain.appendStockFilter(new LowPriceFilter())
+              .appendStockFilter(new PowerUpFilter(3.0f))
+             .appendStockFilter(new DayAverageGoldXFilter(2, 5));
         while(ca.getTime().getTime()<now.getTime()){
 //          StockTradeInfo tradeInfo=service.findOneDayTradeInfo(stock.getCode(), ca.getTime());
 //          if(tradeInfo!=null){
@@ -34,16 +48,14 @@ public class DayAveragePriceGoldXAnalysis {
 //              System.out.println(formate.format(ca.getTime())+"-->"+days+"-->"+tradeInfo.getTurnoverRate()+"%");
 //            }
 //          }
-            boolean isPoint1 = analyseService.isDayAverageGoldX(stock, ca.getTime(), 2, 5);
-            boolean isPoint = analyseService.isPowerUp(stock, ca.getTime());
-            boolean isPoint2 = analyseService.isCurrentAtLowPrice(stock, ca.getTime());
-            if (isPoint1&&isPoint&&isPoint2) {
-                System.out.println("Tree point:" + formate.format(ca.getTime()));
+            boolean isPass=chain.isLowPriceUpPoint(stock, ca.getTime());
+            if (isPass) {
+                logger.info("lowPrice Up  point:" + formate.format(ca.getTime()));
                 float closePrice = service.findOneDayTradeInfo(stock.getCode(), ca.getTime()).getClosePrice();
-                float targetPrice = closePrice * (1 + targetDefinition.getUpPercent());
+                float targetPrice = closePrice * (1 + targetDefin.getUpPercent());
                 int days = analyseService.howManyDaysToTargetPrice(stock.getSymbol(), ca.getTime(), targetPrice);
-                System.out.println("days:" + days);
-                if (days <= targetDefinition.getDays()) {
+                logger.info("after days:" + days+" up to targetPrice");
+                if (days <= targetDefin.getDays()) {
                   hitNum++;
                 } else {
                   nohitNum++;
@@ -53,8 +65,9 @@ public class DayAveragePriceGoldXAnalysis {
         }
       }
       if(hitNum+nohitNum!=0){
-        System.out.println("hitNum:"+hitNum+" noHitNum:"+nohitNum);
-        return (float)((float)hitNum/(float)(hitNum+nohitNum));
+        float accuracy=(float)((float)hitNum/(float)(hitNum+nohitNum));
+        logger.info("hitNum:"+hitNum+" noHitNum:"+nohitNum+" ; accuracy :"+accuracy);
+        return accuracy;
       }else{
         return 0f;
       }
