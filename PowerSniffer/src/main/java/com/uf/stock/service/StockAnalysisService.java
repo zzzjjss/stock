@@ -13,6 +13,7 @@ public interface StockAnalysisService {
 	public Boolean isCurrentAtLowPrice(StockInfo stock,Date date); 
 	public Boolean isPowerUp(StockInfo stock,Date date,float  upPowerDefine);
 	public Float calculateStockPeriodicToLowestPriceDownPercent(StockInfo stock,int periodicDays);
+	public Float calculateAvgPriceBeforeDate(Integer stockCode, Date date);
 	public StockStage analyseStockStage(List<StageDefinition> stageDefines,StockInfo stock);
 	public int howManyDaysToTargetPrice(String stockSymbol,Date fromDate, float targetPrice);
 }

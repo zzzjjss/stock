@@ -146,5 +146,9 @@ public Boolean isCurrentAtLowPrice(StockInfo stock, Date date) {
   }
   return false;
 }
+@Override
+public Float calculateAvgPriceBeforeDate(Integer stockCode, Date date){
+  return tradeInfoDao.calculateAvgPriceBeforeDate(stockCode, date);
+}
 
 }

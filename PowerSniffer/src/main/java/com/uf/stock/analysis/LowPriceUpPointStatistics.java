@@ -3,6 +3,8 @@ package com.uf.stock.analysis;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -72,5 +74,37 @@ public class LowPriceUpPointStatistics {
         return 0f;
       }
       
-    } 
+    }
+    
+    public Map<String,BuyPointStatisticsData> statisticBuypointData(String stockSymbol,Date start,Date end){
+      Map<String,BuyPointStatisticsData>  result=new HashMap<String, BuyPointStatisticsData>();
+      SimpleDateFormat formate=new SimpleDateFormat("yyyy-MM-dd");
+      StockInfo stock=service.findStockInfoByStockSymbol(stockSymbol);
+//      StockTradeInfo info=service.findOldestStockTradeInfo(stock.getCode());
+      if(start!=null){
+        Calendar ca=Calendar.getInstance();
+        ca.setTime(start);
+       
+        while(ca.getTime().getTime()<end.getTime()){
+          StockTradeInfo tradeInfo=service.findOneDayTradeInfo(stock.getCode(), ca.getTime());
+          if(tradeInfo!=null){
+            float closePrice = tradeInfo.getClosePrice();
+            float targetPrice = closePrice * (1 + targetDefin.getUpPercent());
+            int days = analyseService.howManyDaysToTargetPrice(stock.getSymbol(), ca.getTime(), targetPrice);
+            System.out.println(days);
+            if(days<=targetDefin.getDays()){
+              BuyPointStatisticsData data=new BuyPointStatisticsData();
+              float power=tradeInfo.getUpDownRate()/tradeInfo.getTurnoverRate();
+              data.setUpPower(power);
+              float avgPrice=analyseService.calculateAvgPriceBeforeDate(stock.getCode(), ca.getTime());
+              float downPercent=tradeInfo.getClosePrice()-avgPrice/tradeInfo.getClosePrice();
+              data.setDownPercentToAvgPrice(downPercent);
+              result.put(formate.format(ca.getTime()), data);
+            }
+          }
+           ca.add(Calendar.DATE, 1);
+        }
+      }
+      return result;
+    }
 }
