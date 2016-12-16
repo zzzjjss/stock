@@ -48,7 +48,14 @@ public class DataSyncServiceImpl implements DataSyncService {
   public int syncAllStocksBaseInfo() {
     List<StockInfo> stockInfo = dataSyncher.syncAllStocksInfo();
     for (StockInfo info : stockInfo) {
-      stockInfoDao.saveOrUpdate(info);
+      StockInfo old=stockInfoDao.findStockByStockCode(info.getCode());
+      if(old!=null){
+        old.setPeRatio(info.getPeRatio());
+        old.setTotalAAmount(info.getTotalAAmount());
+        stockInfoDao.update(old);
+      }else{
+        stockInfoDao.insert(info);
+      }
     }
     return stockInfo.size();
   }
