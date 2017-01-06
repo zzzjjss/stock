@@ -24,4 +24,5 @@ public interface DataSyncService {
     public StockTradeInfo findOneDayTradeInfo(Integer stockCode,Date date);
     public float calculateAvgPriceBeforeDate(Integer stockCode,Date date);
     public void setAlarmStock(StockInfo stock);
+    public List<StockTradeInfo> findTradeInfosBeforeDate(Integer stockCode,Date date,int limitDays);
 }

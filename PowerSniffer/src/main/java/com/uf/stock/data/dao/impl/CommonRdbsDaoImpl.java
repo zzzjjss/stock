@@ -10,7 +10,6 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate4.HibernateCallback;
 import org.springframework.orm.hibernate4.HibernateTemplate;
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 import com.uf.stock.data.dao.CommonDao;
 
@@ -78,5 +77,22 @@ public class CommonRdbsDaoImpl<T>  implements CommonDao<T> {
     HibernateTemplate temp=getHibernateTemplate();
     temp.setMaxResults(limit);
     return (List<T>)temp.find(hql, paramValues);
+  }
+  protected long countHqlQuery(String hql,Object... paramValue){
+    Query countQuery = getHibernateTemplate().getSessionFactory().getCurrentSession().createQuery(parseCountHql(hql));
+    if (paramValue != null && paramValue.length > 0) {
+      int position=0;
+      for (Object param : paramValue) {
+        countQuery.setParameter(position, param);
+        position++;
+      }
+    }
+    return  (Long) countQuery.list().get(0);
+  }
+  
+  private String parseCountHql(String hql) {
+    int index = hql.indexOf("from ");
+    String afterFrom = hql.substring(index);
+    return "select count(*) " + afterFrom;
   }
 }

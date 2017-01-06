@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 import com.uf.stock.bean.UpDownPower;
 import com.uf.stock.data.bean.AlarmStock;
 import com.uf.stock.data.bean.StockInfo;
@@ -338,6 +340,10 @@ public StockTradeInfo findOneDayTradeInfo(Integer stockCode, Date date) {
     return infos.get(0);
   }
   return null;
+}
+
+public List<StockTradeInfo> findTradeInfosBeforeDate(Integer stockCode,Date date,int limitDays){
+  return tradeInfoDao.findTradeInfosBeforeDate(stockCode, date, limitDays);
 }
 
 @Override

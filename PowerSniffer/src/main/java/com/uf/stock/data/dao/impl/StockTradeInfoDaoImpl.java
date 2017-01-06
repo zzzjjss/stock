@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.springframework.orm.hibernate4.HibernateTemplate;
 import org.springframework.stereotype.Component;
@@ -117,6 +118,23 @@ public float calculateAvgTurnoverRate(Integer stockCode) {
   }else{
     return 0f;
   }  
+}
+
+@Override
+public List<StockTradeInfo> findTradeInfosBeforeDate(Integer stockCode, Date date, int limitDays) {
+  HibernateTemplate temp=this.getHibernateTemplate();
+  String hql="from StockTradeInfo t where t.stock.code=? and t.tradeDate<=? order by t.tradeDate asc";
+  long count=countHqlQuery(hql, stockCode,date);
+  Query query=temp.getSessionFactory().getCurrentSession().createQuery(hql);
+  query.setMaxResults(limitDays);
+  int firstResult=0;
+  if (count>limitDays) {
+    firstResult=(int)(count-limitDays);
+  }
+  query.setFirstResult(firstResult);
+  query.setParameter(0, stockCode);
+  query.setParameter(1, date);
+  return (List<StockTradeInfo>)query.list();
 }
 
 
