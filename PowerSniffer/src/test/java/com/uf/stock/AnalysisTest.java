@@ -55,14 +55,19 @@ public class AnalysisTest {
     SimpleDateFormat  formate=new SimpleDateFormat("yyyy-MM-dd");
     //StockStageAnalysis.analyseStockSidewayIndex(603986, formate.parse("2017-01-5"));
     List<Float> indexs=new ArrayList<Float>();
+    List<Float> slowUpFastDownindexs=new ArrayList<Float>();
     for(StockInfo stock:stocks){
-      AnalysisResult result= StockStageAnalysis.periodAnalyseStock(stock.getCode(),formate.parse("2017-01-5"),30);
+      AnalysisResult result= StockStageAnalysis.periodAnalyseStock(stock.getCode(),formate.parse("2017-01-5"),30000);
       float sidewayIndex=result.calculateSidewayIndex();
+      slowUpFastDownindexs.add(result.calculateSlowUpFastDownIndex());
       indexs.add(sidewayIndex);
       System.out.println(stock.getName()+" sidewayIndex:"+sidewayIndex);
       System.out.println(stock.getName()+result.toString());
     }
     Collections.sort(indexs);
+    Collections.reverse(indexs);
+    Collections.sort(slowUpFastDownindexs);
     System.out.println(indexs);
+    System.out.println(slowUpFastDownindexs);
   }
 }

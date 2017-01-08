@@ -7,6 +7,7 @@ import com.uf.stock.data.bean.StockTradeInfo;
 
 public interface StockTradeInfoDao extends CommonDao<StockTradeInfo>{
   public StockTradeInfo  findLatestDateStockTradeInfo(String stockSymbol);
+  public StockTradeInfo  findLatestDateStockTradeInfo(Integer stockCode);
   public List<StockTradeInfo>  findLatestDaysStockTradeInfos(String stockSymbol,int days);
   public Float calculateDaysHighestPriceBeforeDate(int days,Date date,Integer stockCode);
   public Float calculateDaysLowestPriceBeforeDate(int days,Date date,Integer stockCode);
@@ -17,4 +18,5 @@ public interface StockTradeInfoDao extends CommonDao<StockTradeInfo>{
   public float calculateLowestPriceBeforeDate(Integer  stockCode,Date date);
   public int exrightBeforeDate(Integer stockCode,Date date,Float exPercent);
   public List<StockTradeInfo> findTradeInfosBeforeDate(Integer stockCode,Date date,int limitDays);
+  public Date getLatestDate();
 }

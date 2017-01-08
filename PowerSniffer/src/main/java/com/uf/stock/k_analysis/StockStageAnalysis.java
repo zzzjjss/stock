@@ -44,7 +44,7 @@ public class StockStageAnalysis {
     List<Float> tmpUp=new ArrayList<Float>();
     List<Float> tmpDown=new ArrayList<Float>();
     Boolean isUp=null;
-    float periodUpDownRate=0f,periodMaxUpDownRate=0f,periodMinUpDownRate=0f;
+    float periodUpDownRate=0f,periodMaxUpRate=0f,periodMaxDownRate=0f;
     
     SimpleDateFormat  formate=new SimpleDateFormat("yyyy-MM-dd");
     int index=0;
@@ -55,11 +55,11 @@ public class StockStageAnalysis {
         continue;
       }
       periodUpDownRate=periodUpDownRate+upDownRate;
-      if(periodUpDownRate>periodMaxUpDownRate){
-        periodMaxUpDownRate=periodUpDownRate;
+      if(periodUpDownRate>periodMaxUpRate){
+        periodMaxUpRate=periodUpDownRate;
       }
-      if (periodUpDownRate<periodMinUpDownRate) {
-        periodMinUpDownRate=periodUpDownRate;
+      if (periodUpDownRate<periodMaxDownRate) {
+        periodMaxDownRate=periodUpDownRate;
       }
       //System.out.println(formate.format(stockTradeInfo.getTradeDate())+":"+closePrice);
       if (upDownRate>0) {
@@ -111,8 +111,6 @@ public class StockStageAnalysis {
       //System.out.println("down"+Arrays.asList(floats)+" K:"+k);
     }
     
-    
-    
     Float maxUpKs=upKs.size()>0?Collections.max(upKs):0f;
     Float maxDownKs=downKs.size()>0?Collections.min(downKs):0f;
     Float upKsSum=0f,downKsSum=0f;
@@ -134,8 +132,10 @@ public class StockStageAnalysis {
     result.setAvgUpSpeed(Math.abs(avgUpKs));
     result.setAvgDownSpeed(Math.abs(avgDownKs));
     result.setUpDownRate(periodUpDownRate);
-    result.setMaxUpDownRate(periodMaxUpDownRate);
-    result.setMinUpDownRate(periodMinUpDownRate);
+    result.setMaxUpRate(periodMaxUpRate);
+    result.setMaxDownRate(periodMaxDownRate);
+    result.setDownRateToLowest(periodUpDownRate-periodMaxDownRate);
+    result.setStockCode(stockCode);
     return result;
   }
 }

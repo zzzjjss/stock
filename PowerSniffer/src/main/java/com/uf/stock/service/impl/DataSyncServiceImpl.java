@@ -33,6 +33,7 @@ import com.uf.stock.data.dao.StockInfoDao;
 import com.uf.stock.data.dao.StockTradeInfoDao;
 import com.uf.stock.data.sync.StockDataSynchronizer;
 import com.uf.stock.service.DataSyncService;
+import com.uf.stock.util.Constant;
 
 @Service("dataSyncService")
 public class DataSyncServiceImpl implements DataSyncService {
@@ -253,6 +254,9 @@ public class DataSyncServiceImpl implements DataSyncService {
               }
             }
            tradeInfoDao.insert(info);
+           if(Constant.latestTradeDate!=null&&info.getTradeDate().getTime()>Constant.latestTradeDate.getTime()){
+        	   Constant.latestTradeDate=info.getTradeDate();
+           }
            beforeTradeInfo=info;
             totalRecord++;
           }
@@ -343,7 +347,11 @@ public StockTradeInfo findOneDayTradeInfo(Integer stockCode, Date date) {
 }
 
 public List<StockTradeInfo> findTradeInfosBeforeDate(Integer stockCode,Date date,int limitDays){
-  return tradeInfoDao.findTradeInfosBeforeDate(stockCode, date, limitDays);
+	 Calendar calendar = Calendar.getInstance();
+     calendar.setTime(date);
+     calendar.add(Calendar.DATE, 0-limitDays);	
+    return  (List<StockTradeInfo>)tradeInfoDao.findByHql("from StockTradeInfo t where t.stock.code=? and t.tradeDate>=? order by t.tradeDate asc", stockCode,calendar.getTime());
+  //return tradeInfoDao.findTradeInfosBeforeDate(stockCode, date, limitDays);
 }
 
 @Override
@@ -365,5 +373,17 @@ public void setAlarmStock(StockInfo stock) {
   }
   alarmStockDao.saveOrUpdate(alarm);
 }
+
+@Override
+public boolean isStockStopTrade(Integer stockCode) {
+	if(Constant.latestTradeDate==null){
+		Constant.latestTradeDate=tradeInfoDao.getLatestDate();
+	}
+	StockTradeInfo info=tradeInfoDao.findLatestDateStockTradeInfo(stockCode);
+	if(info!=null&&Constant.latestTradeDate!=null&&Constant.latestTradeDate.getTime()==info.getTradeDate().getTime()){
+		return false;
+	}
+	return true;
+} 
 
 }

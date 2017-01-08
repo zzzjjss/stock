@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript" src="jquery/jquery-3.1.1.min.js"></script>
+<script type="text/javascript"
+	src="jquery/jquery.dataTables/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="jquery/jquery.dataTables/jquery.dataTables.min.css" />
+<link rel="stylesheet" type="text/css"
+	href="bootstrap-3.3.5/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css"
+	href="bootstrap-3.3.5/css/bootstrap-theme.min.css" />
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<ul class="nav nav-tabs">
+		<li class="active"><a href="#upPower" data-toggle="tab">分析结果</a></li>
+	</ul>
+	<br>
+	<div class="tab-content">
+		<div class="tab-pane active" id="upPower">
+			<div class="row">
+				<div class=col-lg-6>
+					<div class="input-group">
+						<span class="input-group-addon">市营率范围</span> 
+						<input type="text"
+							class="form-control" placeholder="MinPE" value="-1"
+							id="minPeRatio"> 
+						<input type="text" class="form-control"
+							placeholder="MaxPE" value="10000" id="maxPeRatio">
+					</div>
+				</div>
+				<div class=col-lg-6>
+					<div class="input-group">
+							<span class="input-group-addon">阶段天数</span>
+							<input type="text"
+							class="form-control" placeholder="periodDays" value="60"
+							id="periodDays"> 
+					</div>
+					<button type="button" class="btn btn-default " id="analysisBtn">开始分析</button>
+					
+				</div>
+
+			</div>
+
+			<br>
+
+			<table id="resultTable" class="display" width="100%"></table>
+
+		</div>
+		
+	</div>
+	<br>
+
+
+</body>
+<script type="text/javascript">
+	var restfulContext = "/PowerSniffer/rest";
+
+	$(document).ready(function() {
+		$("#analysisBtn").on("click", function() {
+			$(this).prop('disabled', true);
+			fetchAnalysisResult()
+
+		});
+	});
+	function fetchAnalysisResult() {
+		var minPeRatio = $("#minPeRatio").val();
+		var maxPeRatio = $("#maxPeRatio").val();
+		var periodDays=$("#periodDays").val();
+		var table = $('#resultTable').DataTable(
+				{
+					"ajax" : restfulContext
+							+ "/analysis/priceSpeedAnalysis?periodDays="+periodDays+"&minPeRatio="+minPeRatio+"&maxPeRatio="+maxPeRatio,
+					"columns" : [ {
+						title : "股票名称",
+						render:function(cellData, type,rowData, meta){
+							//return '<a  target="_blank" href="http://q.stock.sohu.com/cn/'+rowData.stockSymbol.substring(2)+'/index.shtml">'+rowData.stockName+'</a>'
+							return '<a  target="_blank" href="http://finance.sina.com.cn/realstock/company/'+rowData.stockSymbol+'/nc.shtml">'+rowData.stockName+'</a>'
+						}
+					}, {
+						name:"downRateToLowest",
+						title : "到最低价跌幅%",
+						data : "downRateToLowest"
+					}, {
+						title : "横盘指数",
+						data : "sidewayIndex"
+					}, {
+						title : "慢涨快跌指数",
+						data : "slowUpFastDownIndex"
+					} ],
+					destroy : true
+				});
+		table.column([ "downRateToLowest:name" ]).order("desc").draw();
+		table.on('xhr.dt', function() {
+			$("#analysisBtn").prop('disabled', false);
+		});
+
+	}
+</script>

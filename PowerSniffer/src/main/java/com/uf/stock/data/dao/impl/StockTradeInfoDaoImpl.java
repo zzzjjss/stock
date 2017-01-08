@@ -137,6 +137,26 @@ public List<StockTradeInfo> findTradeInfosBeforeDate(Integer stockCode, Date dat
   return (List<StockTradeInfo>)query.list();
 }
 
+@Override
+public Date getLatestDate() {
+	HibernateTemplate temp=this.getHibernateTemplate();
+	  SQLQuery query=temp.getSessionFactory().getCurrentSession().createSQLQuery("select max(trade_date) from stock_trade_info ");
+	  Date date=(Date)query.uniqueResult();
+	  return date;
+}
+
+@Override
+public StockTradeInfo findLatestDateStockTradeInfo(Integer stockCode) {
+	HibernateTemplate temp=this.getHibernateTemplate();
+    temp.setMaxResults(1);
+    List<StockTradeInfo> result=(List<StockTradeInfo>)temp.find("from StockTradeInfo s  where s.stock.code=? order by s.tradeDate desc ", stockCode);
+    temp.setMaxResults(-1);
+    if(result!=null&&result.size()>0){
+        return result.get(0);
+    }
+    return null;
+}
+
 
 
 
