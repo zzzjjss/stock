@@ -462,7 +462,7 @@ public class KLineAnalysis {
     if(KLineAnalysis.isInTwoShadowFlat_LowerShadowLonger(openPrice, closePrice, highestPrice, lowestPrice)){
       return KLineState.TWO_SHADOW_FLAT_LOWER_SHADOW_LONGER;
     }
-    if(KLineAnalysis.isInTwoShadowFloat_UpperShadowLonger(lowestPrice, lowestPrice, lowestPrice, lowestPrice)){
+    if(KLineAnalysis.isInTwoShadowFloat_UpperShadowLonger(openPrice, closePrice, highestPrice, lowestPrice)){
       return KLineState.TWO_SHADOW_FLAT_UPPER_SHADOW_LONGER;
     }
     return null;

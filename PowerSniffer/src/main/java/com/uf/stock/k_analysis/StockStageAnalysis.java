@@ -2,7 +2,6 @@ package com.uf.stock.k_analysis;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -21,9 +20,12 @@ public class StockStageAnalysis {
     if (infors != null) {
       for (StockTradeInfo info : infors) {
         KLineState state = KLineAnalysis.analyseKLineState(info.getOpenPrice(), info.getClosePrice(), info.getHighestPrice(), info.getLowestPrice());
-        upPower = upPower + state.getUpPower();
-        downPower = downPower + state.getDownPower();
-        System.out.println(formate.format(info.getTradeDate()) + "-->" + state.toString());
+        if (state!=null) {
+          upPower = upPower + state.getUpPower();
+          downPower = downPower + state.getDownPower();
+        }else {
+          System.out.println("can't get kline state "+info.getStockSymbol()+" : "+formate.format(info.getTradeDate()));
+        }
       }
     }
     StockStage stage = new StockStage();
