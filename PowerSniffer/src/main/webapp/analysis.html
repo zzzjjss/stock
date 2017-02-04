@@ -135,11 +135,26 @@
 					}, {
 						title : "阶段",
 						data : "stageName"
+					},{
+						title : "操作",
+						render:function(cellData, type,rowData, meta){
+							return '<button type="button" class="btn btn-default " onClick="analyseByKLine(\''+rowData.stockSymbol+'\',this)">K线分析</button>';
+						}
 					} ],
 					destroy : true
 				});
 		table.on('xhr.dt', function() {
 			$("#stageAnalyseBtn").prop('disabled', false);
 		});
+	}
+	function analyseByKLine(stockSymbol,btn){
+		$(btn).prop('disabled', true);
+		$.ajax({
+			url : restfulContext + "/analysis/analyseUpDownPowerByKLine?stockSymbol="+stockSymbol+"&periodDays=10"
+		}).done(function(data) {
+			$(btn).prop('disabled', false);
+			alert("upPower:"+data.upPower+"-----downPower:"+data.downPower);			
+		});
+				
 	}
 </script>

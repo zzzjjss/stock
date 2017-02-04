@@ -2,11 +2,9 @@ package com.uf.stock.k_analysis;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import com.uf.stock.data.bean.StockTradeInfo;
@@ -15,22 +13,28 @@ import com.uf.stock.util.SpringBeanFactory;
 
 public class StockStageAnalysis {
   
-  public static StockStage analyseStockStage(Integer stockCode,Date date){
-    SimpleDateFormat  formate=new SimpleDateFormat("yyyy-MM-dd");
-    DataSyncService service=SpringBeanFactory.getBean(DataSyncService.class);
-    Calendar calendar=Calendar.getInstance();
-    calendar.setTime(date);
-    calendar.add(Calendar.DATE, -50);
-    while(calendar.getTime().getTime()<date.getTime()){
-      Date date2=calendar.getTime();
-      StockTradeInfo tradeInfo=service.findOneDayTradeInfo(stockCode, date2);
-      if(tradeInfo!=null){
-        KLineState state=KLineAnalysis.analyseKLineState(tradeInfo.getOpenPrice(), tradeInfo.getClosePrice(), tradeInfo.getHighestPrice(), tradeInfo.getLowestPrice());
-        System.out.println(formate.format(date2)+"-->"+state.toString());
+  public static StockStage analyseStockStageByKLine(Integer stockCode, Date date, int periodDays) {
+    SimpleDateFormat formate = new SimpleDateFormat("yyyy-MM-dd");
+    DataSyncService service = SpringBeanFactory.getBean(DataSyncService.class);
+    List<StockTradeInfo> infors = service.findLimitTradeInfosBeforeDate(stockCode, date, periodDays);
+    float upPower = 0.0f, downPower = 0.0f;
+    if (infors != null) {
+      for (StockTradeInfo info : infors) {
+        KLineState state = KLineAnalysis.analyseKLineState(info.getOpenPrice(), info.getClosePrice(), info.getHighestPrice(), info.getLowestPrice());
+        upPower = upPower + state.getUpPower();
+        downPower = downPower + state.getDownPower();
+        System.out.println(formate.format(info.getTradeDate()) + "-->" + state.toString());
       }
-      calendar.add(Calendar.DATE, 1);
     }
-    return null;
+    StockStage stage = new StockStage();
+    if ((downPower + upPower) != 0) {
+      stage.setDownPower(downPower / (downPower + upPower));
+      stage.setUpPower(upPower / (downPower + upPower));
+    } else {
+      stage.setDownPower(0f);
+      stage.setUpPower(0f);
+    }
+    return stage;
   }
   
   

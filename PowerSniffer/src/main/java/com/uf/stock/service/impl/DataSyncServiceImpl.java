@@ -384,6 +384,11 @@ public boolean isStockStopTrade(Integer stockCode) {
 		return false;
 	}
 	return true;
+}
+
+@Override
+public List<StockTradeInfo> findLimitTradeInfosBeforeDate(Integer stockCode, Date date, int limitTradeInfos) {
+  return (List<StockTradeInfo>)tradeInfoDao.findLimitByHql("from StockTradeInfo t where t.stock.code=? and t.tradeDate<? order by t.tradeDate desc", limitTradeInfos, stockCode,date);
 } 
 
 }

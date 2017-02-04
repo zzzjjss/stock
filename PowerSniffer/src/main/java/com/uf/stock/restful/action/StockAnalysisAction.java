@@ -17,8 +17,10 @@ import javax.ws.rs.core.MediaType;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.uf.stock.data.bean.StockInfo;
 import com.uf.stock.k_analysis.AnalysisResult;
+import com.uf.stock.k_analysis.StockStage;
 import com.uf.stock.k_analysis.StockStageAnalysis;
 import com.uf.stock.restful.bean.PriceSpeedAnalysisResultData;
 import com.uf.stock.restful.bean.PriceSpeedAnalysisResultResponse;
@@ -115,5 +117,20 @@ public class StockAnalysisAction {
 	        }
 	        Gson gson=new Gson();
 	        return gson.toJson(response);
+	}
+	@Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @GET
+    @Path("/analyseUpDownPowerByKLine")
+    public String analyseUpDownPowerByKLine(@QueryParam("stockSymbol") String stockSymbol,@QueryParam("periodDays") int periodDays) {
+	  StockInfo stockInfo=service.findStockInfoByStockSymbol(stockSymbol);
+	  StockStage stage=new StockStage();
+	  if(stockInfo!=null){
+	    stage=StockStageAnalysis.analyseStockStageByKLine(stockInfo.getCode(), new Date(), periodDays);
+	  }
+	  GsonBuilder gBuilder=new GsonBuilder();
+	  gBuilder.serializeSpecialFloatingPointValues();
+	  Gson gson=gBuilder.create();
+	  return gson.toJson(stage);
 	}
 }
