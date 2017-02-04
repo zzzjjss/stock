@@ -95,6 +95,9 @@ public class StockAnalysisServiceImpl implements StockAnalysisService {
     if (shortAvg > medAvg ) {
       return true;
     }
+    if (shortAvg==medAvg) {
+      return null;
+    }
     return false;
   }
   @Override

@@ -39,16 +39,22 @@
 							class="form-control" placeholder="periodDays" value="60"
 							id="periodDays"> 
 					</div>
-					<button type="button" class="btn btn-default " id="analysisBtn">开始分析</button>
-					
+					<div class="input-group">
+							<span class="input-group-addon">底价跌幅《=</span>
+							<input type="text"
+							class="form-control" placeholder="downPercentToLow" value="10"
+							id="downPercentToLow"> 
+					</div>
 				</div>
-
 			</div>
-
+			<div class="row">
+				<button type="button" class="btn btn-default " id="filterStockBtn">股票过滤</button>
+				<button type="button" class="btn btn-default " id="stageAnalyseBtn">股票阶段分析</button>
+			</div>
 			<br>
 
 			<table id="resultTable" class="display" width="100%"></table>
-
+			<table id="stageAnalysisResultTable" class="display" width="100%"></table>	
 		</div>
 		
 	</div>
@@ -60,20 +66,27 @@
 	var restfulContext = "/PowerSniffer/rest";
 
 	$(document).ready(function() {
-		$("#analysisBtn").on("click", function() {
+		$("#filterStockBtn").on("click", function() {
+			$(this).prop('disabled', true);
+			filterStockByPrice()
+
+		});
+		$("#stageAnalyseBtn").on("click", function() {
 			$(this).prop('disabled', true);
 			fetchAnalysisResult()
 
 		});
+		
 	});
-	function fetchAnalysisResult() {
+	function filterStockByPrice() {
 		var minPeRatio = $("#minPeRatio").val();
 		var maxPeRatio = $("#maxPeRatio").val();
 		var periodDays=$("#periodDays").val();
+		var downPercentToLow=$("#downPercentToLow").val();
 		var table = $('#resultTable').DataTable(
 				{
 					"ajax" : restfulContext
-							+ "/analysis/priceSpeedAnalysis?periodDays="+periodDays+"&minPeRatio="+minPeRatio+"&maxPeRatio="+maxPeRatio,
+							+ "/analysis/filterStockByPrice?periodDays="+periodDays+"&minPeRatio="+minPeRatio+"&maxPeRatio="+maxPeRatio+"&downPercentToLow="+downPercentToLow,
 					"columns" : [ {
 						title : "股票名称",
 						render:function(cellData, type,rowData, meta){
@@ -95,8 +108,38 @@
 				});
 		table.column([ "downRateToLowest:name" ]).order("desc").draw();
 		table.on('xhr.dt', function() {
-			$("#analysisBtn").prop('disabled', false);
+			$("#filterStockBtn").prop('disabled', false);
 		});
 
+	}
+	
+	function fetchAnalysisResult(){
+		var stockTable = $('#resultTable').DataTable();
+		var stockSymbols="";
+		stockTable.data().each(function (d){
+			stockSymbols=stockSymbols+";"+d.stockSymbol;
+		});
+		var table = $('#stageAnalysisResultTable').DataTable(
+				{
+					"ajax" : {
+						"url":restfulContext+"/analysis/analyseStockStageByDayAvg",
+						"type":"POST",
+						"data":{"stockSymbols":stockSymbols}
+					},
+					"columns" : [ {
+						title : "股票名称",
+						render:function(cellData, type,rowData, meta){
+							//return '<a  target="_blank" href="http://q.stock.sohu.com/cn/'+rowData.stockSymbol.substring(2)+'/index.shtml">'+rowData.stockName+'</a>'
+							return '<a  target="_blank" href="http://finance.sina.com.cn/realstock/company/'+rowData.stockSymbol+'/nc.shtml">'+rowData.stockName+'</a>'
+						}
+					}, {
+						title : "阶段",
+						data : "stageName"
+					} ],
+					destroy : true
+				});
+		table.on('xhr.dt', function() {
+			$("#stageAnalyseBtn").prop('disabled', false);
+		});
 	}
 </script>

@@ -2,16 +2,19 @@ package com.uf.stock.restful.action;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.gson.Gson;
 import com.uf.stock.data.bean.StockInfo;
@@ -20,19 +23,22 @@ import com.uf.stock.k_analysis.StockStageAnalysis;
 import com.uf.stock.restful.bean.PriceSpeedAnalysisResultData;
 import com.uf.stock.restful.bean.PriceSpeedAnalysisResultResponse;
 import com.uf.stock.restful.bean.ResponseError;
+import com.uf.stock.restful.bean.StockStageAnalysisResultData;
+import com.uf.stock.restful.bean.StockStageAnalysisResultResponse;
 import com.uf.stock.service.DataSyncService;
+import com.uf.stock.service.StockAnalysisService;
 import com.uf.stock.util.SpringBeanFactory;
 
 @Singleton
 @Path("/analysis")
 public class StockAnalysisAction {
 	private DataSyncService service = SpringBeanFactory.getBean(DataSyncService.class);
-
+	private StockAnalysisService analyseService=SpringBeanFactory.getBean(StockAnalysisService.class);
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@GET
-	@Path("/priceSpeedAnalysis")
-	public String priceSpeedAnalysis(@QueryParam("minPeRatio") float minPeRatio, @QueryParam("maxPeRatio") float maxPeRation, @QueryParam("periodDays") int analysisDays) {
+	@Path("/filterStockByPrice")
+	public String filterStockByPrice(@QueryParam("minPeRatio") float minPeRatio, @QueryParam("maxPeRatio") float maxPeRation,@QueryParam("downPercentToLow") float downPercentToLow, @QueryParam("periodDays") int analysisDays) {
 		PriceSpeedAnalysisResultResponse response = new PriceSpeedAnalysisResultResponse();
 		try {
 			List<PriceSpeedAnalysisResultData> datas = new ArrayList<PriceSpeedAnalysisResultData>();
@@ -43,6 +49,9 @@ public class StockAnalysisAction {
 					if(isStop)
 						continue;
 					AnalysisResult result = StockStageAnalysis.periodAnalyseStock(stock.getCode(), new Date(), analysisDays);
+					if (result.getDownRateToLowest()>=downPercentToLow) {
+                      continue;
+                    }
 					PriceSpeedAnalysisResultData data = new PriceSpeedAnalysisResultData();
 					data.setDownRateToLowest(result.getDownRateToLowest());
 					data.setSidewayIndex(result.calculateSidewayIndex());
@@ -65,5 +74,46 @@ public class StockAnalysisAction {
 		Gson gson=new Gson();
 	    return gson.toJson(response);
 	}
-
+	@Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @POST
+    @Path("/analyseStockStageByDayAvg")
+	public String analyseStockStageByDayAvg(@FormParam("stockSymbols") String stockSymbols){
+	     StockStageAnalysisResultResponse response = new StockStageAnalysisResultResponse();
+	        try {
+	            List<StockStageAnalysisResultData> datas = new ArrayList<StockStageAnalysisResultData>();
+	            if (StringUtils.isNotBlank(stockSymbols)) {
+	              String symbols[]=stockSymbols.split(";");
+	              Date date=new Date();
+	              for (String symbol:symbols) {
+	                StockInfo stock=service.findStockInfoByStockSymbol(symbol.trim());
+	                if(stock!=null){
+	                  Boolean isUp=analyseService.isDayAverageGoldX(stock, date, 5, 10);
+	                  StockStageAnalysisResultData data=new StockStageAnalysisResultData();
+	                  if (isUp==null) {
+	                    data.setStageName("Î´Öª");
+                      }else if(isUp){
+	                    data.setStageName("ÉÏÕÇ½×¶Î");
+	                  }else{
+	                    data.setStageName("ÏÂµø½×¶Î");
+	                  }
+	                  data.setStockName(stock.getName());
+	                  data.setStockSymbol(stock.getSymbol());
+	                  datas.add(data);
+	                }
+                  }
+                }
+	            response.setSuccess(true);
+	            response.setData(datas);
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	              ResponseError error=new ResponseError();
+	              error.setCode("1");
+	              error.setMsg(e.getMessage());
+	              response.setError(error);
+	              response.setSuccess(false);
+	        }
+	        Gson gson=new Gson();
+	        return gson.toJson(response);
+	}
 }
