@@ -4,14 +4,15 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.uf.stock.analysis.filter.DayAverageGoldXFilter;
-import com.uf.stock.analysis.filter.LowPriceFilter;
-import com.uf.stock.analysis.filter.PowerUpFilter;
+import com.uf.stock.analysis.filter.KLineFilter;
+import com.uf.stock.analysis.filter.PriceFilter;
 import com.uf.stock.data.bean.StockInfo;
 import com.uf.stock.data.bean.StockTradeInfo;
 import com.uf.stock.service.DataSyncService;
@@ -26,44 +27,43 @@ public class LowPriceUpPointStatistics {
     public LowPriceUpPointStatistics(TargetDefinition targetDefin){
       this.targetDefin=targetDefin;
     }
-    public float analyseAccuracy(){
+    public float analyseAccuracy(String stockSymbol)throws IllegalArgumentException{
       SimpleDateFormat formate=new SimpleDateFormat("yyyy-MM-dd");
       int hitNum=0,nohitNum=0;
-      StockInfo stock=service.findStockInfoByStockSymbol("sz000850");
-      StockTradeInfo info=service.findOldestStockTradeInfo(stock.getCode());
-      if(info!=null){
-        Date begin=info.getTradeDate();
-        Calendar ca=Calendar.getInstance();
-        ca.setTime(begin);
-        Date now=new Date();
+      StockInfo stock=service.findStockInfoByStockSymbol(stockSymbol);
+      if (stock==null) {
+        throw new IllegalArgumentException("stockSymbol is invalid");
+      }
+      
+      List<StockTradeInfo> tradeInfos=service.findAllTradeInfosOrderByDateAsc(stock.getCode());
+      if (tradeInfos!=null) {
         LowPriceUpStockFilterChain  chain=new LowPriceUpStockFilterChain();
-        chain.appendStockFilter(new LowPriceFilter())
-              .appendStockFilter(new PowerUpFilter(3.0f))
-             .appendStockFilter(new DayAverageGoldXFilter(2, 5));
-        while(ca.getTime().getTime()<now.getTime()){
-//          StockTradeInfo tradeInfo=service.findOneDayTradeInfo(stock.getCode(), ca.getTime());
-//          if(tradeInfo!=null){
-//            float closePrice = tradeInfo.getClosePrice();
-//            float targetPrice = closePrice * (1 + targetDefinition.getUpPercent());
-//            int days = analyseService.howManyDaysToTargetPrice(stock.getSymbol(), ca.getTime(), targetPrice);
-//            if(days<=targetDefinition.getDays()){
-//              System.out.println(formate.format(ca.getTime())+"-->"+days+"-->"+tradeInfo.getTurnoverRate()+"%");
-//            }
-//          }
-            boolean isPass=chain.isLowPriceUpPoint(stock, ca.getTime());
-            if (isPass) {
-                logger.info("lowPrice Up  point:" + formate.format(ca.getTime()));
-                float closePrice = service.findOneDayTradeInfo(stock.getCode(), ca.getTime()).getClosePrice();
-                float targetPrice = closePrice * (1 + targetDefin.getUpPercent());
-                int days = analyseService.howManyDaysToTargetPrice(stock.getSymbol(), ca.getTime(), targetPrice);
-                logger.info("after days:" + days+" up to targetPrice");
-                if (days <= targetDefin.getDays()) {
-                  hitNum++;
-                } else {
-                  nohitNum++;
+        chain.appendStockFilter(new PriceFilter(tradeInfos,50f)).appendStockFilter(new DayAverageGoldXFilter(5, 10))
+             .appendStockFilter(new KLineFilter(5));
+        for (StockTradeInfo stockTradeInfo : tradeInfos) {
+          boolean isPass=chain.isLowPriceUpPoint(stock,stockTradeInfo.getTradeDate());
+          if (isPass) {
+            logger.info("lowPrice Up  point:" + formate.format(stockTradeInfo.getTradeDate()));
+            int index=tradeInfos.indexOf(stockTradeInfo);
+            if(index<tradeInfos.size()-1){
+              float upPercent=0f;
+              int days=-1;
+              for(int tmp=index+1;tmp<tradeInfos.size();tmp++){
+                StockTradeInfo tmpTradeInfo=tradeInfos.get(tmp);
+                upPercent=upPercent+tmpTradeInfo.getUpDownRate();
+                days++;
+                if(upPercent>=targetDefin.getUpPercent()){
+                  break;
                 }
+              }
+              logger.info("after days:" + days+" up to targetUpPercent");
+              if (days <= targetDefin.getDays()) {
+                hitNum++;
+              } else {
+                nohitNum++;
+              }
             }
-          ca.add(Calendar.DATE, 1);
+        }
         }
       }
       if(hitNum+nohitNum!=0){
@@ -88,9 +88,7 @@ public class LowPriceUpPointStatistics {
         while(ca.getTime().getTime()<end.getTime()){
           StockTradeInfo tradeInfo=service.findOneDayTradeInfo(stock.getCode(), ca.getTime());
           if(tradeInfo!=null){
-            float closePrice = tradeInfo.getClosePrice();
-            float targetPrice = closePrice * (1 + targetDefin.getUpPercent());
-            int days = analyseService.howManyDaysToTargetPrice(stock.getSymbol(), ca.getTime(), targetPrice);
+            int days = analyseService.howManyDaysToUpPercent(stock.getSymbol(), ca.getTime(), targetDefin.getUpPercent());
             System.out.println(days);
             if(days<=targetDefin.getDays()){
               BuyPointStatisticsData data=new BuyPointStatisticsData();

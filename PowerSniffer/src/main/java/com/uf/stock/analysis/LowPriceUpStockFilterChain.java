@@ -16,7 +16,7 @@ public class LowPriceUpStockFilterChain {
   public Boolean isLowPriceUpPoint(StockInfo stock,Date date){
     for(StockFilter filter:filters){
       Boolean pass=filter.doFilter(stock, date);
-      if(!pass){
+      if(pass!=null&&!pass){
         return false;
       }
     }

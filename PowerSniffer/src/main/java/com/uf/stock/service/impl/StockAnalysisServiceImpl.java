@@ -101,14 +101,26 @@ public class StockAnalysisServiceImpl implements StockAnalysisService {
     return false;
   }
   @Override
-  public int howManyDaysToTargetPrice(String stockSymbol,Date fromDate, float targetPrice) {
-    List<StockTradeInfo> result= tradeInfoDao.findLimitByHql("from StockTradeInfo s where s.stockSymbol=? and  s.tradeDate>? and s.highestPrice>=? order by s.tradeDate asc",1, stockSymbol,fromDate,targetPrice);
+  public int howManyDaysToUpPercent(String stockSymbol,Date fromDate, float targetUpPercent){
+    List<StockTradeInfo> result=tradeInfoDao.findByHql("from StockTradeInfo s where s.stockSymbol=? and  s.tradeDate>?  order by s.tradeDate asc", stockSymbol,fromDate);
+    //List<StockTradeInfo> result= tradeInfoDao.findLimitByHql("from StockTradeInfo s where s.stockSymbol=? and  s.tradeDate>? and s.highestPrice>=? order by s.tradeDate asc",1, stockSymbol,fromDate,targetPrice);
+//    if(result!=null&&result.size()>0){
+//      StockTradeInfo info=result.get(0);
+//      long days=tradeInfoDao.countHql("from StockTradeInfo s where s.stockSymbol=? and  s.tradeDate>? and s.tradeDate<?  ", stockSymbol,fromDate,info.getTradeDate()) ;
+//      return (int)days;
+//    }
+    int days=-1;
     if(result!=null&&result.size()>0){
-      StockTradeInfo info=result.get(0);
-      long targetTime=info.getTradeDate().getTime();
-      return (int)((targetTime-fromDate.getTime())/(1000*3600*24));
+      float upPercent=0f;
+      for (StockTradeInfo stockTradeInfo : result) {
+        upPercent=upPercent+stockTradeInfo.getUpDownRate();
+        days++;
+        if(upPercent>=targetUpPercent){
+          break;
+        }
+      }
     }
-    return 0;
+    return days;
   }
 @Override
 public Boolean isPowerUp(StockInfo stock, Date date,float upPowerDefine) {

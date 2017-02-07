@@ -38,7 +38,6 @@ public Float calculateAveragePriceBeforeDate(int limit, Date date,Integer stockC
 	  return 0f;
 	}
 }
-
 @Override
 public List<StockTradeInfo> findLatestDaysStockTradeInfos(String stockSymbol, int days) {
   HibernateTemplate temp=this.getHibernateTemplate();
@@ -157,7 +156,9 @@ public StockTradeInfo findLatestDateStockTradeInfo(Integer stockCode) {
     return null;
 }
 
-
+public long countHql(String hql,Object... paramValue){
+  return countHqlQuery(hql,paramValue);
+}
 
 
 

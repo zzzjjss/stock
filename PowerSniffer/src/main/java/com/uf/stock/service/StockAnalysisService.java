@@ -15,5 +15,5 @@ public interface StockAnalysisService {
 	public Float calculateStockPeriodicToLowestPriceDownPercent(StockInfo stock,int periodicDays);
 	public Float calculateAvgPriceBeforeDate(Integer stockCode, Date date);
 	public StockStage analyseStockStage(List<StageDefinition> stageDefines,StockInfo stock);
-	public int howManyDaysToTargetPrice(String stockSymbol,Date fromDate, float targetPrice);
+	public int howManyDaysToUpPercent(String stockSymbol,Date fromDate, float upPercent);
 }
