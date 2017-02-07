@@ -165,5 +165,9 @@ public Boolean isCurrentAtLowPrice(StockInfo stock, Date date) {
 public Float calculateAvgPriceBeforeDate(Integer stockCode, Date date){
   return tradeInfoDao.calculateAvgPriceBeforeDate(stockCode, date);
 }
+@Override
+public Float calculateAverageTurnoverRateBeforeDate(int limit, Date date,Integer stockCode){
+  return tradeInfoDao.calculateAverageTurnoverRateBeforeDate(limit, date, stockCode);
+}
 
 }

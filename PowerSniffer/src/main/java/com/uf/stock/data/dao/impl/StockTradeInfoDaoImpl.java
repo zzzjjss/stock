@@ -38,6 +38,19 @@ public Float calculateAveragePriceBeforeDate(int limit, Date date,Integer stockC
 	  return 0f;
 	}
 }
+
+@Override
+public Float calculateAverageTurnoverRateBeforeDate(int limit, Date date,Integer stockCode) {
+    HibernateTemplate temp=this.getHibernateTemplate();
+    SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd");
+    SQLQuery query=temp.getSessionFactory().getCurrentSession().createSQLQuery("select avg(turnover_rate) from (select * from stock_trade_info where  stock_code="+stockCode+" and trade_date <='"+format.format(date)+"' order by trade_date desc  limit "+limit+") as a;");
+    Double avg=(Double)query.uniqueResult();
+    if(avg!=null){
+      return avg.floatValue();
+    }else{
+      return 0f;
+    }
+}
 @Override
 public List<StockTradeInfo> findLatestDaysStockTradeInfos(String stockSymbol, int days) {
   HibernateTemplate temp=this.getHibernateTemplate();

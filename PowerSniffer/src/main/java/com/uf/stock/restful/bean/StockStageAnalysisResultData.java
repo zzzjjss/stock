@@ -4,6 +4,8 @@ public class StockStageAnalysisResultData {
   private String stockName;
   private String stockSymbol;
   private String stageName;
+  private Float upPower=0f;
+  private Float turnOverRateUp=0f;
   public String getStockName() {
     return stockName;
   }
@@ -21,6 +23,18 @@ public class StockStageAnalysisResultData {
   }
   public void setStageName(String stageName) {
     this.stageName = stageName;
+  }
+  public Float getUpPower() {
+    return upPower;
+  }
+  public void setUpPower(Float upPower) {
+    this.upPower = upPower;
+  }
+  public Float getTurnOverRateUp() {
+    return turnOverRateUp;
+  }
+  public void setTurnOverRateUp(Float turnOverRateUp) {
+    this.turnOverRateUp = turnOverRateUp;
   }
   
 }

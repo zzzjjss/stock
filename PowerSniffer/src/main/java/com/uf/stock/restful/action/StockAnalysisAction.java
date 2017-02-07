@@ -92,13 +92,19 @@ public class StockAnalysisAction {
 	                if(stock!=null){
 	                  Boolean isUp=analyseService.isDayAverageGoldX(stock, date, 5, 10);
 	                  StockStageAnalysisResultData data=new StockStageAnalysisResultData();
-	                  if (isUp==null) {
-	                    data.setStageName("Î´Öª");
-                      }else if(isUp){
-	                    data.setStageName("ÉÏÕÇ½×¶Î");
-	                  }else{
-	                    data.setStageName("ÏÂµø½×¶Î");
-	                  }
+	                  if (isUp==null||!isUp) {
+	                    continue;
+                      }
+	                  Float avg1=analyseService.calculateAverageTurnoverRateBeforeDate(5, date, stock.getCode());
+	                  Float avg2=analyseService.calculateAverageTurnoverRateBeforeDate(10, date, stock.getCode());
+                      data.setTurnOverRateUp(avg1-avg2);
+	                  StockStage  stage=StockStageAnalysis.analyseStockStageByKLine(stock.getCode(),date, 5);
+	                  if (stage==null||stage.getUpPower()<=stage.getDownPower()) {
+                        continue;
+                      }else {
+                        data.setUpPower(stage.getUpPower());
+                      }
+	                  data.setStageName("ÉÏÕÇ½×¶Î");
 	                  data.setStockName(stock.getName());
 	                  data.setStockSymbol(stock.getSymbol());
 	                  datas.add(data);

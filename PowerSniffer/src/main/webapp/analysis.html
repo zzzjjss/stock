@@ -133,13 +133,14 @@
 							return '<a  target="_blank" href="http://finance.sina.com.cn/realstock/company/'+rowData.stockSymbol+'/nc.shtml">'+rowData.stockName+'</a>'
 						}
 					}, {
-						title : "阶段",
+						title : "日均线涨势指数",
 						data : "stageName"
 					},{
-						title : "操作",
-						render:function(cellData, type,rowData, meta){
-							return '<button type="button" class="btn btn-default " onClick="analyseByKLine(\''+rowData.stockSymbol+'\',this)">K线分析</button>';
-						}
+						title : "K线涨势指数",
+						data : "upPower"
+					},{
+						title : "日均换手率增加",
+						data:"turnOverRateUp"
 					} ],
 					destroy : true
 				});
