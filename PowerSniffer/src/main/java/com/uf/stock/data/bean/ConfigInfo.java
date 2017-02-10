@@ -4,8 +4,22 @@ public class ConfigInfo {
 	private boolean isUseProxy=false;
 	private String proxyAddress;
 	private int proxyPort;
+	private String proxyUserName;
+	private String proxyPassword;
 	
-	public boolean isUseProxy() {
+	public String getProxyUserName() {
+    return proxyUserName;
+  }
+  public void setProxyUserName(String proxyUserName) {
+    this.proxyUserName = proxyUserName;
+  }
+  public String getProxyPassword() {
+    return proxyPassword;
+  }
+  public void setProxyPassword(String proxyPassword) {
+    this.proxyPassword = proxyPassword;
+  }
+  public boolean isUseProxy() {
 		return isUseProxy;
 	}
 	public void setIsUseProxy(boolean isUseProxy) {

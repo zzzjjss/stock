@@ -1,9 +1,7 @@
 package com.uf.stock.analysis.filter;
 
-import java.util.Date;
 import java.util.List;
 
-import com.uf.stock.data.bean.StockInfo;
 import com.uf.stock.data.bean.StockTradeInfo;
 
 public class PriceFilter implements StockFilter{
@@ -14,23 +12,26 @@ public PriceFilter(List<StockTradeInfo> orderedTradeInfos,float downPercentToLow
   this.downPercentToLowest=downPercentToLowest;
 }
   @Override
-  public Boolean doFilter(StockInfo stock, Date date) {
+  public FilterResult doFilter(StockTradeInfo tradeInfo) {
+    FilterResult result=new FilterResult();
     float lowestDownPercent=0f,upDownPercent=0f;
     for (StockTradeInfo stockTradeInfo : orderedTradeInfos) {
         upDownPercent=upDownPercent+stockTradeInfo.getUpDownRate();
         if (lowestDownPercent>upDownPercent) {
           lowestDownPercent=upDownPercent;
         }
-        if (stockTradeInfo.getTradeDate().getTime()>=date.getTime()) {
+        if (stockTradeInfo.getTradeDate().getTime()>=tradeInfo.getTradeDate().getTime()) {
           break;
         }
     }
     float downPerToLowest=upDownPercent-lowestDownPercent;
+    result.setFilterValue(downPerToLowest);
     if (downPerToLowest<downPercentToLowest) {
-      return true;
+      result.setIsPass(true);
     }else {
-      return false;
+      result.setIsPass(false);
     }
+    return result;
   }
 
 }

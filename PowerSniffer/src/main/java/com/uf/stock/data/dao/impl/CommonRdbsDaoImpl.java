@@ -74,9 +74,17 @@ public class CommonRdbsDaoImpl<T>  implements CommonDao<T> {
   }
   @Override
   public List<T> findLimitByHql(String hql, int limit, Object... paramValues) {
-    HibernateTemplate temp=getHibernateTemplate();
-    temp.setMaxResults(limit);
-    return (List<T>)temp.find(hql, paramValues);
+    Session session=getHibernateTemplate().getSessionFactory().openSession();
+    Query query=session.createQuery(hql);
+    query.setMaxResults(limit);
+    int i=0;
+    for (Object object : paramValues) {
+      query.setParameter(i, object);
+      i++;
+    }
+    List<T> resulTs= (List<T>)query.list();
+    session.close();
+    return resulTs;
   }
   protected long countHqlQuery(String hql,Object... paramValue){
     Query countQuery = getHibernateTemplate().getSessionFactory().getCurrentSession().createQuery(parseCountHql(hql));

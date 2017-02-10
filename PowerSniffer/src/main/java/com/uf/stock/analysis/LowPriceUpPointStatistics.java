@@ -1,17 +1,12 @@
 package com.uf.stock.analysis;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.uf.stock.analysis.filter.DayAverageGoldXFilter;
-import com.uf.stock.analysis.filter.KLineFilter;
+import com.uf.stock.analysis.filter.KLineTFilter;
 import com.uf.stock.analysis.filter.PriceFilter;
 import com.uf.stock.data.bean.StockInfo;
 import com.uf.stock.data.bean.StockTradeInfo;
@@ -27,7 +22,7 @@ public class LowPriceUpPointStatistics {
     public LowPriceUpPointStatistics(TargetDefinition targetDefin){
       this.targetDefin=targetDefin;
     }
-    public float analyseAccuracy(String stockSymbol)throws IllegalArgumentException{
+    public Float analyseAccuracy(String stockSymbol)throws IllegalArgumentException{
       SimpleDateFormat formate=new SimpleDateFormat("yyyy-MM-dd");
       int hitNum=0,nohitNum=0;
       StockInfo stock=service.findStockInfoByStockSymbol(stockSymbol);
@@ -38,11 +33,21 @@ public class LowPriceUpPointStatistics {
       List<StockTradeInfo> tradeInfos=service.findAllTradeInfosOrderByDateAsc(stock.getCode());
       if (tradeInfos!=null) {
         LowPriceUpStockFilterChain  chain=new LowPriceUpStockFilterChain();
-        chain.appendStockFilter(new PriceFilter(tradeInfos,50f)).appendStockFilter(new DayAverageGoldXFilter(5, 10))
-             .appendStockFilter(new KLineFilter(5));
-        for (StockTradeInfo stockTradeInfo : tradeInfos) {
-          boolean isPass=chain.isLowPriceUpPoint(stock,stockTradeInfo.getTradeDate());
+        //chain.appendStockFilter(new PriceFilter(tradeInfos,20f)).appendStockFilter(new DayAverageGoldXFilter(5, 10));
+        //chain.appendStockFilter(new PriceFilter(tradeInfos,15f)).appendStockFilter(new KLineFilter(5));
+//        chain.appendStockFilter(new PriceFilter(tradeInfos,15f)).appendStockFilter(new KLineFilterV2(5));
+        chain.appendStockFilter(new PriceFilter(tradeInfos,15f)).appendStockFilter(new KLineTFilter());
+//        chain.appendStockFilter(new PriceFilter(tradeInfos,5f));
+//             .appendStockFilter(new KLineFilter(5));
+        int i=0;
+        if (tradeInfos.size()>100) {
+          i=tradeInfos.size()-100;
+        }
+        for (;i<tradeInfos.size();i++) {
+          StockTradeInfo stockTradeInfo= tradeInfos.get(i);
+          boolean isPass=chain.isLowPriceUpPoint(stockTradeInfo);
           if (isPass) {
+            System.out.println(chain.getFilterChainResult());
             logger.info("lowPrice Up  point:" + formate.format(stockTradeInfo.getTradeDate()));
             int index=tradeInfos.indexOf(stockTradeInfo);
             if(index<tradeInfos.size()-1){
@@ -71,38 +76,8 @@ public class LowPriceUpPointStatistics {
         logger.info("hitNum:"+hitNum+" noHitNum:"+nohitNum+" ; accuracy :"+accuracy);
         return accuracy;
       }else{
-        return 0f;
+        return null;
       }
       
-    }
-    
-    public Map<String,BuyPointStatisticsData> statisticBuypointData(String stockSymbol,Date start,Date end){
-      Map<String,BuyPointStatisticsData>  result=new HashMap<String, BuyPointStatisticsData>();
-      SimpleDateFormat formate=new SimpleDateFormat("yyyy-MM-dd");
-      StockInfo stock=service.findStockInfoByStockSymbol(stockSymbol);
-//      StockTradeInfo info=service.findOldestStockTradeInfo(stock.getCode());
-      if(start!=null){
-        Calendar ca=Calendar.getInstance();
-        ca.setTime(start);
-       
-        while(ca.getTime().getTime()<end.getTime()){
-          StockTradeInfo tradeInfo=service.findOneDayTradeInfo(stock.getCode(), ca.getTime());
-          if(tradeInfo!=null){
-            int days = analyseService.howManyDaysToUpPercent(stock.getSymbol(), ca.getTime(), targetDefin.getUpPercent());
-            System.out.println(days);
-            if(days<=targetDefin.getDays()){
-              BuyPointStatisticsData data=new BuyPointStatisticsData();
-              float power=tradeInfo.getUpDownRate()/tradeInfo.getTurnoverRate();
-              data.setUpPower(power);
-              float avgPrice=analyseService.calculateAvgPriceBeforeDate(stock.getCode(), ca.getTime());
-              float downPercent=tradeInfo.getClosePrice()-avgPrice/tradeInfo.getClosePrice();
-              data.setDownPercentToAvgPrice(downPercent);
-              result.put(formate.format(ca.getTime()), data);
-            }
-          }
-           ca.add(Calendar.DATE, 1);
-        }
-      }
-      return result;
     }
 }

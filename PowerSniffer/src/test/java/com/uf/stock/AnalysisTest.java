@@ -1,35 +1,56 @@
 package com.uf.stock;
 
-import static org.junit.Assert.*;
-
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
+import java.util.SortedSet;
 
 import org.junit.Test;
 
-import com.uf.stock.analysis.BuyPointStatisticsData;
 import com.uf.stock.analysis.LowPriceUpPointStatistics;
 import com.uf.stock.analysis.TargetDefinition;
 import com.uf.stock.data.bean.StockInfo;
 import com.uf.stock.k_analysis.AnalysisResult;
+import com.uf.stock.k_analysis.KLineAnalysisV2.DayBuySellPower;
 import com.uf.stock.k_analysis.StockStageAnalysis;
 import com.uf.stock.service.DataSyncService;
-import com.uf.stock.service.StockAnalysisService;
+import com.uf.stock.service.bean.StockStage;
 import com.uf.stock.util.SpringBeanFactory;
 
 public class AnalysisTest {
 
   @Test
+  public void testKLineAnalysisV2(){
+    DataSyncService dataService=SpringBeanFactory.getBean(DataSyncService.class);
+    List<StockInfo> stocks=dataService.findStocksPeRatioBetween(-1f, Float.MAX_VALUE);
+    Date date=new Date();
+    List<Float> upPowers=new ArrayList<Float>();
+    for(StockInfo stock:stocks){
+      DayBuySellPower power=StockStageAnalysis.analyseStockBuySellPower(stock.getCode(), date,1);
+      float upPower=power.getBuyPower()-power.getSellPower();
+      upPowers.add(upPower);
+      if (upPower>0.5) {
+        System.out.println(stock.getName()+":"+power.getBuyPower()+":"+power.getSellPower());
+      }
+    }
+    Collections.sort(upPowers);
+    System.out.println(upPowers);
+  }
+  
+  @Test
   public void testLowPriceUpPointStatistics() {
+    DataSyncService dataService=SpringBeanFactory.getBean(DataSyncService.class);
     DataSyncService service=SpringBeanFactory.getBean(DataSyncService.class);
     LowPriceUpPointStatistics analysis=new LowPriceUpPointStatistics(new TargetDefinition(7, 2.0f)); 
-    Float res=analysis.analyseAccuracy("sz000007");
-    System.out.println("res:"+res);
+    List<StockInfo> stocks=dataService.findStocksPeRatioBetween(-1f, Float.MAX_VALUE);
+    for(StockInfo stock:stocks){
+      Float res=analysis.analyseAccuracy(stock.getSymbol());
+      if (res!=null) {
+        System.out.println("res:"+res);
+      }
+    }
 
 //    SimpleDateFormat  formate=new SimpleDateFormat("yyyy-MM-dd");
 //    Map<String, BuyPointStatisticsData> statistics=null;
@@ -51,6 +72,7 @@ public class AnalysisTest {
 //    System.out.println((float)hit/(float)(hit+nohit));
   }
 
+  
   @Test
   public void testStockStageAnalyse() throws Exception {
     DataSyncService dataService=SpringBeanFactory.getBean(DataSyncService.class);

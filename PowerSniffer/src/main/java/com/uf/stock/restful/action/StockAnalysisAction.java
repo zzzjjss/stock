@@ -102,7 +102,7 @@ public class StockAnalysisAction {
 	                  if (stage==null||stage.getUpPower()<=stage.getDownPower()) {
                         continue;
                       }else {
-                        data.setUpPower(stage.getUpPower());
+                        data.setUpPower((stage.getUpPower())/(stage.getUpPower()+stage.getDownPower()));
                       }
 	                  data.setStageName("ÉÏÕÇ½×¶Î");
 	                  data.setStockName(stock.getName());

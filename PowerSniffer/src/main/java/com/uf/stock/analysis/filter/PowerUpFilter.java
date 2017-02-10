@@ -1,20 +1,28 @@
 package com.uf.stock.analysis.filter;
 
-import java.util.Date;
-
-import com.uf.stock.data.bean.StockInfo;
-import com.uf.stock.service.StockAnalysisService;
-import com.uf.stock.util.SpringBeanFactory;
+import com.uf.stock.data.bean.StockTradeInfo;
 
 public class PowerUpFilter implements StockFilter{
-  private StockAnalysisService analyseService=SpringBeanFactory.getBean(StockAnalysisService.class);
   private float upPowerDefine;
   public PowerUpFilter(float upPowerDefine){
     this.upPowerDefine=upPowerDefine;
   }
   @Override
-  public Boolean doFilter(StockInfo stock, Date date) {
-    return analyseService.isPowerUp(stock, date,upPowerDefine);
+  public FilterResult doFilter(StockTradeInfo tradeInfo) {
+    FilterResult result=new FilterResult();
+    if(tradeInfo!=null&&tradeInfo.getUpDownRate()>0){
+        float power=tradeInfo.getUpDownRate()/tradeInfo.getTurnoverRate();
+        result.setFilterValue(power);
+        if(power>upPowerDefine){
+          result.setIsPass(true);
+        }else {
+          result.setIsPass(false);
+        }
+    }else{
+      result.setFilterValue(-1f);
+      result.setIsPass(false);
+    }
+    return result;
   }
   
 }

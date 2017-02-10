@@ -238,26 +238,27 @@ public class DataSyncServiceImpl implements DataSyncService {
         if (end.getTime() >= today.getTime()) {
           end = today;
         }
-        List<StockTradeInfo> tradeInfos;
-        tradeInfos = dataSyncher.syncStockDateTradeInfos(stockSymbol, start, end);
-        logger.info("start:"+startDate.toString()+" to  end:"+end.toString()+" ,result:"+tradeInfos.size()+" stockSymbol:"+stockSymbol);
+        long startTime=System.currentTimeMillis();
+        List<StockTradeInfo> tradeInfos = dataSyncher.syncStockDateTradeInfos(stockSymbol, start, end);
+        long cost=System.currentTimeMillis()-startTime;
+        logger.info("start:"+startDate.toString()+" to  end:"+end.toString()+" ,result:"+tradeInfos.size()+" stockSymbol:"+stockSymbol+" costTime:"+cost+"ms");
+        
+        
         if (tradeInfos != null && tradeInfos.size() > 0) {
-          StockTradeInfo beforeTradeInfo=latestTi;
-          Collections.sort(tradeInfos);
+//          Collections.sort(tradeInfos);
           for (StockTradeInfo info : tradeInfos) {
 //            System.out.println(format.format(info.getTradeDate()));
-            if(beforeTradeInfo!=null){
-              float downPercent=(beforeTradeInfo.getClosePrice()-info.getOpenPrice())/beforeTradeInfo.getClosePrice();
-              if(downPercent>=0.2){
-                logger.info(stockSymbol+" is ex-right ,the ex-right date is "+format.format(info.getTradeDate()));
-                tradeInfoDao.exrightBeforeDate(info.getStock().getCode(), info.getTradeDate(), downPercent);
-              }
-            }
+//            if(beforeTradeInfo!=null){
+//              float downPercent=(beforeTradeInfo.getClosePrice()-info.getOpenPrice())/beforeTradeInfo.getClosePrice();
+//              if(downPercent>=0.2){
+//                logger.info(stockSymbol+" is ex-right ,the ex-right date is "+format.format(info.getTradeDate()));
+//                tradeInfoDao.exrightBeforeDate(info.getStock().getCode(), info.getTradeDate(), downPercent);
+//              }
+//            }
            tradeInfoDao.insert(info);
            if(Constant.latestTradeDate!=null&&info.getTradeDate().getTime()>Constant.latestTradeDate.getTime()){
         	   Constant.latestTradeDate=info.getTradeDate();
            }
-           beforeTradeInfo=info;
             totalRecord++;
           }
         }
@@ -388,7 +389,7 @@ public boolean isStockStopTrade(Integer stockCode) {
 
 @Override
 public List<StockTradeInfo> findLimitTradeInfosBeforeDate(Integer stockCode, Date date, int limitTradeInfos) {
-  return (List<StockTradeInfo>)tradeInfoDao.findLimitByHql("from StockTradeInfo t where t.stock.code=? and t.tradeDate<? order by t.tradeDate desc", limitTradeInfos, stockCode,date);
+  return (List<StockTradeInfo>)tradeInfoDao.findLimitByHql("from StockTradeInfo t where t.stock.code=? and t.tradeDate<=? order by t.tradeDate desc", limitTradeInfos, stockCode,date);
 } 
 public List<StockTradeInfo> findAllTradeInfosOrderByDateAsc(Integer stockCode){
   return (List<StockTradeInfo>)tradeInfoDao.findByHql("from StockTradeInfo t where t.stock.code=?  order by t.tradeDate asc", stockCode);

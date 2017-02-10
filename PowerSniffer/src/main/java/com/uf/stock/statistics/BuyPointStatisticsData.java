@@ -1,4 +1,4 @@
-package com.uf.stock.analysis;
+package com.uf.stock.statistics;
 
 public class BuyPointStatisticsData {
   private float upPower;

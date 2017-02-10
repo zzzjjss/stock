@@ -10,6 +10,7 @@ import com.uf.stock.service.bean.StockStage;
 public interface StockAnalysisService {
 	public Boolean calculateStockIsDayAverageGoldX(StockInfo stock,int shortTerm,int mediumTerm ,int longTerm);
 	public Boolean isDayAverageGoldX(StockInfo stock,Date date,int shortTerm,int longTerm);
+	public Float calculateAveragePriceBeforeDate(int limit,Date date,Integer stockCode);
 	public Float calculateAverageTurnoverRateBeforeDate(int limit, Date date,Integer stockCode);
 	public Boolean isCurrentAtLowPrice(StockInfo stock,Date date); 
 	public Boolean isPowerUp(StockInfo stock,Date date,float  upPowerDefine);

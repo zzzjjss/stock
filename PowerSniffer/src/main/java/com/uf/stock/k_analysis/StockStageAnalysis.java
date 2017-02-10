@@ -7,10 +7,34 @@ import java.util.Date;
 import java.util.List;
 
 import com.uf.stock.data.bean.StockTradeInfo;
+import com.uf.stock.k_analysis.KLineAnalysisV2.DayBuySellPower;
 import com.uf.stock.service.DataSyncService;
 import com.uf.stock.util.SpringBeanFactory;
 
 public class StockStageAnalysis {
+  
+  public static DayBuySellPower analyseStockBuySellPower(Integer stockCode, Date date, int periodDays) {
+    SimpleDateFormat formate = new SimpleDateFormat("yyyy-MM-dd");
+    DataSyncService service = SpringBeanFactory.getBean(DataSyncService.class);
+    List<StockTradeInfo> infors = service.findLimitTradeInfosBeforeDate(stockCode, date, periodDays);
+    float upPower = 0.0f, downPower = 0.0f;
+    if (infors != null) {
+      for (StockTradeInfo info : infors) {
+        DayBuySellPower state = KLineAnalysisV2.calculateBuySellPower(info);
+        if (state!=null) {
+          upPower = upPower + state.getBuyPower();
+          downPower = downPower + state.getSellPower();
+        }else {
+          System.out.println("can't get kline state "+info.getStockSymbol()+" : "+formate.format(info.getTradeDate()));
+        }
+      }
+    }
+    DayBuySellPower power = new DayBuySellPower();
+    power.setBuyPower(upPower);
+    power.setSellPower(downPower);
+    return power;
+  }
+  
   
   public static StockStage analyseStockStageByKLine(Integer stockCode, Date date, int periodDays) {
     SimpleDateFormat formate = new SimpleDateFormat("yyyy-MM-dd");
@@ -29,13 +53,15 @@ public class StockStageAnalysis {
       }
     }
     StockStage stage = new StockStage();
-    if ((downPower + upPower) != 0) {
-      stage.setDownPower(downPower / (downPower + upPower));
-      stage.setUpPower(upPower / (downPower + upPower));
-    } else {
-      stage.setDownPower(0f);
-      stage.setUpPower(0f);
-    }
+    stage.setDownPower(downPower);
+    stage.setUpPower(upPower);
+//    if ((downPower + upPower) != 0) {
+//      stage.setDownPower(downPower / (downPower + upPower));
+//      stage.setUpPower(upPower / (downPower + upPower));
+//    } else {
+//      stage.setDownPower(0f);
+//      stage.setUpPower(0f);
+//    }
     return stage;
   }
   

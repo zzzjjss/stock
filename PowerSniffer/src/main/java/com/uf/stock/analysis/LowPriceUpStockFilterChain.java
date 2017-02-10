@@ -1,25 +1,41 @@
 package com.uf.stock.analysis;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.uf.stock.analysis.filter.FilterResult;
 import com.uf.stock.analysis.filter.StockFilter;
-import com.uf.stock.data.bean.StockInfo;
+import com.uf.stock.data.bean.StockTradeInfo;
 
 public class LowPriceUpStockFilterChain {
   private List<StockFilter> filters=new ArrayList<StockFilter>();
+  private Map<String, Float> filterResult=new HashMap<String, Float>(); 
   public LowPriceUpStockFilterChain appendStockFilter(StockFilter stockFilter){
     filters.add(stockFilter);
     return this;
   }
-  public Boolean isLowPriceUpPoint(StockInfo stock,Date date){
+  
+  
+  public Boolean isLowPriceUpPoint(StockTradeInfo tradeInfo){
+    filterResult.clear();
     for(StockFilter filter:filters){
-      Boolean pass=filter.doFilter(stock, date);
-      if(pass!=null&&!pass){
+      FilterResult result=filter.doFilter(tradeInfo);
+      if (result==null) {
         return false;
+      }
+      if(!result.getIsPass()){
+        return false;
+      }else {
+        filterResult.put(filter.getClass().getName(), result.getFilterValue());
       }
     }
     return true;
   }
+  public Map<String, Float> getFilterChainResult(){
+    return filterResult;
+  }
+  
+  
 }

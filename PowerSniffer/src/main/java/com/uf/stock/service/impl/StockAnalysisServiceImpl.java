@@ -81,6 +81,9 @@ public class StockAnalysisServiceImpl implements StockAnalysisService {
     }
     return null;
   }
+  public Float calculateAveragePriceBeforeDate(int limit,Date date,Integer stockCode){
+    return tradeInfoDao.calculateAveragePriceBeforeDate(limit, date, stockCode);
+  }
   @Override
   public Boolean isDayAverageGoldX(StockInfo stock, Date date, int shortTerm, int longTerm) {
 //    Calendar calen = Calendar.getInstance();

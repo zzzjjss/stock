@@ -1,8 +1,6 @@
 package com.uf.stock.analysis.filter;
 
-import java.util.Date;
-
-import com.uf.stock.data.bean.StockInfo;
+import com.uf.stock.data.bean.StockTradeInfo;
 import com.uf.stock.k_analysis.StockStage;
 import com.uf.stock.k_analysis.StockStageAnalysis;
 
@@ -12,12 +10,18 @@ private int periodDays;
     this.periodDays=periodDays;
   }
   @Override
-  public Boolean doFilter(StockInfo stock, Date date) {
-    StockStage stage=StockStageAnalysis.analyseStockStageByKLine(stock.getCode(), date, periodDays);
+  public  FilterResult doFilter(StockTradeInfo tradeInfo) {
+    FilterResult result=new FilterResult();
+    StockStage stage=StockStageAnalysis.analyseStockStageByKLine(tradeInfo.getStock().getCode(), tradeInfo.getTradeDate(), periodDays);
     if (stage!=null&&stage.getUpPower()>stage.getDownPower()) {
-      return true;
+      result.setIsPass(true);
+    }else{
+      result.setIsPass(false);
     }
-    return false;
+    if(stage!=null){
+      result.setFilterValue(stage.getUpPower()-stage.getDownPower());
+    }
+    return result;
   }
 
 }
