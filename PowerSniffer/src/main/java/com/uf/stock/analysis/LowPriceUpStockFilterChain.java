@@ -18,17 +18,16 @@ public class LowPriceUpStockFilterChain {
   }
   
   
-  public Boolean isLowPriceUpPoint(StockTradeInfo tradeInfo){
+  public Boolean doFilter(StockTradeInfo tradeInfo){
     filterResult.clear();
     for(StockFilter filter:filters){
       FilterResult result=filter.doFilter(tradeInfo);
       if (result==null) {
-        return false;
+        return null;
       }
+      filterResult.put(filter.getClass().getName(), result.getFilterValue());
       if(!result.getIsPass()){
         return false;
-      }else {
-        filterResult.put(filter.getClass().getName(), result.getFilterValue());
       }
     }
     return true;

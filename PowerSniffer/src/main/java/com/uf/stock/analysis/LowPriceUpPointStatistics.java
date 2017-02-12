@@ -45,7 +45,7 @@ public class LowPriceUpPointStatistics {
         }
         for (;i<tradeInfos.size();i++) {
           StockTradeInfo stockTradeInfo= tradeInfos.get(i);
-          boolean isPass=chain.isLowPriceUpPoint(stockTradeInfo);
+          boolean isPass=chain.doFilter(stockTradeInfo);
           if (isPass) {
             System.out.println(chain.getFilterChainResult());
             logger.info("lowPrice Up  point:" + formate.format(stockTradeInfo.getTradeDate()));

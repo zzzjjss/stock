@@ -1,5 +1,6 @@
 package com.uf.stock.analysis.filter;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import com.uf.stock.data.bean.StockTradeInfo;
@@ -13,6 +14,7 @@ public PriceFilter(List<StockTradeInfo> orderedTradeInfos,float downPercentToLow
 }
   @Override
   public FilterResult doFilter(StockTradeInfo tradeInfo) {
+	SimpleDateFormat formate=new SimpleDateFormat("yyyy-MM-dd");
     FilterResult result=new FilterResult();
     float lowestDownPercent=0f,upDownPercent=0f;
     for (StockTradeInfo stockTradeInfo : orderedTradeInfos) {
