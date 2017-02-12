@@ -13,6 +13,7 @@ import com.uf.stock.data.bean.StockTradeInfo;
 import com.uf.stock.service.DataSyncService;
 import com.uf.stock.service.StockAnalysisService;
 import com.uf.stock.util.SpringBeanFactory;
+import com.uf.stock.util.StockUtil;
 
 public class LowPriceUpPointStatistics {
     private StockAnalysisService analyseService=SpringBeanFactory.getBean(StockAnalysisService.class);
@@ -49,18 +50,8 @@ public class LowPriceUpPointStatistics {
           if (isPass) {
             System.out.println(chain.getFilterChainResult());
             logger.info("lowPrice Up  point:" + formate.format(stockTradeInfo.getTradeDate()));
-            int index=tradeInfos.indexOf(stockTradeInfo);
-            if(index<tradeInfos.size()-1){
-              float upPercent=0f;
-              int days=-1;
-              for(int tmp=index+1;tmp<tradeInfos.size();tmp++){
-                StockTradeInfo tmpTradeInfo=tradeInfos.get(tmp);
-                upPercent=upPercent+tmpTradeInfo.getUpDownRate();
-                days++;
-                if(upPercent>=targetDefin.getUpPercent()){
-                  break;
-                }
-              }
+            if(i<tradeInfos.size()-1){
+              int days=StockUtil.howmanyDaysToTargetUpPercent(tradeInfos, i, targetDefin.getUpPercent());
               logger.info("after days:" + days+" up to targetUpPercent");
               if (days <= targetDefin.getDays()) {
                 hitNum++;
@@ -80,4 +71,5 @@ public class LowPriceUpPointStatistics {
       }
       
     }
+    
 }

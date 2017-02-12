@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import com.uf.stock.data.bean.StockTradeInfo;
+
 public class StockUtil {
 public static Integer parseStockSymbolToStockCode(String stockSymbol){
   return Integer.parseInt(stockSymbol.substring(2));
@@ -35,5 +37,25 @@ public static boolean isOpenTime(Date date){
     e.printStackTrace();
   }
   return false;
+}
+
+
+public static int howmanyDaysToTargetUpPercent(List<StockTradeInfo> tradeInfos,int tradeInfoIndex,float targetUpPercent){
+	int index=tradeInfoIndex;
+	int days = -1;
+	if (index < tradeInfos.size() - 1) {
+		float upPercent = 0f;
+		for (int tmp = index + 1; tmp < tradeInfos.size(); tmp++) {
+			StockTradeInfo tmpTradeInfo = tradeInfos.get(tmp);
+			float highestUpPercent=(float)(((tmpTradeInfo.getHighestPrice()*(1+tmpTradeInfo.getUpDownRate()*0.01))/tmpTradeInfo.getClosePrice())-1)*100;
+			upPercent = upPercent + tmpTradeInfo.getUpDownRate();
+			float maxUp=upPercent+highestUpPercent;
+			days++;
+			if (maxUp >= targetUpPercent) {
+				break;
+			}
+		}
+	}
+	return days;
 }
 }
