@@ -2,6 +2,8 @@ package com.uf.stock.data.bean;
 
 import java.util.Date;
 
+import com.uf.stock.k_analysis.MACD_Analysis.MACDResult;
+
 public class StockTradeInfo implements Comparable<StockTradeInfo>{
   private Long id;
   private Date tradeDate;
@@ -16,6 +18,35 @@ public class StockTradeInfo implements Comparable<StockTradeInfo>{
   private Float upDownRate;
   private String stockSymbol;
   private StockInfo stock;
+  private Float shortEMA;
+  private Float longEMA;
+  private MACDResult macdResult;
+
+  
+
+  public MACDResult getMacdResult() {
+    return macdResult;
+  }
+
+  public void setMacdResult(MACDResult macdResult) {
+    this.macdResult = macdResult;
+  }
+
+  public Float getShortEMA() {
+    return shortEMA;
+  }
+
+  public void setShortEMA(Float shortEMA) {
+    this.shortEMA = shortEMA;
+  }
+
+  public Float getLongEMA() {
+    return longEMA;
+  }
+
+  public void setLongEMA(Float longEMA) {
+    this.longEMA = longEMA;
+  }
 
   public Float getUpDownPrice() {
     return upDownPrice;

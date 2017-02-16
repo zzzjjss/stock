@@ -18,8 +18,6 @@ public class StatisticsTest {
 	@Test
 	public void test() {
 		 DataSyncService dataService=SpringBeanFactory.getBean(DataSyncService.class);
-		    DataSyncService service=SpringBeanFactory.getBean(DataSyncService.class);
-		    LowPriceUpPointStatistics analysis=new LowPriceUpPointStatistics(new TargetDefinition(7, 2.0f)); 
 		    List<StockInfo> stocks=dataService.findStocksPeRatioBetween(-1f, Float.MAX_VALUE);
 		    StatisticsTool tool=new  StatisticsTool();
 		    for(StockInfo stock:stocks){

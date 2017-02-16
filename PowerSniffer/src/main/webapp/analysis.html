@@ -50,11 +50,13 @@
 			<div class="row">
 				<button type="button" class="btn btn-default " id="filterStockBtn">股票过滤</button>
 				<button type="button" class="btn btn-default " id="stageAnalyseBtn">股票阶段分析</button>
+				<button type="button" class="btn btn-default " id="expmaAnalyseBtn">EXPMA分析</button>
 			</div>
 			<br>
 
 			<table id="resultTable" class="display" width="100%"></table>
 			<table id="stageAnalysisResultTable" class="display" width="100%"></table>	
+			<table id="expmaResultTable" class="display" width="100%"></table>
 		</div>
 		
 	</div>
@@ -64,26 +66,31 @@
 </body>
 <script type="text/javascript">
 	var restfulContext = "/PowerSniffer/rest";
-
+	var stockTable;
 	$(document).ready(function() {
 		$("#filterStockBtn").on("click", function() {
 			$(this).prop('disabled', true);
-			filterStockByPrice()
+			filterStockByPrice();
 
 		});
 		$("#stageAnalyseBtn").on("click", function() {
 			$(this).prop('disabled', true);
-			fetchAnalysisResult()
+			fetchAnalysisResult();
 
 		});
-		
+		$("#expmaAnalyseBtn").on("click", function() {
+			$(this).prop('disabled', true);
+			expmaAnalysisResult();
+
+		});
+
 	});
 	function filterStockByPrice() {
 		var minPeRatio = $("#minPeRatio").val();
 		var maxPeRatio = $("#maxPeRatio").val();
 		var periodDays=$("#periodDays").val();
 		var downPercentToLow=$("#downPercentToLow").val();
-		var table = $('#resultTable').DataTable(
+		stockTable= $('#resultTable').DataTable(
 				{
 					"ajax" : restfulContext
 							+ "/analysis/filterStockByPrice?periodDays="+periodDays+"&minPeRatio="+minPeRatio+"&maxPeRatio="+maxPeRatio+"&downPercentToLow="+downPercentToLow,
@@ -97,24 +104,21 @@
 						name:"downRateToLowest",
 						title : "到最低价跌幅%",
 						data : "downRateToLowest"
-					}, {
-						title : "横盘指数",
-						data : "sidewayIndex"
-					}, {
-						title : "慢涨快跌指数",
-						data : "slowUpFastDownIndex"
 					} ],
 					destroy : true
 				});
-		table.column([ "downRateToLowest:name" ]).order("desc").draw();
-		table.on('xhr.dt', function() {
+		stockTable.column([ "downRateToLowest:name" ]).order("desc").draw();
+		stockTable.on('xhr.dt', function() {
 			$("#filterStockBtn").prop('disabled', false);
 		});
 
 	}
 	
 	function fetchAnalysisResult(){
-		var stockTable = $('#resultTable').DataTable();
+		if(stockTable==null){
+			$("#stageAnalyseBtn").prop('disabled', false);
+			return;
+		}
 		var stockSymbols="";
 		stockTable.data().each(function (d){
 			stockSymbols=stockSymbols+";"+d.stockSymbol;
@@ -148,6 +152,47 @@
 			$("#stageAnalyseBtn").prop('disabled', false);
 		});
 	}
+	
+	function expmaAnalysisResult(){
+		if(stockTable==null){
+			$("#expmaAnalyseBtn").prop('disabled', false);
+			return;
+		}
+		var stockSymbols="";
+		stockTable.data().each(function (d){
+			stockSymbols=stockSymbols+";"+d.stockSymbol;
+		});
+		var periodDays=$('#periodDays').val();
+		var table = $('#expmaResultTable').DataTable(
+				{
+					"ajax" : {
+						"url":restfulContext+"/analysis/analyseStockByEXPMA",
+						"type":"POST",
+						"data":{"stockSymbols":stockSymbols,"periodDays":periodDays}
+					},
+					"columns" : [ {
+						title : "股票名称",
+						render:function(cellData, type,rowData, meta){
+							//return '<a  target="_blank" href="http://q.stock.sohu.com/cn/'+rowData.stockSymbol.substring(2)+'/index.shtml">'+rowData.stockName+'</a>'
+							return '<a  target="_blank" href="http://finance.sina.com.cn/realstock/company/'+rowData.stockSymbol+'/nc.shtml">'+rowData.stockName+'</a>'
+						}
+					}, {
+						title : "EXPMA buy point",
+						render:function(cellData, type,rowData, meta){
+							return 'yes';
+						}
+					}],
+					destroy : true
+				});
+		table.on('xhr.dt', function() {
+			$("#expmaAnalyseBtn").prop('disabled', false);
+		});		
+	}
+	
+	
+	
+	
+	
 	function analyseByKLine(stockSymbol,btn){
 		$(btn).prop('disabled', true);
 		$.ajax({

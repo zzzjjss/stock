@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.uf.stock.bean.UpDownPower;
 import com.uf.stock.data.bean.StockInfo;
+import com.uf.stock.data.bean.StockTradeInfo;
 import com.uf.stock.service.DataSyncService;
 import com.uf.stock.service.StockAnalysisService;
 import com.uf.stock.sniffer.alarm.Alarm;
@@ -45,16 +46,18 @@ public class Monitor extends Thread {
             List<UpDownPower> powers = dataSyncService.calculateStocksCurrentPower(stocks);
             List<StockBuySellAlarmMsg> msgs = new ArrayList<StockBuySellAlarmMsg>();
             for (UpDownPower power : powers) {
-              String symbol=power.getTradeInfo().getStockSymbol();
-              if (power.isUpPower() && power.getUpdownPowerValue() >2&& power.getTradeInfo().getUpDownRate() > 1) {
+              StockTradeInfo  tradeInfo= power.getTradeInfo();
+              System.out.println(tradeInfo.getClosePrice());
+              String symbol=tradeInfo.getStockSymbol();
+              StockInfo stock=stockMap.get(symbol);
+              if (stock.getAlarmBuCangPrice()!=null&&tradeInfo.getClosePrice()<=stock.getAlarmBuCangPrice()) {
                 StockBuySellAlarmMsg msg = new StockBuySellAlarmMsg();
                 msg.setStockName(power.getStockName());
                 msg.setStockSymbol(symbol);
                 msg.setMsgType(AlarmMsgType.BUY_POINT_MSG);
                 msgs.add(msg);
               }
-              StockInfo stock=stockMap.get(symbol);
-              if(stock!=null&&stock.getAlarmSellPrice()!=null&&power.getTradeInfo().getClosePrice()>=stock.getAlarmSellPrice()){
+              if(stock.getAlarmSellPrice()!=null&&tradeInfo.getClosePrice()>=stock.getAlarmSellPrice()){
                 StockBuySellAlarmMsg msg = new StockBuySellAlarmMsg();
                 msg.setStockName(power.getStockName());
                 msg.setStockSymbol(symbol);

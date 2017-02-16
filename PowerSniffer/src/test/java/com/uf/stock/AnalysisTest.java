@@ -51,6 +51,7 @@ public class AnalysisTest {
         System.out.println("res:"+res);
       }
     }
+    System.out.println(LowPriceUpPointStatistics.max);
 
 //    SimpleDateFormat  formate=new SimpleDateFormat("yyyy-MM-dd");
 //    Map<String, BuyPointStatisticsData> statistics=null;

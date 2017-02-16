@@ -1,12 +1,19 @@
 package com.uf.stock.analysis;
 
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.uf.stock.analysis.filter.DayAverageGoldXFilter;
+import com.uf.stock.analysis.filter.EXPMA_Filter;
+import com.uf.stock.analysis.filter.KLineFilter;
+import com.uf.stock.analysis.filter.KLineFilterV2;
 import com.uf.stock.analysis.filter.KLineTFilter;
+import com.uf.stock.analysis.filter.MACDFilter;
 import com.uf.stock.analysis.filter.PriceFilter;
 import com.uf.stock.data.bean.StockInfo;
 import com.uf.stock.data.bean.StockTradeInfo;
@@ -16,6 +23,7 @@ import com.uf.stock.util.SpringBeanFactory;
 import com.uf.stock.util.StockUtil;
 
 public class LowPriceUpPointStatistics {
+    public static int max=0;
     private StockAnalysisService analyseService=SpringBeanFactory.getBean(StockAnalysisService.class);
     private Logger logger = LogManager.getLogger(LowPriceUpPointStatistics.class);
     private DataSyncService service=SpringBeanFactory.getBean(DataSyncService.class);
@@ -33,12 +41,15 @@ public class LowPriceUpPointStatistics {
       
       List<StockTradeInfo> tradeInfos=service.findAllTradeInfosOrderByDateAsc(stock.getCode());
       if (tradeInfos!=null) {
+     
         LowPriceUpStockFilterChain  chain=new LowPriceUpStockFilterChain();
-        //chain.appendStockFilter(new PriceFilter(tradeInfos,20f)).appendStockFilter(new DayAverageGoldXFilter(5, 10));
-        //chain.appendStockFilter(new PriceFilter(tradeInfos,15f)).appendStockFilter(new KLineFilter(5));
-//        chain.appendStockFilter(new PriceFilter(tradeInfos,15f)).appendStockFilter(new KLineFilterV2(5));
-        chain.appendStockFilter(new PriceFilter(tradeInfos,15f)).appendStockFilter(new KLineTFilter());
-//        chain.appendStockFilter(new PriceFilter(tradeInfos,5f));
+//        chain.appendStockFilter(new PriceFilter(tradeInfos,30f)).appendStockFilter(new EXPMA_Filter(tradeInfos));
+        chain.appendStockFilter(new PriceFilter(tradeInfos,20f)).appendStockFilter(new MACDFilter(tradeInfos));
+//        chain.appendStockFilter(new PriceFilter(tradeInfos,10f)).appendStockFilter(new DayAverageGoldXFilter(tradeInfos,5, 10));
+//        chain.appendStockFilter(new PriceFilter(tradeInfos,15f)).appendStockFilter(new KLineFilter(5));
+  // chain.appendStockFilter(new PriceFilter(tradeInfos,15f)).appendStockFilter(new KLineFilterV2(5));
+//        chain.appendStockFilter(new PriceFilter(tradeInfos,15f)).appendStockFilter(new KLineTFilter());
+//        chain.appendStockFilter(new PriceFilter(tradeInfos,10f));
 //             .appendStockFilter(new KLineFilter(5));
         int i=0;
         if (tradeInfos.size()>100) {
@@ -52,7 +63,10 @@ public class LowPriceUpPointStatistics {
             logger.info("lowPrice Up  point:" + formate.format(stockTradeInfo.getTradeDate()));
             if(i<tradeInfos.size()-1){
               int days=StockUtil.howmanyDaysToTargetUpPercent(tradeInfos, i, targetDefin.getUpPercent());
-              logger.info("after days:" + days+" up to targetUpPercent");
+              if (days>max) {
+                max=days;
+              }
+              logger.info(stockTradeInfo.getStockSymbol()+" "+formate.format(stockTradeInfo.getTradeDate())+" after days:" + days+" up to targetUpPercent");
               if (days <= targetDefin.getDays()) {
                 hitNum++;
               } else {

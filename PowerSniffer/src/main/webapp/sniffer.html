@@ -24,16 +24,32 @@
 </body>
 <script type="text/javascript">
 var socket;
+var webSocketUrl='ws://' + window.location.host + '/PowerSniffer/alarm';
 $(document).ready(function() {
-	var webSocketUrl='ws://' + window.location.host + '/PowerSniffer/alarm';
 	socket=new WebSocket(webSocketUrl);
 	socket.onmessage = function (message) {
 							//alert(message.data);
 							refreshDashboard(JSON.parse(message.data));
 			                //console.log(message.data);
 			            };
+      
+      window.setInterval(checkWebSocketConnection,5000);
 
 });
+
+
+function checkWebSocketConnection(){
+	if(socket.readyState!=socket.OPEN){
+		console.log("webSocket is closed ,reconnecting...");
+		socket=new WebSocket(webSocketUrl);
+		socket.onmessage = function (message) {
+			refreshDashboard(JSON.parse(message.data));
+        };
+	}else{
+		console.log("webSocket is open");
+	}
+	
+}
 function refreshDashboard(alarmDatas){
 	var alertMsg="";
 	for(var i=0;i<alarmDatas.length;i++){

@@ -3,6 +3,7 @@ package com.uf.stock.restful.action;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
@@ -18,7 +19,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.uf.stock.analysis.LowPriceUpStockFilterChain;
+import com.uf.stock.analysis.filter.EXPMA_Filter;
+import com.uf.stock.analysis.filter.PriceFilter;
 import com.uf.stock.data.bean.StockInfo;
+import com.uf.stock.data.bean.StockTradeInfo;
 import com.uf.stock.k_analysis.AnalysisResult;
 import com.uf.stock.k_analysis.StockStage;
 import com.uf.stock.k_analysis.StockStageAnalysis;
@@ -50,17 +55,23 @@ public class StockAnalysisAction {
 					boolean isStop=service.isStockStopTrade(stock.getCode());
 					if(isStop)
 						continue;
-					AnalysisResult result = StockStageAnalysis.periodAnalyseStock(stock.getCode(), new Date(), analysisDays);
-					if (result.getDownRateToLowest()>=downPercentToLow) {
-                      continue;
-                    }
+					List<StockTradeInfo> infors=service.findTradeInfosBeforeDate(stock.getCode(), new Date(), analysisDays);
+					LowPriceUpStockFilterChain  chain=new LowPriceUpStockFilterChain();
+					chain.appendStockFilter(new PriceFilter(infors, downPercentToLow));
 					PriceSpeedAnalysisResultData data = new PriceSpeedAnalysisResultData();
-					data.setDownRateToLowest(result.getDownRateToLowest());
-					data.setSidewayIndex(result.calculateSidewayIndex());
-					data.setSlowUpFastDownIndex(result.calculateSlowUpFastDownIndex());
-					data.setStockName(stock.getName());
-					data.setStockSymbol(stock.getSymbol());
-					datas.add(data);
+					if (chain.doFilter(infors.get(infors.size()-1))) {
+					  Map<String, Float>  result=chain.getFilterChainResult();
+					  data.setDownRateToLowest(result.get(PriceFilter.class.getName()));
+					  data.setStockName(stock.getName());
+					  data.setStockSymbol(stock.getSymbol());
+					  datas.add(data);
+                    }
+					//AnalysisResult result = StockStageAnalysis.periodAnalyseStock(stock.getCode(), new Date(), analysisDays);
+//					if (result.getDownRateToLowest()>=downPercentToLow) {
+//                      continue;
+//                    }
+//					data.setSidewayIndex(result.calculateSidewayIndex());
+//					data.setSlowUpFastDownIndex(result.calculateSlowUpFastDownIndex());
 				}
 			}
 			response.setSuccess(true);
@@ -124,6 +135,52 @@ public class StockAnalysisAction {
 	        Gson gson=new Gson();
 	        return gson.toJson(response);
 	}
+	
+	@Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @POST
+    @Path("/analyseStockByEXPMA")
+    public String analyseStockByEXPMA(@FormParam("stockSymbols") String stockSymbols,@FormParam("periodDays")  int periodDays){
+         StockStageAnalysisResultResponse response = new StockStageAnalysisResultResponse();
+            try {
+                List<StockStageAnalysisResultData> datas = new ArrayList<StockStageAnalysisResultData>();
+                if (StringUtils.isNotBlank(stockSymbols)) {
+                  String symbols[]=stockSymbols.split(";");
+                  Date date=new Date();
+                  for (String symbol:symbols) {
+                    StockInfo stock=service.findStockInfoByStockSymbol(symbol.trim());
+                    if(stock!=null){
+                      StockStageAnalysisResultData data=new StockStageAnalysisResultData();
+                      List<StockTradeInfo> infors=service.findTradeInfosBeforeDate(stock.getCode(), new Date(), periodDays);
+                      if (infors!=null&&infors.size()>0) {
+                        LowPriceUpStockFilterChain  chain=new LowPriceUpStockFilterChain();
+                        chain.appendStockFilter(new EXPMA_Filter(infors));
+                        Boolean isPass=chain.doFilter(infors.get(infors.size()-1));
+                        if (isPass) {
+                          data.setStockName(stock.getName());
+                          data.setStockSymbol(stock.getSymbol());
+                          datas.add(data);
+                        }
+                      }
+                    }
+                  }
+                }
+                response.setSuccess(true);
+                response.setData(datas);
+            } catch (Exception e) {
+                e.printStackTrace();
+                  ResponseError error=new ResponseError();
+                  error.setCode("1");
+                  error.setMsg(e.getMessage());
+                  response.setError(error);
+                  response.setSuccess(false);
+            }
+            Gson gson=new Gson();
+            return gson.toJson(response);
+    }
+	
+	
+	
 	@Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @GET
