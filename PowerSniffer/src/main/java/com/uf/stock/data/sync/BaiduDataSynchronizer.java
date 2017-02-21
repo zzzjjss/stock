@@ -39,7 +39,7 @@ public class BaiduDataSynchronizer {
     String stockCode=stockSymbol.substring(2);
     DateFormat format=new SimpleDateFormat("yyyyMMdd");
     Date startDate=new Date();
-    while(true){
+    out: while(true){
       String start=format.format(startDate);
       int count=160;
       String urlString="https://gupiao.baidu.com/api/stocks/stockdaybar?from=pc&os_ver=1&cuid=xxx&vv=100&format=json&stock_code="+stockSymbol+"&step=3&start="+start+"&count="+count+"&fq_type=front&timestamp="+System.currentTimeMillis();
@@ -51,6 +51,7 @@ public class BaiduDataSynchronizer {
         if (status == HttpStatus.SC_OK) {
           HttpEntity entity = response.getEntity();
           String responseContent = EntityUtils.toString(entity, Charset.forName("gb2312"));
+          System.out.println(responseContent);
           if(StringUtils.isBlank(responseContent)||"{}".equals(StringUtils.reverseDelimited(responseContent,'\n'))){
               return result;
           }
@@ -70,7 +71,7 @@ public class BaiduDataSynchronizer {
               if(existLatestDataDate!=null){
                 int existDataDateInt=Integer.parseInt(format.format(existLatestDataDate));
                 if (tradeDateInt<=existDataDateInt) {
-                  break;
+                  break out;
                 }
               }
               String tradeDate=String.valueOf(tradeDateInt);
