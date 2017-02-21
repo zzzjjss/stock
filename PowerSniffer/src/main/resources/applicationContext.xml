@@ -37,6 +37,7 @@ http://www.springframework.org/schema/aop/spring-aop.xsd">
 				<value>com/uf/stock/data/bean/StockInfo.hbm.xml</value>
 				<value>com/uf/stock/data/bean/AlarmStock.hbm.xml</value>
 				<value>com/uf/stock/data/bean/StockTradeInfo.hbm.xml</value>
+				<value>com/uf/stock/data/bean/StockTradeInfoWithAnalysisResult.hbm.xml</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">
@@ -49,7 +50,7 @@ http://www.springframework.org/schema/aop/spring-aop.xsd">
 	</bean>
 	
 	<bean class="com.uf.stock.data.bean.ConfigInfo">
-		<property name="isUseProxy" value="true"></property>
+		<property name="isUseProxy" value="false"></property>
 		<property name="proxyAddress" value="proxy-sfo"></property>
 		<property name="proxyPort" value="80"></property>
 	</bean>

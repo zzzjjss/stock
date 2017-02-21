@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.uf.stock.data.bean.StockTradeInfoWithAnalysisResult" table="stock_trade_info_with_analysis">
+		<id name="id" type="long">
+			<column name="id" />
+			<generator class="identity" />
+		</id>
+		<property name="tradeDate" type="timestamp">
+			<column name="trade_date" />
+		</property>
+
+		<property name="openPrice" type="float">
+			<column name="open_price" />
+		</property>
+		<property name="highestPrice" type="float">
+			<column name="highest_price" />
+		</property>
+		<property name="closePrice" type="float">
+			<column name="close_price" />
+		</property>
+		<property name="lowestPrice" type="float">
+			<column name="lowest_price" />
+		</property>
+		<property name="tradeAmount" type="long">
+			<column name="trade_amount" />
+		</property>
+		<property name="tradeMoney" type="long">
+			<column name="trade_money" />
+		</property>
+		<property name="upDownPrice" type="float">
+			<column name="up_down_price" />
+		</property>
+		<property name="preClosePrice" type="float">
+			<column name="pre_close_price" />
+		</property>
+		<property name="upDownRate" type="float">
+			<column name="up_down_rate" />
+		</property>
+		<property name="stockSymbol" type="string">
+			<column name="stock_symbol" />
+		</property>
+		
+		<property name="ma5Price" type="float">
+			<column name="ma5_price" />
+		</property>
+		<property name="ma5Volume" type="long">
+			<column name="ma5_volume" />
+		</property>
+		<property name="ma10Price" type="float">
+			<column name="ma10_price" />
+		</property>
+		<property name="ma10Volume" type="long">
+			<column name="ma10_volume" />
+		</property>
+		<property name="ma20Price" type="float">
+			<column name="ma20_price" />
+		</property>
+		<property name="ma20Volume" type="long">
+			<column name="ma20_volume" />
+		</property>
+		<property name="kKDJ" type="float">
+			<column name="k_kdj" />
+		</property>
+		<property name="dKDJ" type="float">
+			<column name="d_kdj" />
+		</property>
+		<property name="jKDJ" type="float">
+			<column name="j_kdj" />
+		</property>
+		<property name="diffMACD" type="float">
+			<column name="diff_macd" />
+		</property>
+		<property name="deaMACD" type="float">
+			<column name="dea_macd" />
+		</property>
+		<property name="macdMACD" type="float">
+			<column name="macd_macd" />
+		</property>
+		<property name="rsi1" type="float">
+			<column name="rsi1" />
+		</property>
+		<property name="rsi2" type="float">
+			<column name="rsi2" />
+		</property>
+		<property name="rsi3" type="float">
+			<column name="rsi3" />
+		</property>
+		<many-to-one name="stock" column="stock_code"
+			class="com.uf.stock.data.bean.StockInfo" lazy="false"></many-to-one>
+
+	</class>
+</hibernate-mapping>

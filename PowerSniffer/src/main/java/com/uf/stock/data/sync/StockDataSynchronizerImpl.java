@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.uf.stock.data.bean.ConfigInfo;
 import com.uf.stock.data.bean.StockInfo;
 import com.uf.stock.data.bean.StockTradeInfo;
+import com.uf.stock.data.bean.StockTradeInfoWithAnalysisResult;
 import com.uf.stock.data.exception.DataSyncException;
 
 public class StockDataSynchronizerImpl implements StockDataSynchronizer {
@@ -20,11 +21,12 @@ public class StockDataSynchronizerImpl implements StockDataSynchronizer {
 
   private SinaDataSynchronizer sinaSync;
   private SoHuDataSynchronizer sohuSyn;
-
+  private BaiduDataSynchronizer baiduSyn;
   @PostConstruct
   private void afterConstruct() {
     sinaSync = new SinaDataSynchronizer(configInfo);
     sohuSyn = new SoHuDataSynchronizer(configInfo);
+    baiduSyn=new BaiduDataSynchronizer(configInfo);
   }
 
   public List<StockInfo> syncAllStocksInfo() {
@@ -56,6 +58,11 @@ public class StockDataSynchronizerImpl implements StockDataSynchronizer {
   public List<StockTradeInfo> syncStockDateTradeInfos(String stockSymbol, Date start, Date end)  throws DataSyncException{
 
     return sohuSyn.syncStockDateTradeInfos(stockSymbol, start, end);
+  }
+
+  @Override
+  public List<StockTradeInfoWithAnalysisResult> syncStockDateTradeInfosWithAnalysisResult(String stockSymbol, Date existLatestDataDate) throws DataSyncException {
+    return baiduSyn.syncStockDateTradeInfosWithAnalysisResult(stockSymbol, existLatestDataDate);
   }
 
 
