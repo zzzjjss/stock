@@ -19,7 +19,7 @@ public class FilterTest {
   @Test
   public void priceFilterTest() {
     DataSyncService service = SpringBeanFactory.getBean(DataSyncService.class);
-    List<StockTradeInfo> infors=service.findTradeInfosBeforeDate(1, new Date(), 1000);
+    List<StockTradeInfo> infors=service.findDateAscTradeInfosBeforeDate(300498, new Date(), 10);
     LowPriceUpStockFilterChain  chain=new LowPriceUpStockFilterChain();
     chain.appendStockFilter(new PriceFilter(infors, 10f));
     chain.doFilter(infors.get(infors.size()-1));
@@ -27,7 +27,7 @@ public class FilterTest {
   @Test
   public void macdFilterTest() {
     DataSyncService service = SpringBeanFactory.getBean(DataSyncService.class);
-    List<StockTradeInfo> infors=service.findTradeInfosBeforeDate(300482, new Date(), 1000);
+    List<StockTradeInfo> infors=service.findDateAscTradeInfosBeforeDate(300482, new Date(), 1000);
     LowPriceUpStockFilterChain  chain=new LowPriceUpStockFilterChain();
     chain.appendStockFilter(new MACDFilter(infors));
     chain.doFilter(infors.get(infors.size()-1));

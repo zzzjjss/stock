@@ -15,14 +15,55 @@
 <title>Insert title here</title>
 </head>
 <body>
+	<table class="table">
+		<tr>
+			<th></th>
+			<th></th>
+			<th><button onclick="showAddToMonitor()">AddToMonitor</button></th>
+		</tr>
+		<tbody id="stocks">
+		</tbody>
+	</table>
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h3 class="panel-title">Dashboard</h3>
 		</div>
 		<div class="panel-body" id="dashboard"  style="max-height: 600px;overflow-y: scroll;"></div>
 	</div>
+	
+	
+	<div class="modal fade" id="addToMonitorModal" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Add  to Monitor</h4>
+				</div>
+				<div class="modal-body">
+					<div class="input-group">
+						<span class="input-group-addon">Stock Symbol</span>
+						<input type="text" class="form-control"  id="stockSymbol">
+					</div>
+					<div class="input-group">
+						<span class="input-group-addon">buyPrice</span>
+						<input type="text" class="form-control" placeholder="" id="buyPrice" >
+					</div>
+					
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" onclick="addToMonitor()">Sure</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	
 </body>
 <script type="text/javascript">
+var restfulContext = "/PowerSniffer/rest";
 var socket;
 var webSocketUrl='ws://' + window.location.host + '/PowerSniffer/alarm';
 $(document).ready(function() {
@@ -34,7 +75,7 @@ $(document).ready(function() {
 			            };
       
       window.setInterval(checkWebSocketConnection,5000);
-
+      listStocksInMonitor();
 });
 
 
@@ -67,6 +108,54 @@ function refreshDashboard(alarmDatas){
 		//$("#dashboard").append('<span id="'+stock.stockSymbol+'"><a  target="_blank" href="http://q.stock.sohu.com/cn/'+stock.stockSymbol.substring(2)+'/index.shtml">'+stock.stockName+'</a>--->'+upDown+'--->'+stock.power+'<br></span>');
 		$("#dashboard").append('<span id="'+stock.stockSymbol+'"><a  target="_blank" href="http://finance.sina.com.cn/realstock/company/'+stock.stockSymbol+'/nc.shtml">'+stock.stockName+'</a>--->'+stock.msgType+'<br></span>');
 	}
+}
+function showAddToMonitor(){
+	$('#addToMonitorModal').modal('show');
+}
+
+function removeFromMonitor(btn){
+	var stockSymbol = $(btn).prop("id");
+	$.ajax({
+		url : restfulContext + "/analysis/removeFromMonitor?stockSymbol="+stockSymbol
+	}).done(function(data) {
+		listStocksInMonitor();
+	});
+}
+
+function addToMonitor(){
+	var stockSymbol=$("#stockSymbol").val();
+	if(stockSymbol==''){
+		alert("stock Symbol is empty!");
+		return;
+	}
+	var buyPrice=$("#buyPrice").val();
+	if(buyPrice<=0){
+		alert("buyPrice must greater 0");
+		return;
+	}
+	
+	$.ajax({
+		url : restfulContext + "/analysis/addToMonitor?stockSymbol="+stockSymbol+"&buyPrice="+buyPrice
+	}).done(function(data) {
+		$('#addToMonitorModal').modal('hide');
+		listStocksInMonitor();
+	});
+}
+
+function listStocksInMonitor(){
+	$("#stocks").empty();
+	$.ajax({
+		url : restfulContext + "/analysis/listStocksInMonitor"
+	}).done(function(data) {
+		if(data!=null){
+			for(var i=0;i<data.length;i++){
+				var stock=data[i];
+				$("#stocks").append('<tr title="'+stock.name+'"><td>'+stock.symbol+'</td>'+
+						'<td>(sell:'+stock.alarmSellPrice+';bucang:'+stock.alarmBuCangPrice+')</td>'+
+						'<td><button  id="'+stock.symbol+ '" onclick="removeFromMonitor(this)">Remove</button></td></tr>');
+			}
+		}
+	});
 }
 </script>
 </html>

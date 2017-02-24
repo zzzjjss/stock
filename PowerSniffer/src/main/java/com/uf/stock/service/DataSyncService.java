@@ -24,8 +24,11 @@ public interface DataSyncService {
     public StockTradeInfo findOneDayTradeInfo(Integer stockCode,Date date);
     public float calculateAvgPriceBeforeDate(Integer stockCode,Date date);
     public void setAlarmStock(StockInfo stock);
-    public List<StockTradeInfo> findTradeInfosBeforeDate(Integer stockCode,Date date,int limitDays);
+    public List<StockTradeInfo> findDateAscTradeInfosBeforeDate(Integer stockCode,Date date,int limitDays);
     public List<StockTradeInfo> findAllTradeInfosOrderByDateAsc(Integer stockCode);
     public List<StockTradeInfo> findLimitTradeInfosBeforeDate(Integer stockCode,Date date,int limitTradeInfos);
     public boolean isStockStopTrade(Integer stockCode);
+    public void addStockToMonitor(String stockSymbol,float alarmSellPrice,float alarmBuCangPrice);
+    public void removeFromMonitor(String stockSymbol);
+    public int syncStockTradeInfoWithAnalysisResult(String stockSymbol);
 }

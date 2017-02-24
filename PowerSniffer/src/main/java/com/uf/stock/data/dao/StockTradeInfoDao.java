@@ -18,7 +18,7 @@ public interface StockTradeInfoDao extends CommonDao<StockTradeInfo>{
   public float calculateLowestPrice(Integer  stockCode);
   public float calculateLowestPriceBeforeDate(Integer  stockCode,Date date);
   public int exrightBeforeDate(Integer stockCode,Date date,Float exPercent);
-  public List<StockTradeInfo> findTradeInfosBeforeDate(Integer stockCode,Date date,int limitDays);
+  public List<StockTradeInfo> findDateAscTradeInfosBeforeDate(Integer stockCode,Date date,int limitDays);
   public Date getLatestDate();
   public long countHql(String hql,Object... paramValue);
 }

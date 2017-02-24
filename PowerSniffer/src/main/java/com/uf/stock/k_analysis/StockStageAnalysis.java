@@ -70,7 +70,7 @@ public class StockStageAnalysis {
   public static AnalysisResult periodAnalyseStock(Integer stockCode,Date date,int period){
     AnalysisResult result=new AnalysisResult();
     DataSyncService service=SpringBeanFactory.getBean(DataSyncService.class);
-    List<StockTradeInfo> infors=service.findTradeInfosBeforeDate(stockCode, date, period);
+    List<StockTradeInfo> infors=service.findDateAscTradeInfosBeforeDate(stockCode, date, period);
     List<Float[]> continueUpRate=new ArrayList<Float[]>();
     List<Float[]> continueDownRate=new ArrayList<Float[]>();
     List<Float> tmpUp=new ArrayList<Float>();

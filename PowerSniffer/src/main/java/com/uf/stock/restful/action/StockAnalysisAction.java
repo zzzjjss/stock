@@ -55,7 +55,7 @@ public class StockAnalysisAction {
 					boolean isStop=service.isStockStopTrade(stock.getCode());
 					if(isStop)
 						continue;
-					List<StockTradeInfo> infors=service.findTradeInfosBeforeDate(stock.getCode(), new Date(), analysisDays);
+					List<StockTradeInfo> infors=service.findDateAscTradeInfosBeforeDate(stock.getCode(), new Date(), analysisDays);
 					LowPriceUpStockFilterChain  chain=new LowPriceUpStockFilterChain();
 					chain.appendStockFilter(new PriceFilter(infors, downPercentToLow));
 					PriceSpeedAnalysisResultData data = new PriceSpeedAnalysisResultData();
@@ -156,7 +156,7 @@ public class StockAnalysisAction {
                     StockInfo stock=service.findStockInfoByStockSymbol(symbol.trim());
                     if(stock!=null){
                       StockStageAnalysisResultData data=new StockStageAnalysisResultData();
-                      List<StockTradeInfo> infors=service.findTradeInfosBeforeDate(stock.getCode(), new Date(), periodDays);
+                      List<StockTradeInfo> infors=service.findDateAscTradeInfosBeforeDate(stock.getCode(), new Date(), periodDays);
                       if (infors!=null&&infors.size()>0) {
                         LowPriceUpStockFilterChain  chain=new LowPriceUpStockFilterChain();
                         chain.appendStockFilter(new EXPMA_Filter(infors));
@@ -201,4 +201,36 @@ public class StockAnalysisAction {
 	  Gson gson=gBuilder.create();
 	  return gson.toJson(stage);
 	}
+	
+	@Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @GET
+    @Path("/addToMonitor")
+    public String addToMonitor(@QueryParam("stockSymbol") String stockSymbol,@QueryParam("buyPrice") float buyPrice) {
+	 service.addStockToMonitor(stockSymbol, buyPrice*1.02f, buyPrice*0.98f); 
+	 return "{}";
+	}
+	@Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @GET
+    @Path("/removeFromMonitor")
+    public String removeFromMonitor(@QueryParam("stockSymbol") String stockSymbol) {
+     service.removeFromMonitor(stockSymbol); 
+     return "{}";
+    }
+	@Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @GET
+    @Path("/listStocksInMonitor")
+    public String listStocksInMonitor() {
+     List<StockInfo> stocks=service.findStocksInMonitor(); 
+     if (stocks!=null&&stocks.size()>0) {
+       GsonBuilder gBuilder=new GsonBuilder();
+       gBuilder.serializeSpecialFloatingPointValues();
+       Gson gson=gBuilder.create();
+       return gson.toJson(stocks);
+    }else {
+      return "";
+    }
+    }
 }

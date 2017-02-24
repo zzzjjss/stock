@@ -62,7 +62,7 @@
 	</div>
 	<br>
 
-
+	
 </body>
 <script type="text/javascript">
 	var restfulContext = "/PowerSniffer/rest";
@@ -104,7 +104,7 @@
 						name:"downRateToLowest",
 						title : "到最低价跌幅%",
 						data : "downRateToLowest"
-					} ],
+					}],
 					destroy : true
 				});
 		stockTable.column([ "downRateToLowest:name" ]).order("desc").draw();
@@ -189,18 +189,4 @@
 		});		
 	}
 	
-	
-	
-	
-	
-	function analyseByKLine(stockSymbol,btn){
-		$(btn).prop('disabled', true);
-		$.ajax({
-			url : restfulContext + "/analysis/analyseUpDownPowerByKLine?stockSymbol="+stockSymbol+"&periodDays=10"
-		}).done(function(data) {
-			$(btn).prop('disabled', false);
-			alert("upPower:"+data.upPower+"-----downPower:"+data.downPower);			
-		});
-				
-	}
 </script>

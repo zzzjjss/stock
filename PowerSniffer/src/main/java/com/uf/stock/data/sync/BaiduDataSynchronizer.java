@@ -42,7 +42,7 @@ public class BaiduDataSynchronizer {
     out: while(true){
       String start=format.format(startDate);
       int count=160;
-      String urlString="https://gupiao.baidu.com/api/stocks/stockdaybar?from=pc&os_ver=1&cuid=xxx&vv=100&format=json&stock_code="+stockSymbol+"&step=3&start="+start+"&count="+count+"&fq_type=front&timestamp="+System.currentTimeMillis();
+      String urlString="http://gupiao.baidu.com/api/stocks/stockdaybar?from=pc&os_ver=1&cuid=xxx&vv=100&format=json&stock_code="+stockSymbol+"&step=3&start="+start+"&count="+count+"&fq_type=front&timestamp="+System.currentTimeMillis();
       HttpGet getMethod = new HttpGet(urlString);
       CloseableHttpResponse response = null;
       try {
@@ -68,6 +68,9 @@ public class BaiduDataSynchronizer {
             for(int i=0;i<tradeDatas.size();i++){
               JsonObject   oneDayData=tradeDatas.get(i).getAsJsonObject();
               int tradeDateInt=oneDayData.get("date").getAsInt();
+              if (tradeDateInt<=20100100) {
+                break out;
+              }
               if(existLatestDataDate!=null){
                 int existDataDateInt=Integer.parseInt(format.format(existLatestDataDate));
                 if (tradeDateInt<=existDataDateInt) {
@@ -75,7 +78,6 @@ public class BaiduDataSynchronizer {
                 }
               }
               String tradeDate=String.valueOf(tradeDateInt);
-              System.out.println(tradeDate);
               startDate=format.parse(tradeDate);
               JsonObject klineObject=oneDayData.get("kline").getAsJsonObject();
               JsonObject kdjObject=oneDayData.get("kdj").getAsJsonObject();
@@ -135,6 +137,7 @@ public class BaiduDataSynchronizer {
         }
       }
     }
+    System.out.println("total sync:"+result.size());
     return result;
   }
   

@@ -133,15 +133,15 @@ public float calculateAvgTurnoverRate(Integer stockCode) {
 }
 
 @Override
-public List<StockTradeInfo> findTradeInfosBeforeDate(Integer stockCode, Date date, int limitDays) {
+public List<StockTradeInfo> findDateAscTradeInfosBeforeDate(Integer stockCode, Date date, int limitDays) {
   HibernateTemplate temp=this.getHibernateTemplate();
-  String hql="from StockTradeInfo t where t.stock.code=? and t.tradeDate<=? order by t.tradeDate asc";
+  String hql="from StockTradeInfo t where t.stock.code=? and t.tradeDate<? order by t.tradeDate asc";
   long count=countHqlQuery(hql, stockCode,date);
   Query query=temp.getSessionFactory().getCurrentSession().createQuery(hql);
   query.setMaxResults(limitDays);
   int firstResult=0;
   if (count>limitDays) {
-    firstResult=(int)(count-limitDays);
+    firstResult=(int)(count-limitDays-1);
   }
   query.setFirstResult(firstResult);
   query.setParameter(0, stockCode);

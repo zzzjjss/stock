@@ -96,7 +96,8 @@ public class GoUpStrategyAction {
     			final String symbolTmp=stock.getSymbol();
     			Future<Integer> future=pool.submit(new Callable<Integer>() {
     				public Integer  call(){
-    					return service.syncStockTradeInfos(symbolTmp);
+    				  return service.syncStockTradeInfoWithAnalysisResult(symbolTmp);
+    					//return service.syncStockTradeInfos(symbolTmp);
     				}
     			});	
     			results.add(future);
@@ -115,7 +116,8 @@ public class GoUpStrategyAction {
     	  if(StringUtils.isBlank(stockSymbol)){
         	  stockSymbol=service.transToStockSymbolFromStockCode(stockCode);
           }
-          syncCount=service.syncStockTradeInfos(stockSymbol);
+//          syncCount=service.syncStockTradeInfos(stockSymbol);
+    	  syncCount=service.syncStockTradeInfoWithAnalysisResult(stockSymbol);
       }
       response.setMsg("total sucess :"+syncCount);
       response.setSuccess(true);

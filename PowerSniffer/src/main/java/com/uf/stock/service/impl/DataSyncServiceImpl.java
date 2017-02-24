@@ -28,9 +28,11 @@ import com.uf.stock.bean.UpDownPower;
 import com.uf.stock.data.bean.AlarmStock;
 import com.uf.stock.data.bean.StockInfo;
 import com.uf.stock.data.bean.StockTradeInfo;
+import com.uf.stock.data.bean.StockTradeInfoWithAnalysisResult;
 import com.uf.stock.data.dao.AlarmStockDao;
 import com.uf.stock.data.dao.StockInfoDao;
 import com.uf.stock.data.dao.StockTradeInfoDao;
+import com.uf.stock.data.dao.StockTradeInfoWithAnalysisResultDao;
 import com.uf.stock.data.sync.StockDataSynchronizer;
 import com.uf.stock.service.DataSyncService;
 import com.uf.stock.util.Constant;
@@ -45,6 +47,8 @@ public class DataSyncServiceImpl implements DataSyncService {
   private AlarmStockDao alarmStockDao;
   @Autowired
   private StockTradeInfoDao tradeInfoDao;
+  @Autowired
+  private StockTradeInfoWithAnalysisResultDao  tradeInfoWithResultDao;
   private Map<Integer, AlarmStock> alarmStockCache = new HashMap<Integer, AlarmStock>();
   private Map<Integer,String> codeToSymbol=new HashMap<Integer, String>();
   private Logger logger = LogManager.getLogger(DataSyncServiceImpl.class);
@@ -347,12 +351,8 @@ public StockTradeInfo findOneDayTradeInfo(Integer stockCode, Date date) {
   return null;
 }
 
-public List<StockTradeInfo> findTradeInfosBeforeDate(Integer stockCode,Date date,int limitDays){
-	 Calendar calendar = Calendar.getInstance();
-     calendar.setTime(date);
-     calendar.add(Calendar.DATE, 0-limitDays);	
-    return  (List<StockTradeInfo>)tradeInfoDao.findByHql("from StockTradeInfo t where t.stock.code=? and t.tradeDate>=? order by t.tradeDate asc", stockCode,calendar.getTime());
-  //return tradeInfoDao.findTradeInfosBeforeDate(stockCode, date, limitDays);
+public List<StockTradeInfo> findDateAscTradeInfosBeforeDate(Integer stockCode,Date date,int limitDays){
+  return tradeInfoDao.findDateAscTradeInfosBeforeDate(stockCode, date, limitDays);
 }
 
 @Override
@@ -393,5 +393,47 @@ public List<StockTradeInfo> findLimitTradeInfosBeforeDate(Integer stockCode, Dat
 } 
 public List<StockTradeInfo> findAllTradeInfosOrderByDateAsc(Integer stockCode){
   return (List<StockTradeInfo>)tradeInfoDao.findByHql("from StockTradeInfo t where t.stock.code=?  order by t.tradeDate asc", stockCode);
+}
+
+@Override
+public int syncStockTradeInfoWithAnalysisResult(String stockSymbol) {
+  int i=0;
+  try {
+    StockTradeInfoWithAnalysisResult latest=tradeInfoWithResultDao.findLatestDateStockTradeInfo(stockSymbol);
+    List<StockTradeInfoWithAnalysisResult> results=null;
+    if (latest==null) {
+      results=dataSyncher.syncStockDateTradeInfosWithAnalysisResult(stockSymbol, null);
+    }else{
+      results=dataSyncher.syncStockDateTradeInfosWithAnalysisResult(stockSymbol, latest.getTradeDate());
+    }
+    if (results!=null) {
+      tradeInfoWithResultDao.batchInsertInfos(results);
+      i=results.size();
+    }
+  } catch (Exception e) {
+    logger.error("sync :"+stockSymbol+" tradeinfoWithResult  has exception",e);
+    throw new RuntimeException(e);
+  }
+  return i;
+}
+
+@Override
+public void addStockToMonitor(String stockSymbol, float alarmSellPrice, float alarmBuCangPrice) {
+  StockInfo stockInfo=stockInfoDao.findStockBySymbol(stockSymbol);
+  if (stockInfo!=null) {
+    stockInfo.setIsInAlarmMonitor(true);
+    stockInfo.setAlarmSellPrice(alarmSellPrice);
+    stockInfo.setAlarmBuCangPrice(alarmBuCangPrice);
+    stockInfoDao.saveOrUpdate(stockInfo);
+  }
+}
+
+@Override
+public void removeFromMonitor(String stockSymbol) {
+  StockInfo stockInfo=stockInfoDao.findStockBySymbol(stockSymbol);
+  if (stockInfo!=null) {
+    stockInfo.setIsInAlarmMonitor(false);
+    stockInfoDao.saveOrUpdate(stockInfo);
+  }
 }
 }
