@@ -9,9 +9,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,6 +35,7 @@ import com.uf.stock.data.dao.AlarmStockDao;
 import com.uf.stock.data.dao.StockInfoDao;
 import com.uf.stock.data.dao.StockTradeInfoDao;
 import com.uf.stock.data.dao.StockTradeInfoWithAnalysisResultDao;
+import com.uf.stock.data.exception.DataSyncException;
 import com.uf.stock.data.sync.StockDataSynchronizer;
 import com.uf.stock.service.DataSyncService;
 import com.uf.stock.util.Constant;
@@ -435,5 +438,35 @@ public void removeFromMonitor(String stockSymbol) {
     stockInfo.setIsInAlarmMonitor(false);
     stockInfoDao.saveOrUpdate(stockInfo);
   }
+}
+
+@Override
+public boolean isTradeDate(Date date) {
+  List<StockTradeInfo> infos=tradeInfoDao.findLimitByHql("from StockTradeInfo s where s.tradeDate=?", 1, date);
+  if (infos!=null&&infos.size()>0) {
+    return true;
+  }
+  return false;
+}
+
+@Override
+public Set<String> findAllTradeDate() {
+  Set<String> result=new HashSet<String>();
+  DateFormat format=new SimpleDateFormat("yyyyMMdd");
+  List<Date> allDates=tradeInfoDao.findAllTradeDate();
+  for(Date date:allDates){
+    result.add(format.format(date));
+  }
+  return result;
+}
+public StockTradeInfoWithAnalysisResult syncCurrentStockTradeInfoWithAnalysisResult(String stockSymbol){
+  StockTradeInfoWithAnalysisResult result=null;
+  try {
+    result=dataSyncher.syncCurrentStockTradeInfoWithAnalysisResult(stockSymbol);
+  } catch (DataSyncException e) {
+    // TODO Auto-generated catch block
+    e.printStackTrace();
+  }
+  return result;
 }
 }

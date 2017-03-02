@@ -3,11 +3,13 @@ package com.uf.stock.service;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.uf.stock.bean.UpDownPower;
 import com.uf.stock.data.bean.AlarmStock;
 import com.uf.stock.data.bean.StockInfo;
 import com.uf.stock.data.bean.StockTradeInfo;
+import com.uf.stock.data.bean.StockTradeInfoWithAnalysisResult;
 
 public interface DataSyncService {
     public int syncAllStocksBaseInfo();
@@ -31,4 +33,7 @@ public interface DataSyncService {
     public void addStockToMonitor(String stockSymbol,float alarmSellPrice,float alarmBuCangPrice);
     public void removeFromMonitor(String stockSymbol);
     public int syncStockTradeInfoWithAnalysisResult(String stockSymbol);
+    public StockTradeInfoWithAnalysisResult syncCurrentStockTradeInfoWithAnalysisResult(String stockSymbol);
+    public boolean isTradeDate(Date date);
+    public Set<String>  findAllTradeDate();
 }

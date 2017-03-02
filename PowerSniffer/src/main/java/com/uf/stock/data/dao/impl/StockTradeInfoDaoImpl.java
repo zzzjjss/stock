@@ -3,6 +3,7 @@ package com.uf.stock.data.dao.impl;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -171,6 +172,14 @@ public StockTradeInfo findLatestDateStockTradeInfo(Integer stockCode) {
 
 public long countHql(String hql,Object... paramValue){
   return countHqlQuery(hql,paramValue);
+}
+
+@Override
+public List<Date> findAllTradeDate() {
+  HibernateTemplate temp=this.getHibernateTemplate();
+  SQLQuery query=temp.getSessionFactory().getCurrentSession().createSQLQuery("select distinct(trade_date) from stock_trade_info ");
+  return (List<Date>)query.list();
+
 }
 
 

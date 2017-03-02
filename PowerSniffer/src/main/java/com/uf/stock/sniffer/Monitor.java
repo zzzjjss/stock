@@ -47,7 +47,7 @@ public class Monitor extends Thread {
             List<StockBuySellAlarmMsg> msgs = new ArrayList<StockBuySellAlarmMsg>();
             for (UpDownPower power : powers) {
               StockTradeInfo  tradeInfo= power.getTradeInfo();
-              System.out.println(tradeInfo.getClosePrice());
+              //System.out.println(tradeInfo.getClosePrice());
               String symbol=tradeInfo.getStockSymbol();
               StockInfo stock=stockMap.get(symbol);
               if (stock.getAlarmBuCangPrice()!=null&&tradeInfo.getClosePrice()<=stock.getAlarmBuCangPrice()) {

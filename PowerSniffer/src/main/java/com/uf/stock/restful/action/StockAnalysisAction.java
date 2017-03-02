@@ -21,9 +21,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.uf.stock.analysis.LowPriceUpStockFilterChain;
 import com.uf.stock.analysis.filter.EXPMA_Filter;
+import com.uf.stock.analysis.filter.FilterResult;
+import com.uf.stock.analysis.filter.MACDFilter;
 import com.uf.stock.analysis.filter.PriceFilter;
 import com.uf.stock.data.bean.StockInfo;
 import com.uf.stock.data.bean.StockTradeInfo;
+import com.uf.stock.data.bean.StockTradeInfoWithAnalysisResult;
 import com.uf.stock.k_analysis.AnalysisResult;
 import com.uf.stock.k_analysis.StockStage;
 import com.uf.stock.k_analysis.StockStageAnalysis;
@@ -64,6 +67,11 @@ public class StockAnalysisAction {
 					  data.setDownRateToLowest(result.get(PriceFilter.class.getName()));
 					  data.setStockName(stock.getName());
 					  data.setStockSymbol(stock.getSymbol());
+					 MACDFilter macdFilter=new MACDFilter(infors);
+					 
+					 FilterResult filterResult=macdFilter.doFilter(infors.get(infors.size()-1));
+					 Float macd=filterResult.getFilterValue();
+					 data.setMacd(macd);
 					  datas.add(data);
                     }
 					//AnalysisResult result = StockStageAnalysis.periodAnalyseStock(stock.getCode(), new Date(), analysisDays);

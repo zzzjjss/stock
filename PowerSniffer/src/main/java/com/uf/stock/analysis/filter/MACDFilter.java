@@ -39,6 +39,7 @@ public class MACDFilter implements StockFilter{
     if (index!=null&&index>0) {
       Integer preDayIndex=index-1;
       StockTradeInfo thisDayTradeInfo=orderedTradeInfos.get(index);
+      result.setFilterValue(thisDayTradeInfo.getMacdResult().getMacd());
       StockTradeInfo preDayTradeInfo=orderedTradeInfos.get(preDayIndex);
 //      System.out.println("diff:"+thisDayTradeInfo.getMacdResult().getDiff()+" dea:"+thisDayTradeInfo.getMacdResult().getDea()+" macd:"+thisDayTradeInfo.getMacdResult().getMacd());
       if (thisDayTradeInfo.getMacdResult().getDiff()>0&&preDayTradeInfo.getMacdResult().getMacd()<=0&&thisDayTradeInfo.getMacdResult().getMacd()>0) {

@@ -65,6 +65,11 @@ public class StockDataSynchronizerImpl implements StockDataSynchronizer {
     return baiduSyn.syncStockDateTradeInfosWithAnalysisResult(stockSymbol, existLatestDataDate);
   }
 
+  @Override
+  public StockTradeInfoWithAnalysisResult syncCurrentStockTradeInfoWithAnalysisResult(String stockSymbol) throws DataSyncException {
+    return baiduSyn.syncCurrentStockTradeInfoWithAnalysisResult(stockSymbol);
+  }
+
 
 
 }

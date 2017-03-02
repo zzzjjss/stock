@@ -24,8 +24,12 @@ public class StatisticsTest {
 		    	System.out.println(stock.getName());
 		    	tool.statisticBuyPointByKline(stock.getSymbol());
 		    }
-		
-		
+	}
+	@Test
+	public void testPriceBuyPoint(){
+	  StatisticsTool tool=new StatisticsTool();
+	  tool.statisticBuyPointByLowestPrice();
+	  
 	}
 
 }

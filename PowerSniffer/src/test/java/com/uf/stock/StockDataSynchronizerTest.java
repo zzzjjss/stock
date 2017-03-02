@@ -19,19 +19,27 @@ public class StockDataSynchronizerTest {
 
   @Test
   public void test() {
-    StockDataSynchronizer sync=SpringBeanFactory.getBean(StockDataSynchronizer.class);
+//    StockDataSynchronizer sync=SpringBeanFactory.getBean(StockDataSynchronizer.class);
+//    try {
+////      List<StockTradeInfoWithAnalysisResult> results=sync.syncStockDateTradeInfosWithAnalysisResult("sh601766", null);
+////      System.out.println(results.size());
+//      DateFormat format=new SimpleDateFormat("yyyyMMdd");
+//      try {
+//        List<StockTradeInfoWithAnalysisResult> result2=sync.syncStockDateTradeInfosWithAnalysisResult("sh601766", format.parse("20170110"));
+//        System.out.println(result2.size());
+//      } catch (ParseException e) {
+//        // TODO Auto-generated catch block
+//        e.printStackTrace();
+//      }
+//    } catch (DataSyncException e) {
+//      // TODO Auto-generated catch block
+//      e.printStackTrace();
+//    }
+    DataSyncService service = SpringBeanFactory.getBean(DataSyncService.class);
+    DateFormat format=new SimpleDateFormat("yyyyMMdd");
     try {
-//      List<StockTradeInfoWithAnalysisResult> results=sync.syncStockDateTradeInfosWithAnalysisResult("sh601766", null);
-//      System.out.println(results.size());
-      DateFormat format=new SimpleDateFormat("yyyyMMdd");
-      try {
-        List<StockTradeInfoWithAnalysisResult> result2=sync.syncStockDateTradeInfosWithAnalysisResult("sh601766", format.parse("20170110"));
-        System.out.println(result2.size());
-      } catch (ParseException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
-    } catch (DataSyncException e) {
+      service.isTradeDate(format.parse("20170224"));
+    } catch (ParseException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }

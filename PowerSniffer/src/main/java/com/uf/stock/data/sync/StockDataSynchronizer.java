@@ -17,4 +17,5 @@ public interface StockDataSynchronizer {
   public Map<String,StockTradeInfo> syncStocksCurrentTradeInfo(List<String> stockSymbol);
   public List<StockTradeInfo> syncStockDateTradeInfos(String stockSymbol,Date start,Date end) throws DataSyncException;
   public List<StockTradeInfoWithAnalysisResult> syncStockDateTradeInfosWithAnalysisResult(String stockSymbol,Date existLatestDataDate) throws DataSyncException;
+  public StockTradeInfoWithAnalysisResult syncCurrentStockTradeInfoWithAnalysisResult(String stockSymbol) throws DataSyncException ;
 }

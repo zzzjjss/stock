@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import com.uf.stock.analysis.filter.FilterResult;
 import com.uf.stock.data.bean.StockTradeInfo;
 
 public class StockUtil {
@@ -39,7 +40,27 @@ public static boolean isOpenTime(Date date){
   return false;
 }
 
+public static float calculateDownPercentToLowest(List<StockTradeInfo> orderedTradeInfos,StockTradeInfo tradeInfo){
+  float lowestDownPercent=0f,upDownPercent=0f;
+  for (int i=0;i<orderedTradeInfos.size();i++) {
+      if (i==0) {
+        continue;
+      }
+      StockTradeInfo   stockTradeInfo=orderedTradeInfos.get(i);
+      float lowestUpDownPercent=(float)(((stockTradeInfo.getLowestPrice()*(1+stockTradeInfo.getUpDownRate()*0.01))/stockTradeInfo.getClosePrice())-1)*100;
+      float tmpLowestDownPercent=upDownPercent+lowestUpDownPercent;
+      upDownPercent=upDownPercent+stockTradeInfo.getUpDownRate();
+      if (lowestDownPercent>tmpLowestDownPercent) {
+        lowestDownPercent=tmpLowestDownPercent;
+      }
+      if (stockTradeInfo.getTradeDate().getTime()>=tradeInfo.getTradeDate().getTime()) {
+        break;
+      }
+  }
+  
+  return upDownPercent-lowestDownPercent;
 
+}
 public static int howmanyDaysToTargetUpPercent(List<StockTradeInfo> tradeInfos,int tradeInfoIndex,float targetUpPercent){
 	int index=tradeInfoIndex;
 	int days = -1;

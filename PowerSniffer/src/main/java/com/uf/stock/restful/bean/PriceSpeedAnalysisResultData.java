@@ -6,6 +6,14 @@ private String stockSymbol;
 private float downRateToLowest;
 private float sidewayIndex;
 private float slowUpFastDownIndex;
+private float macd;
+
+public float getMacd() {
+  return macd;
+}
+public void setMacd(float macd) {
+  this.macd = macd;
+}
 public String getStockName() {
 	return stockName;
 }
