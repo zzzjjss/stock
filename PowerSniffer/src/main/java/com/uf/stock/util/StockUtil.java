@@ -69,8 +69,8 @@ public static int howmanyDaysToTargetUpPercent(List<StockTradeInfo> tradeInfos,i
 		for (int tmp = index + 1; tmp < tradeInfos.size(); tmp++) {
 			StockTradeInfo tmpTradeInfo = tradeInfos.get(tmp);
 			float highestUpPercent=(float)(((tmpTradeInfo.getHighestPrice()*(1+tmpTradeInfo.getUpDownRate()*0.01))/tmpTradeInfo.getClosePrice())-1)*100;
-			upPercent = upPercent + tmpTradeInfo.getUpDownRate();
 			float maxUp=upPercent+highestUpPercent;
+			upPercent = upPercent + tmpTradeInfo.getUpDownRate();
 			days++;
 			if (maxUp >= targetUpPercent) {
 				break;
@@ -78,5 +78,23 @@ public static int howmanyDaysToTargetUpPercent(List<StockTradeInfo> tradeInfos,i
 		}
 	}
 	return days;
+}
+public static int howmanyDaysToTargetDownPercent(List<StockTradeInfo> tradeInfos,int tradeInfoIndex,float targetDownPercent){
+  int index=tradeInfoIndex;
+  int days = -1;
+  if (index < tradeInfos.size() - 1) {
+      float downPercent = 0f;
+      for (int tmp = index + 1; tmp < tradeInfos.size(); tmp++) {
+          StockTradeInfo tmpTradeInfo = tradeInfos.get(tmp);
+          float lowestUpDownPercent=(float)(((tmpTradeInfo.getLowestPrice()*(1+tmpTradeInfo.getUpDownRate()*0.01))/tmpTradeInfo.getClosePrice())-1)*100;
+          float maxDown=downPercent+lowestUpDownPercent;
+          downPercent = downPercent + tmpTradeInfo.getUpDownRate();
+          days++;
+          if (maxDown <= (0-targetDownPercent)) {
+              break;
+          }
+      }
+  }
+  return days;
 }
 }

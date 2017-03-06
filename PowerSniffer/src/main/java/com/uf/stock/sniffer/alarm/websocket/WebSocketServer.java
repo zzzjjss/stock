@@ -41,6 +41,5 @@ public class WebSocketServer{
   @OnError
   public void onError(Throwable t) throws Throwable {
       System.out.println("websocket exception");
-      t.printStackTrace();
   }
 }

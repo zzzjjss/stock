@@ -214,8 +214,12 @@ public class StockAnalysisAction {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @GET
     @Path("/addToMonitor")
-    public String addToMonitor(@QueryParam("stockSymbol") String stockSymbol,@QueryParam("buyPrice") float buyPrice) {
-	 service.addStockToMonitor(stockSymbol, buyPrice*1.02f, buyPrice*0.98f); 
+    public String addToMonitor(@QueryParam("stockSymbol") String stockSymbol,@QueryParam("buyPrice") float buyPrice,@QueryParam("alarmType") String alarmType) {
+	  if ("buyAlarm".equals(alarmType)) {
+	    service.addStockToMonitor(stockSymbol, null, buyPrice);
+      }else {
+        service.addStockToMonitor(stockSymbol, buyPrice*1.02f, null); 
+      }
 	 return "{}";
 	}
 	@Produces(MediaType.APPLICATION_JSON)

@@ -41,7 +41,7 @@ public class EXPMA_Filter implements StockFilter{
       Integer preDayIndex=index-1;
       StockTradeInfo thisDayTradeInfo=orderedTradeInfos.get(index);
       StockTradeInfo preDayTradeInfo=orderedTradeInfos.get(preDayIndex);
-      if(preDayTradeInfo.getShortEMA()<preDayTradeInfo.getLongEMA()&&thisDayTradeInfo.getShortEMA()>=thisDayTradeInfo.getLongEMA()){
+      if(preDayTradeInfo.getShortEMA()<preDayTradeInfo.getLongEMA()&&tradeInfo.getClosePrice()>thisDayTradeInfo.getShortEMA()&&thisDayTradeInfo.getShortEMA()>=thisDayTradeInfo.getLongEMA()){
         result.setIsPass(true);
       }else{
         result.setIsPass(false);

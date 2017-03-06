@@ -43,6 +43,13 @@
 				</div>
 				<div class="modal-body">
 					<div class="input-group">
+						<span class="input-group-addon">AlarmType</span>
+						<select id="alarmType" class="form-control">
+							<option value="buyAlarm">buyAlarm</option>
+							<option value="sellAlarm">sellAlarm</option>
+						</select>
+					</div>
+					<div class="input-group">
 						<span class="input-group-addon">Stock Symbol</span>
 						<input type="text" class="form-control"  id="stockSymbol">
 					</div>
@@ -133,9 +140,9 @@ function addToMonitor(){
 		alert("buyPrice must greater 0");
 		return;
 	}
-	
+	var alarmType=$("#alarmType").val();
 	$.ajax({
-		url : restfulContext + "/analysis/addToMonitor?stockSymbol="+stockSymbol+"&buyPrice="+buyPrice
+		url : restfulContext + "/analysis/addToMonitor?stockSymbol="+stockSymbol+"&buyPrice="+buyPrice+"&alarmType="+alarmType
 	}).done(function(data) {
 		$('#addToMonitorModal').modal('hide');
 		listStocksInMonitor();
@@ -151,7 +158,7 @@ function listStocksInMonitor(){
 			for(var i=0;i<data.length;i++){
 				var stock=data[i];
 				$("#stocks").append('<tr title="'+stock.name+'"><td>'+stock.symbol+'</td>'+
-						'<td>(sell:'+stock.alarmSellPrice+';bucang:'+stock.alarmBuCangPrice+')</td>'+
+						'<td>(sell:'+stock.alarmSellPrice+';buy:'+stock.alarmBuCangPrice+')</td>'+
 						'<td><button  id="'+stock.symbol+ '" onclick="removeFromMonitor(this)">Remove</button></td></tr>');
 			}
 		}

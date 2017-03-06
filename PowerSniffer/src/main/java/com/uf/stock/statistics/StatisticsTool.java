@@ -17,6 +17,8 @@ import javassist.expr.NewArray;
 
 import com.uf.stock.analysis.LowPriceUpStockFilterChain;
 import com.uf.stock.analysis.TargetDefinition;
+import com.uf.stock.analysis.filter.EXPMA_Filter;
+import com.uf.stock.analysis.filter.FilterResult;
 import com.uf.stock.analysis.filter.KLineTFilter;
 import com.uf.stock.analysis.filter.PriceFilter;
 import com.uf.stock.data.bean.StockInfo;
@@ -27,8 +29,6 @@ import com.uf.stock.util.StockUtil;
 
 public class StatisticsTool {
 	private DataSyncService service = SpringBeanFactory.getBean(DataSyncService.class);
-
-	
 	public void statisticBuyPointByLowestPrice(){
 	  List<StockInfo> stocks=service.findStocksPeRatioBetween(-1f, 100000f);
 	  DateFormat format=new SimpleDateFormat("yyyyMMdd");
@@ -129,7 +129,46 @@ public class StatisticsTool {
       return result;
     }
 	
-	
+	public void statisticBuyPointByEXPMA(){
+
+      List<StockInfo> stocks=service.findStocksPeRatioBetween(-1f, 100000f);
+      DateFormat format=new SimpleDateFormat("yyyyMMdd");
+      float loseCount=0f,winCount=0f;
+       for (StockInfo stockInfo : stocks) {
+          List<StockTradeInfo> allTradeInfos=service.findAllTradeInfosOrderByDateAsc(stockInfo.getCode());
+          Map<String, Integer> dataToIndexMap=new HashMap<String, Integer>();
+          for(int i=0;i<allTradeInfos.size();i++){
+            StockTradeInfo s=allTradeInfos.get(i);
+            dataToIndexMap.put(format.format(s.getTradeDate()),i);
+          }
+          int start=allTradeInfos.size()-200;
+          if (start<0) {
+            start=0;
+          }
+          PriceFilter priceFilter=new PriceFilter(allTradeInfos, 20f);
+          EXPMA_Filter  emaFilter=new EXPMA_Filter(allTradeInfos);
+          for(;start<allTradeInfos.size();start++){
+            StockTradeInfo tradeInfo=allTradeInfos.get(start);
+//            FilterResult priceResult=priceFilter.doFilter(tradeInfo);
+//            if (!priceResult.getIsPass()) {
+//              continue;
+//            }
+            FilterResult result=emaFilter.doFilter(tradeInfo);
+            if (result.getIsPass()) {
+              int upDays=StockUtil.howmanyDaysToTargetUpPercent(allTradeInfos, start, 2f);
+              int downDays=StockUtil.howmanyDaysToTargetDownPercent(allTradeInfos, start, 2f);
+              if (downDays<=upDays) {
+                loseCount++;
+                System.out.println(tradeInfo.getStockSymbol()+"-->"+format.format(tradeInfo.getTradeDate())+"-->"+downDays+" to downPercent");
+              }else {
+                winCount++;
+                System.out.println(tradeInfo.getStockSymbol()+"-->"+format.format(tradeInfo.getTradeDate())+"-->"+downDays+" to upPercent");
+              }
+            }
+          }
+        }
+       System.out.println("total winRate:"+(winCount/(winCount+loseCount))*100);
+      }
 	
 	public void statisticBuyPointByKline(String stockSymbol) {
 		{

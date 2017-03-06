@@ -1,13 +1,9 @@
 package com.uf.stock;
 
-import static org.junit.Assert.*;
-
 import java.util.List;
 
 import org.junit.Test;
 
-import com.uf.stock.analysis.LowPriceUpPointStatistics;
-import com.uf.stock.analysis.TargetDefinition;
 import com.uf.stock.data.bean.StockInfo;
 import com.uf.stock.service.DataSyncService;
 import com.uf.stock.statistics.StatisticsTool;
@@ -29,7 +25,11 @@ public class StatisticsTest {
 	public void testPriceBuyPoint(){
 	  StatisticsTool tool=new StatisticsTool();
 	  tool.statisticBuyPointByLowestPrice();
-	  
 	}
+	@Test
+    public void testExpmaPoint(){
+      StatisticsTool tool=new StatisticsTool();
+      tool.statisticBuyPointByEXPMA();
+    }
 
 }

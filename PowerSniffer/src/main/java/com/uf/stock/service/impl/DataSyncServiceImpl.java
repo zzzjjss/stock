@@ -421,7 +421,7 @@ public int syncStockTradeInfoWithAnalysisResult(String stockSymbol) {
 }
 
 @Override
-public void addStockToMonitor(String stockSymbol, float alarmSellPrice, float alarmBuCangPrice) {
+public void addStockToMonitor(String stockSymbol, Float alarmSellPrice, Float alarmBuCangPrice) {
   StockInfo stockInfo=stockInfoDao.findStockBySymbol(stockSymbol);
   if (stockInfo!=null) {
     stockInfo.setIsInAlarmMonitor(true);
