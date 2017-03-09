@@ -31,5 +31,10 @@ public class StatisticsTest {
       StatisticsTool tool=new StatisticsTool();
       tool.statisticBuyPointByEXPMA();
     }
+	@Test
+	public void testTKlinePoint(){
+	  StatisticsTool tool=new StatisticsTool();
+	  tool.statisticBuyPointByTKline();
+	}
 
 }

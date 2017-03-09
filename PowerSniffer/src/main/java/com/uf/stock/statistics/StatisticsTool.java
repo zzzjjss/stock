@@ -8,10 +8,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javassist.expr.NewArray;
 
@@ -20,6 +23,7 @@ import com.uf.stock.analysis.TargetDefinition;
 import com.uf.stock.analysis.filter.EXPMA_Filter;
 import com.uf.stock.analysis.filter.FilterResult;
 import com.uf.stock.analysis.filter.KLineTFilter;
+import com.uf.stock.analysis.filter.MACDFilter;
 import com.uf.stock.analysis.filter.PriceFilter;
 import com.uf.stock.data.bean.StockInfo;
 import com.uf.stock.data.bean.StockTradeInfo;
@@ -128,7 +132,79 @@ public class StatisticsTool {
       }
       return result;
     }
-	
+	public void statisticBuyPointByTKline(){
+
+      List<StockInfo> stocks=service.findStocksPeRatioBetween(-1f, 100000f);
+      float maxDown=0f;
+      List<Float> downs=new ArrayList<Float>();
+      DateFormat format=new SimpleDateFormat("yyyyMMdd");
+      SortedMap<Integer, Integer> statitc=new  TreeMap<Integer, Integer>();
+       for (StockInfo stockInfo : stocks) {
+         if (stockInfo.getName().contains("ST")) {
+          continue;
+         }
+          List<StockTradeInfo> allTradeInfos=service.findAllTradeInfosOrderByDateAsc(stockInfo.getCode());
+          int start=allTradeInfos.size()-200;
+          if (start<0) {
+            start=0;
+          }
+          int priceFilterStart=allTradeInfos.size()-300;
+          if (priceFilterStart<0) {
+            priceFilterStart=0;
+          }
+          PriceFilter priceFilter=new PriceFilter(allTradeInfos.subList(priceFilterStart,allTradeInfos.size()-1), 50f);
+          KLineTFilter tFilter=new KLineTFilter(0.2f);
+          for(;start<allTradeInfos.size();start++){
+            StockTradeInfo tradeInfo=allTradeInfos.get(start);
+            FilterResult priceResult=priceFilter.doFilter(tradeInfo);
+            if (!priceResult.getIsPass()) {
+              continue;
+            }
+            FilterResult result=tFilter.doFilter(tradeInfo);
+            if (result.getIsPass()) {
+              int upDays=StockUtil.howmanyDaysToTargetUpPercent(allTradeInfos, start, 2f);
+              if (upDays>10) {
+                Float upDownPercent=StockUtil.updownPercentBetweenStartEnd(allTradeInfos, start+1, start+11);
+                downs.add(upDownPercent);
+                if (upDownPercent<maxDown) {
+                  maxDown=upDownPercent;
+                }
+                if (upDownPercent!=null&&upDownPercent<-7f) {
+                  System.out.println(tradeInfo.getStockSymbol()+":"+format.format(tradeInfo.getTradeDate())+" updown:--->"+upDownPercent);
+                }
+              }
+              Integer tmp=statitc.get(upDays);
+              if (tmp==null) {
+                tmp=1;
+              }else {
+                tmp++;
+              }
+              statitc.put(upDays, tmp);
+            }
+          }
+        }
+       System.out.println(statitc);
+       int win=0,lose=0;
+       for (Map.Entry<Integer, Integer> sta : statitc.entrySet()) {
+         Integer key=sta.getKey();
+         if (key<=10) {
+           win=win+sta.getValue();
+        }else {
+          lose=lose+sta.getValue();
+        }
+      }
+       System.out.println("win:"+win+" lose:"+lose);
+       float rate=((float)(win)/(float)(win+lose))*100;
+       System.out.println("winRate:"+rate);
+       float accept=(rate*2f)/(100-rate);
+       System.out.println("accept downPercent:"+accept+"%");
+       System.out.println("maxDownPercent:"+maxDown);
+       float sum=0f;
+       for(Float updown:downs){
+         sum=sum+updown;
+       }
+       System.out.println("avgDownPercent:"+(sum/downs.size())+"%");
+      }	
 	public void statisticBuyPointByEXPMA(){
 
       List<StockInfo> stocks=service.findStocksPeRatioBetween(-1f, 100000f);
@@ -184,7 +260,7 @@ public class StatisticsTool {
 				LowPriceUpStockFilterChain lowPriceChain = new LowPriceUpStockFilterChain();
 				lowPriceChain.appendStockFilter(new PriceFilter(tradeInfos, 50f));
 				LowPriceUpStockFilterChain klineChain = new LowPriceUpStockFilterChain();
-				klineChain.appendStockFilter(new KLineTFilter());
+				klineChain.appendStockFilter(new KLineTFilter(0.1f));
 				int i = 0;
 				if (tradeInfos.size() > 100) {
 					i = tradeInfos.size() - 100;

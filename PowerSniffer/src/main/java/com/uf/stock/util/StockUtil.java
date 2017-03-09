@@ -97,4 +97,15 @@ public static int howmanyDaysToTargetDownPercent(List<StockTradeInfo> tradeInfos
   }
   return days;
 }
+public static Float updownPercentBetweenStartEnd(List<StockTradeInfo> allTradeInfos ,int startIndex,int endIndex){
+  if (startIndex<0||endIndex>=allTradeInfos.size()||startIndex>=endIndex) {
+    return null;
+  }
+  float result=0f;
+  for(;startIndex<=endIndex;startIndex++){
+    StockTradeInfo info=allTradeInfos.get(startIndex);
+    result=result+info.getUpDownRate();
+  }
+  return result;
+}
 }

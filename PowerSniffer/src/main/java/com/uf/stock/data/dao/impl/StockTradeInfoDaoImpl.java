@@ -142,7 +142,7 @@ public List<StockTradeInfo> findDateAscTradeInfosBeforeDate(Integer stockCode, D
   query.setMaxResults(limitDays);
   int firstResult=0;
   if (count>limitDays) {
-    firstResult=(int)(count-limitDays-1);
+    firstResult=(int)(count-limitDays);
   }
   query.setFirstResult(firstResult);
   query.setParameter(0, stockCode);

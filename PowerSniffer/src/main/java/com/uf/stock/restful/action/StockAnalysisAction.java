@@ -22,6 +22,7 @@ import com.google.gson.GsonBuilder;
 import com.uf.stock.analysis.LowPriceUpStockFilterChain;
 import com.uf.stock.analysis.filter.EXPMA_Filter;
 import com.uf.stock.analysis.filter.FilterResult;
+import com.uf.stock.analysis.filter.KLineTFilter;
 import com.uf.stock.analysis.filter.MACDFilter;
 import com.uf.stock.analysis.filter.PriceFilter;
 import com.uf.stock.data.bean.StockInfo;
@@ -53,6 +54,7 @@ public class StockAnalysisAction {
 		try {
 			List<PriceSpeedAnalysisResultData> datas = new ArrayList<PriceSpeedAnalysisResultData>();
 			List<StockInfo> stocks = service.findStocksPeRatioBetween(minPeRatio, maxPeRation);
+			KLineTFilter tFilter=new KLineTFilter(0.2f);
 			if (stocks != null && stocks.size() > 0) {
 				for (StockInfo stock : stocks) {
 					boolean isStop=service.isStockStopTrade(stock.getCode());
@@ -68,9 +70,11 @@ public class StockAnalysisAction {
 					  data.setStockName(stock.getName());
 					  data.setStockSymbol(stock.getSymbol());
 					 MACDFilter macdFilter=new MACDFilter(infors);
-					 
-					 FilterResult filterResult=macdFilter.doFilter(infors.get(infors.size()-1));
+					 StockTradeInfo latestTradeInfo=infors.get(infors.size()-1);
+					 FilterResult filterResult=macdFilter.doFilter(latestTradeInfo);
 					 Float macd=filterResult.getFilterValue();
+					 FilterResult tResult=tFilter.doFilter(latestTradeInfo);
+					 data.settKLine(tResult.getFilterValue());
 					 data.setMacd(macd);
 					  datas.add(data);
                     }

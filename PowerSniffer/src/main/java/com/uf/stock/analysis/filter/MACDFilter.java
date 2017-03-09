@@ -48,6 +48,7 @@ public class MACDFilter implements StockFilter{
         result.setIsPass(true);
       }
     }else{
+      result.setFilterValue(0f);
       result.setIsPass(false);
     }
     return result;

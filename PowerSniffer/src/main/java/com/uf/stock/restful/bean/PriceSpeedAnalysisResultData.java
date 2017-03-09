@@ -7,7 +7,15 @@ private float downRateToLowest;
 private float sidewayIndex;
 private float slowUpFastDownIndex;
 private float macd;
+private float tKLine;
 
+
+public float gettKLine() {
+  return tKLine;
+}
+public void settKLine(float tKLine) {
+  this.tKLine = tKLine;
+}
 public float getMacd() {
   return macd;
 }

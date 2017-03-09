@@ -36,13 +36,13 @@
 					<div class="input-group">
 							<span class="input-group-addon">阶段天数</span>
 							<input type="text"
-							class="form-control" placeholder="periodDays" value="60"
+							class="form-control" placeholder="periodDays" value="300"
 							id="periodDays"> 
 					</div>
 					<div class="input-group">
 							<span class="input-group-addon">底价跌幅《=</span>
 							<input type="text"
-							class="form-control" placeholder="downPercentToLow" value="10"
+							class="form-control" placeholder="downPercentToLow" value="50"
 							id="downPercentToLow"> 
 					</div>
 				</div>
@@ -108,6 +108,10 @@
 						name:"macd",
 						title:"macd",
 						data:"macd"
+					},{
+						name:"tKLine",
+						title:"T style (>0.2 buy)",
+						data:"tKLine"
 					}],
 					destroy : true
 				});
