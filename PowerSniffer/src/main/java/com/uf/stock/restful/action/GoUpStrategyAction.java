@@ -47,25 +47,25 @@ public class GoUpStrategyAction {
       @QueryParam("maxDownPercent")float maxDownPercent){
     GoUpStrategyResponse response=new GoUpStrategyResponse();
     try{
-      List<StockInfo> stocks=service.findStocksPeRatioBetween(minPeRatio,maxPeRation);
-      List<UpDownPower> powers=service.calculateStocksCurrentPower(stocks);
+//      List<StockInfo> stocks=service.findStocksPeRatioBetween(minPeRatio,maxPeRation);
+      //List<UpDownPower> powers=service.calculateStocksCurrentPower(stocks);
       List<GoUpStrategyResponseData> data=new ArrayList<GoUpStrategyResponseData>();
-      for(UpDownPower power:powers){
-        AlarmStock alarm=service.findAlarmStockInfoByStockCode(StockUtil.parseStockSymbolToStockCode(power.getTradeInfo().getStockSymbol()));
-        float  downPercent=((power.getTradeInfo().getClosePrice()-alarm.getAlarmBuyPrice())/power.getTradeInfo().getClosePrice())*100;
-        if(power.getTradeInfo().getUpDownRate()<1||downPercent>maxDownPercent){
-          continue;
-        }
-        GoUpStrategyResponseData item=new GoUpStrategyResponseData();
-        item.setDownPercent(downPercent);
-        item.setPeRatio(power.getStockPeRatio());
-        item.setPower(power.getUpdownPowerValue());
-        item.setStockName(power.getStockName());
-        item.setUpDownRate(power.getTradeInfo().getUpDownRate());
-        item.setStockSymbol(power.getTradeInfo().getStockSymbol());
-        data.add(item);
-        //System.out.println(power.toString()+":  "+downPercent+"%");
-      }
+//      for(UpDownPower power:powers){
+//        AlarmStock alarm=service.findAlarmStockInfoByStockCode(StockUtil.parseStockSymbolToStockCode(power.getTradeInfo().getStockSymbol()));
+//        float  downPercent=((power.getTradeInfo().getClosePrice()-alarm.getAlarmBuyPrice())/power.getTradeInfo().getClosePrice())*100;
+//        if(power.getTradeInfo().getUpDownRate()<1||downPercent>maxDownPercent){
+//          continue;
+//        }
+//        GoUpStrategyResponseData item=new GoUpStrategyResponseData();
+//        item.setDownPercent(downPercent);
+//        item.setPeRatio(power.getStockPeRatio());
+//        item.setPower(power.getUpdownPowerValue());
+//        item.setStockName(power.getStockName());
+//        item.setUpDownRate(power.getTradeInfo().getUpDownRate());
+//        item.setStockSymbol(power.getTradeInfo().getStockSymbol());
+//        data.add(item);
+//        //System.out.println(power.toString()+":  "+downPercent+"%");
+//      }
       response.setSuccess(true);
       response.setData(data);
     }catch(Exception e){

@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.uf.stock.analysis.filter.FilterResult;
 import com.uf.stock.data.bean.StockTradeInfo;
@@ -61,6 +62,32 @@ public static float calculateDownPercentToLowest(List<StockTradeInfo> orderedTra
   return upDownPercent-lowestDownPercent;
 
 }
+
+public static float calculateMa(List<StockTradeInfo> tradeInfos,Map<String, Integer> dateToIndex,StockTradeInfo tradeInfo,int periodDays){
+  SimpleDateFormat formate=new SimpleDateFormat("yyyy-MM-dd");
+  Integer index=dateToIndex.get(formate.format(tradeInfo.getTradeDate()));
+  if (index==null) {
+    return -1f;
+  }
+  StockTradeInfo info=tradeInfos.get(index);
+  if (info==null) {
+    return -1f;
+  }else {
+    int start=(index-periodDays)+1;
+    if (start<0) {
+      start=0;
+    }
+    float sum=0f;
+    int realDays=0;
+    for(int i=start;i<=index;i++){
+      StockTradeInfo tmpInfo=tradeInfos.get(i);
+      sum=sum+tmpInfo.getClosePrice();
+      realDays++;
+    }
+    return sum/realDays;
+  }
+}
+
 public static int howmanyDaysToTargetUpPercent(List<StockTradeInfo> tradeInfos,int tradeInfoIndex,float targetUpPercent){
 	int index=tradeInfoIndex;
 	int days = -1;

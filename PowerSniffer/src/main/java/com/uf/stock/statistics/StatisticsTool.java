@@ -137,13 +137,17 @@ public class StatisticsTool {
       List<StockInfo> stocks=service.findStocksPeRatioBetween(-1f, 100000f);
       float maxDown=0f;
       List<Float> downs=new ArrayList<Float>();
-      DateFormat format=new SimpleDateFormat("yyyyMMdd");
+      DateFormat format=new SimpleDateFormat("yyyy-MM-dd");
       SortedMap<Integer, Integer> statitc=new  TreeMap<Integer, Integer>();
        for (StockInfo stockInfo : stocks) {
          if (stockInfo.getName().contains("ST")) {
           continue;
          }
           List<StockTradeInfo> allTradeInfos=service.findAllTradeInfosOrderByDateAsc(stockInfo.getCode());
+          Map<String, Integer> dateToIndexMap=new HashMap<String,Integer>();
+          for (int index=0;index<allTradeInfos.size();index++) {
+            dateToIndexMap.put(format.format(allTradeInfos.get(index).getTradeDate()) ,index);
+          }
           int start=allTradeInfos.size()-200;
           if (start<0) {
             start=0;
@@ -160,6 +164,9 @@ public class StatisticsTool {
             if (!priceResult.getIsPass()) {
               continue;
             }
+//            float ma5=StockUtil.calculateMa(allTradeInfos, dateToIndexMap, tradeInfo, 5);
+//            float ma10=StockUtil.calculateMa(allTradeInfos, dateToIndexMap, tradeInfo, 10);
+//            float ma20=StockUtil.calculateMa(allTradeInfos, dateToIndexMap, tradeInfo, 20);
             FilterResult result=tFilter.doFilter(tradeInfo);
             if (result.getIsPass()) {
               int upDays=StockUtil.howmanyDaysToTargetUpPercent(allTradeInfos, start, 2f);
@@ -205,24 +212,20 @@ public class StatisticsTool {
        }
        System.out.println("avgDownPercent:"+(sum/downs.size())+"%");
       }	
+	
 	public void statisticBuyPointByEXPMA(){
-
       List<StockInfo> stocks=service.findStocksPeRatioBetween(-1f, 100000f);
       DateFormat format=new SimpleDateFormat("yyyyMMdd");
-      float loseCount=0f,winCount=0f;
+      int loseCount=0,winCount=0;
        for (StockInfo stockInfo : stocks) {
           List<StockTradeInfo> allTradeInfos=service.findAllTradeInfosOrderByDateAsc(stockInfo.getCode());
-          Map<String, Integer> dataToIndexMap=new HashMap<String, Integer>();
-          for(int i=0;i<allTradeInfos.size();i++){
-            StockTradeInfo s=allTradeInfos.get(i);
-            dataToIndexMap.put(format.format(s.getTradeDate()),i);
-          }
           int start=allTradeInfos.size()-200;
           if (start<0) {
             start=0;
           }
           PriceFilter priceFilter=new PriceFilter(allTradeInfos, 20f);
           EXPMA_Filter  emaFilter=new EXPMA_Filter(allTradeInfos);
+          int win=0,lose=0;
           for(;start<allTradeInfos.size();start++){
             StockTradeInfo tradeInfo=allTradeInfos.get(start);
 //            FilterResult priceResult=priceFilter.doFilter(tradeInfo);
@@ -232,18 +235,26 @@ public class StatisticsTool {
             FilterResult result=emaFilter.doFilter(tradeInfo);
             if (result.getIsPass()) {
               int upDays=StockUtil.howmanyDaysToTargetUpPercent(allTradeInfos, start, 2f);
-              int downDays=StockUtil.howmanyDaysToTargetDownPercent(allTradeInfos, start, 2f);
-              if (downDays<=upDays) {
-                loseCount++;
-                System.out.println(tradeInfo.getStockSymbol()+"-->"+format.format(tradeInfo.getTradeDate())+"-->"+downDays+" to downPercent");
-              }else {
-                winCount++;
-                System.out.println(tradeInfo.getStockSymbol()+"-->"+format.format(tradeInfo.getTradeDate())+"-->"+downDays+" to upPercent");
-              }
+                if (upDays<=10) {
+                  winCount++;
+                }else {
+                  loseCount++;
+                }
+//              int downDays=StockUtil.howmanyDaysToTargetDownPercent(allTradeInfos, start, 2f);
+//              if (downDays<=upDays) {
+//                loseCount++;
+//                System.out.println(tradeInfo.getStockSymbol()+"-->"+format.format(tradeInfo.getTradeDate())+"-->"+downDays+" to downPercent");
+//              }else {
+//                winCount++;
+//                System.out.println(tradeInfo.getStockSymbol()+"-->"+format.format(tradeInfo.getTradeDate())+"-->"+downDays+" to upPercent");
+//              }
             }
           }
         }
-       System.out.println("total winRate:"+(winCount/(winCount+loseCount))*100);
+       if ((winCount+loseCount)!=0) {
+         System.out.println("win:"+winCount+"lose:"+loseCount);
+         System.out.println("total winRate:"+((float)winCount/(float)(winCount+loseCount))*100);
+      }
       }
 	
 	public void statisticBuyPointByKline(String stockSymbol) {

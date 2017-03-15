@@ -38,28 +38,30 @@ public class Monitor extends Thread {
       try {
         if (StockUtil.isOpenTime(new Date())) {
           List<StockInfo> stocks = dataSyncService.findStocksInMonitor();
+          List<String> stockSymbols=new ArrayList<String>();
           Map<String,StockInfo> stockMap=new HashMap<String,StockInfo>();
           for(StockInfo stock:stocks){
             stockMap.put(stock.getSymbol(), stock);
+            stockSymbols.add(stock.getSymbol());
           }
           if (stocks != null && stocks.size() > 0) {
-            List<UpDownPower> powers = dataSyncService.calculateStocksCurrentPower(stocks);
+            Map<String, StockTradeInfo> tradeInfoMap = dataSyncService.getCurrentStocksTradeInfo(stockSymbols);
             List<StockBuySellAlarmMsg> msgs = new ArrayList<StockBuySellAlarmMsg>();
-            for (UpDownPower power : powers) {
-              StockTradeInfo  tradeInfo= power.getTradeInfo();
-              //System.out.println(tradeInfo.getClosePrice());
+            for (String stockSymbol : tradeInfoMap.keySet()) {
+              StockTradeInfo  tradeInfo= tradeInfoMap.get(stockSymbol);
               String symbol=tradeInfo.getStockSymbol();
               StockInfo stock=stockMap.get(symbol);
+              //System.out.println(stock.getName()+"-->"+tradeInfo.getClosePrice());
               if (stock.getAlarmBuCangPrice()!=null&&tradeInfo.getClosePrice()<=stock.getAlarmBuCangPrice()) {
                 StockBuySellAlarmMsg msg = new StockBuySellAlarmMsg();
-                msg.setStockName(power.getStockName());
+                msg.setStockName(stock.getName());
                 msg.setStockSymbol(symbol);
                 msg.setMsgType(AlarmMsgType.BUY_POINT_MSG);
                 msgs.add(msg);
               }
               if(stock.getAlarmSellPrice()!=null&&tradeInfo.getClosePrice()>=stock.getAlarmSellPrice()){
                 StockBuySellAlarmMsg msg = new StockBuySellAlarmMsg();
-                msg.setStockName(power.getStockName());
+                msg.setStockName(stock.getName());
                 msg.setStockSymbol(symbol);
                 msg.setMsgType(AlarmMsgType.SELL_POINT_MSG);
                 msgs.add(msg);

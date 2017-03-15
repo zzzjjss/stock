@@ -58,12 +58,9 @@ public class SinaDataSynchronizer {
         formData.add(new BasicNameValuePair("value0", "*"));
         formData.add(new BasicNameValuePair("value1", "*"));
         formData.add(new BasicNameValuePair("value2", "*"));
-        formData.add(new BasicNameValuePair("field3", "ltag"));
-        formData.add(new BasicNameValuePair("max3", "29405529.3904"));
-        formData.add(new BasicNameValuePair("min3", "100"));
-        formData.add(new BasicNameValuePair("field4", "dtsyl"));
-        formData.add(new BasicNameValuePair("max4", "82902.98"));
-        formData.add(new BasicNameValuePair("min4", "0"));
+        formData.add(new BasicNameValuePair("field3", "dtsyl"));
+        formData.add(new BasicNameValuePair("max3", "82902.98"));
+        formData.add(new BasicNameValuePair("min3", "0"));
         UrlEncodedFormEntity formEntity = new UrlEncodedFormEntity(formData);
         postMethod.setEntity(formEntity);
         CloseableHttpResponse response = client.execute(postMethod);
@@ -85,7 +82,7 @@ public class SinaDataSynchronizer {
             } catch (NumberFormatException exception) {
               exception.printStackTrace();
             }
-            stockInfo.setTotalAAmount((stockData.get("ltag").getAsFloat()) * 100);
+            //stockInfo.setTotalAAmount((stockData.get("ltag").getAsFloat()) * 100);
             stockInfo.setPeRatio(stockData.get("dtsyl").getAsFloat());
             all.add(stockInfo);
           }

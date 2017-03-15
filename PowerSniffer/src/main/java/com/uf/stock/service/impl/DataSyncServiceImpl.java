@@ -57,6 +57,7 @@ public class DataSyncServiceImpl implements DataSyncService {
   private Logger logger = LogManager.getLogger(DataSyncServiceImpl.class);
   public int syncAllStocksBaseInfo() {
     List<StockInfo> stockInfo = dataSyncher.syncAllStocksInfo();
+    int add=0;
     for (StockInfo info : stockInfo) {
       StockInfo old=stockInfoDao.findStockByStockCode(info.getCode());
       if(old!=null){
@@ -65,9 +66,10 @@ public class DataSyncServiceImpl implements DataSyncService {
         stockInfoDao.update(old);
       }else{
         stockInfoDao.insert(info);
+        add++;
       }
     }
-    return stockInfo.size();
+    return add;
   }
 
   public List<UpDownPower> calculateStocksCurrentPower(List<StockInfo> stocks) {
