@@ -97,4 +97,10 @@ public class AnalysisTest {
     System.out.println(indexs);
     System.out.println(slowUpFastDownindexs);
   }
+  
+  @Test
+  public void test(){
+    Float a=null;
+    System.out.println(a);
+  }
 }

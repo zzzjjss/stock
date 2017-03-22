@@ -11,20 +11,25 @@ public class KLineTFilter implements StockFilter{
   @Override
   public FilterResult doFilter(StockTradeInfo tradeInfo) {
     FilterResult result=new FilterResult();
-    float preDayClosePrice=tradeInfo.getClosePrice()/(1+(tradeInfo.getUpDownRate()*0.01f));
+    float preDayClosePrice=0f;
+    if (tradeInfo.getClosePrice()!=null&&tradeInfo.getUpDownRate()!=null&&(1+(tradeInfo.getUpDownRate()*0.01f))!=0f) {
+      preDayClosePrice=tradeInfo.getClosePrice()/(1+(tradeInfo.getUpDownRate()*0.01f));
+    }
     float length=(preDayClosePrice*1.1f)-(preDayClosePrice*0.9f);
     
-    KLine kLine=calculateByTline(tradeInfo);
-    
-    float lowerUpPower=kLine.getLowerShadowLength()/length;
-    float upperDownPower=kLine.getUpperShadowLength()/length;
-    result.setFilterValue(lowerUpPower);
-    if(lowerUpPower>lowerShadowPercent&&upperDownPower<0.1f){
-      result.setIsPass(true);;
-    }else{
-      result.setIsPass(false);;
+    KLine kLine=calculateByTline2(tradeInfo);
+    if (length!=0) {
+      float lowerUpPower=kLine.getLowerShadowLength()/length;
+      float upperDownPower=kLine.getUpperShadowLength()/length;
+      result.setFilterValue(lowerUpPower);
+      if(lowerUpPower>lowerShadowPercent&&upperDownPower<0.1f){
+        result.setIsPass(true);
+      }else{
+        result.setIsPass(false);
+      }
+    }else {
+      result.setIsPass(false);
     }
-    
     return result;
   }
   private KLine calculateByTline2(StockTradeInfo tradeInfo){

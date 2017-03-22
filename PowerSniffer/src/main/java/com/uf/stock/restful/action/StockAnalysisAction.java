@@ -49,18 +49,35 @@ public class StockAnalysisAction {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@GET
 	@Path("/filterStockByPrice")
-	public String filterStockByPrice(@QueryParam("minPeRatio") float minPeRatio, @QueryParam("maxPeRatio") float maxPeRation,@QueryParam("downPercentToLow") float downPercentToLow, @QueryParam("periodDays") int analysisDays) {
+	public String filterStockByPrice(@QueryParam("minPeRatio") float minPeRatio, @QueryParam("maxPeRatio") float maxPeRation,@QueryParam("downPercentToLow") float downPercentToLow, @QueryParam("periodDays") int analysisDays
+	                                  ,@QueryParam("useCurrentInfo")boolean useCurrentInfo ) {
 		PriceSpeedAnalysisResultResponse response = new PriceSpeedAnalysisResultResponse();
 		try {
 			List<PriceSpeedAnalysisResultData> datas = new ArrayList<PriceSpeedAnalysisResultData>();
 			List<StockInfo> stocks = service.findStocksPeRatioBetween(minPeRatio, maxPeRation);
+			
 			KLineTFilter tFilter=new KLineTFilter(0.2f);
 			if (stocks != null && stocks.size() > 0) {
+			  Map<String, StockTradeInfo> currentTradeInfos=null;
+			  if (useCurrentInfo) {
+			    List<String> stockSymbols=new ArrayList<String>();
+			    for (StockInfo stock : stocks) {
+			      stockSymbols.add(stock.getSymbol());
+			    }
+			    currentTradeInfos=service.getCurrentStocksTradeInfo(stockSymbols);
+              }
 				for (StockInfo stock : stocks) {
 					boolean isStop=service.isStockStopTrade(stock.getCode());
 					if(isStop)
 						continue;
 					List<StockTradeInfo> infors=service.findDateAscTradeInfosBeforeDate(stock.getCode(), new Date(), analysisDays);
+					if (useCurrentInfo) {
+					  StockTradeInfo currentTradeInfo=currentTradeInfos.get(stock.getSymbol());
+					  if (currentTradeInfo!=null) {
+					    currentTradeInfo.setTradeDate(new Date());
+					    infors.add(currentTradeInfo);
+					  }
+                    }
 					LowPriceUpStockFilterChain  chain=new LowPriceUpStockFilterChain();
 					chain.appendStockFilter(new PriceFilter(infors, downPercentToLow));
 					PriceSpeedAnalysisResultData data = new PriceSpeedAnalysisResultData();
@@ -69,13 +86,13 @@ public class StockAnalysisAction {
 					  data.setDownRateToLowest(result.get(PriceFilter.class.getName()));
 					  data.setStockName(stock.getName());
 					  data.setStockSymbol(stock.getSymbol());
-					 MACDFilter macdFilter=new MACDFilter(infors);
-					 StockTradeInfo latestTradeInfo=infors.get(infors.size()-1);
-					 FilterResult filterResult=macdFilter.doFilter(latestTradeInfo);
-					 Float macd=filterResult.getFilterValue();
-					 FilterResult tResult=tFilter.doFilter(latestTradeInfo);
-					 data.settKLine(tResult.getFilterValue());
-					 data.setMacd(macd);
+  					  MACDFilter macdFilter=new MACDFilter(infors);
+  					  StockTradeInfo latestTradeInfo=infors.get(infors.size()-1);
+  					  FilterResult filterResult=macdFilter.doFilter(latestTradeInfo);
+  					  Float macd=filterResult.getFilterValue();
+  					  FilterResult tResult=tFilter.doFilter(latestTradeInfo);
+  					  data.settKLine(tResult.getFilterValue());
+  					  data.setMacd(macd);
 					  datas.add(data);
                     }
 					//AnalysisResult result = StockStageAnalysis.periodAnalyseStock(stock.getCode(), new Date(), analysisDays);
@@ -96,6 +113,8 @@ public class StockAnalysisAction {
 		      response.setError(error);
 		      response.setSuccess(false);
 		}
+//		GsonBuilder gb=new GsonBuilder();
+//		gb.serializeSpecialFloatingPointValues();
 		Gson gson=new Gson();
 	    return gson.toJson(response);
 	}

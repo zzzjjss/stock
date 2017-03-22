@@ -26,7 +26,7 @@
 					<div class="input-group">
 						<span class="input-group-addon">市营率范围</span> 
 						<input type="text"
-							class="form-control" placeholder="MinPE" value="-1"
+							class="form-control" placeholder="MinPE" value="1"
 							id="minPeRatio"> 
 						<input type="text" class="form-control"
 							placeholder="MaxPE" value="10000" id="maxPeRatio">
@@ -51,6 +51,7 @@
 				<button type="button" class="btn btn-default " id="filterStockBtn">股票过滤</button>
 				<button type="button" class="btn btn-default " id="stageAnalyseBtn">股票阶段分析</button>
 				<button type="button" class="btn btn-default " id="expmaAnalyseBtn">EXPMA分析</button>
+				<button type="button" class="btn btn-default " id="filterStockUseCurrentInfoBtn">(实时)股票过滤</button>
 			</div>
 			<br>
 
@@ -70,7 +71,12 @@
 	$(document).ready(function() {
 		$("#filterStockBtn").on("click", function() {
 			$(this).prop('disabled', true);
-			filterStockByPrice();
+			filterStockByPrice(false);
+
+		});
+		$("#filterStockUseCurrentInfoBtn").on("click", function() {
+			$(this).prop('disabled', true);
+			filterStockByPrice(true);
 
 		});
 		$("#stageAnalyseBtn").on("click", function() {
@@ -85,7 +91,7 @@
 		});
 
 	});
-	function filterStockByPrice() {
+	function filterStockByPrice(useCurrentInfo) {
 		var minPeRatio = $("#minPeRatio").val();
 		var maxPeRatio = $("#maxPeRatio").val();
 		var periodDays=$("#periodDays").val();
@@ -93,7 +99,7 @@
 		stockTable= $('#resultTable').DataTable(
 				{
 					"ajax" : restfulContext
-							+ "/analysis/filterStockByPrice?periodDays="+periodDays+"&minPeRatio="+minPeRatio+"&maxPeRatio="+maxPeRatio+"&downPercentToLow="+downPercentToLow,
+							+ "/analysis/filterStockByPrice?periodDays="+periodDays+"&minPeRatio="+minPeRatio+"&maxPeRatio="+maxPeRatio+"&downPercentToLow="+downPercentToLow+"&useCurrentInfo="+useCurrentInfo,
 					"columns" : [ {
 						title : "股票名称",
 						render:function(cellData, type,rowData, meta){
@@ -116,9 +122,15 @@
 					destroy : true
 				});
 		stockTable.column([ "downRateToLowest:name" ]).order("desc").draw();
-		stockTable.on('xhr.dt', function() {
-			$("#filterStockBtn").prop('disabled', false);
-		});
+		if(useCurrentInfo){
+			stockTable.on('xhr.dt', function() {
+				$("#filterStockUseCurrentInfoBtn").prop('disabled', false);
+			});
+		}else{
+			stockTable.on('xhr.dt', function() {
+				$("#filterStockBtn").prop('disabled', false);
+			});
+		}
 
 	}
 	

@@ -104,12 +104,7 @@ public class SinaDataSynchronizer {
     Map<String, StockTradeInfo> result = new HashMap<String, StockTradeInfo>();
     if(stockSymbol==null||stockSymbol.size()==0)
     	return result;
-    List<String> urlParam = new ArrayList<String>();
-    for (String symbol : stockSymbol) {
-      urlParam.add("s_" + symbol);
-    }
-    long time = System.currentTimeMillis();
-    String url = "http://hq.sinajs.cn/?rn=" + time + "&list=" + Joiner.on(",").join(urlParam);
+    String url = "http://hq.sinajs.cn/list=" + Joiner.on(",").join(stockSymbol);
     HttpGet getMethod = new HttpGet(url);
     CloseableHttpResponse responese = null;
     try {
@@ -128,23 +123,32 @@ public class SinaDataSynchronizer {
               StockTradeInfo currentInfo = new StockTradeInfo();
               currentInfo.setStockSymbol(symbol);
               String infos[] = keyValue[1].replace("\"", "").split(",");
-              if (infos != null && infos.length > 5) {
+              if (infos != null && infos.length > 32) {
+                float yesterdayClosePrice=0f,currentPrice=0f;
                 if (infos[1] != null) {
-                  currentInfo.setClosePrice(Float.parseFloat(infos[1]));
+                  currentInfo.setOpenPrice(Float.parseFloat(infos[1]));
                 }
                 if (infos[2] != null) {
-                  currentInfo.setUpDownPrice(Float.parseFloat(infos[2]));
+                  yesterdayClosePrice=Float.parseFloat(infos[2]);
                 }
                 if (infos[3] != null) {
-                  currentInfo.setUpDownRate(Float.parseFloat(infos[3]));
+                  currentInfo.setClosePrice(Float.parseFloat(infos[3]));
+                  currentPrice=Float.parseFloat(infos[3]);
                 }
-
                 if (infos[4] != null) {
-                  currentInfo.setTradeAmount(Long.parseLong(infos[4]));
+                  currentInfo.setHighestPrice(Float.parseFloat(infos[4]));
                 }
                 if (infos[5] != null) {
-                  currentInfo.setTradeMoney(Long.parseLong(infos[5]));
+                  currentInfo.setLowestPrice(Float.parseFloat(infos[5]));;
                 }
+                if (infos[8]!=null) {
+                  currentInfo.setTradeAmount(Long.parseLong(infos[8]));
+                }
+                if (infos[9]!=null) {
+                  currentInfo.setTradeMoney(Long.parseLong(infos[9].split("[.]")[0]));
+                }
+                currentInfo.setUpDownPrice(currentPrice-yesterdayClosePrice);
+                currentInfo.setUpDownRate(((currentPrice-yesterdayClosePrice)/yesterdayClosePrice)*100);
               }
               result.put(symbol, currentInfo);
             }
