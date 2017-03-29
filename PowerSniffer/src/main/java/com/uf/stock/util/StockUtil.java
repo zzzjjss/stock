@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.uf.stock.analysis.filter.FilterResult;
+import com.uf.stock.bean.KLine;
 import com.uf.stock.data.bean.StockTradeInfo;
 
 public class StockUtil {
@@ -134,5 +135,30 @@ public static Float updownPercentBetweenStartEnd(List<StockTradeInfo> allTradeIn
     result=result+info.getUpDownRate();
   }
   return result;
+}
+
+
+public static  KLine calculateStandardKline(StockTradeInfo tradeInfo){
+  KLine k=new KLine();
+  float preDayClosePrice=0f;
+  if (tradeInfo.getClosePrice()!=null&&tradeInfo.getUpDownRate()!=null&&(1+(tradeInfo.getUpDownRate()*0.01f))!=0f) {
+    preDayClosePrice=tradeInfo.getClosePrice()/(1+(tradeInfo.getUpDownRate()*0.01f));
+  }
+  float length=(preDayClosePrice*1.1f)-(preDayClosePrice*0.9f);
+  float lowerShadowLength,upperShadowLength,realLength;
+  if (tradeInfo.getOpenPrice()<tradeInfo.getClosePrice()) {
+    upperShadowLength=tradeInfo.getHighestPrice()-tradeInfo.getClosePrice();
+    lowerShadowLength=tradeInfo.getOpenPrice()-tradeInfo.getLowestPrice();
+    realLength=tradeInfo.getClosePrice()-tradeInfo.getOpenPrice();
+  }else{
+    lowerShadowLength=tradeInfo.getClosePrice()-tradeInfo.getLowestPrice();
+    upperShadowLength=tradeInfo.getHighestPrice()-tradeInfo.getOpenPrice();
+    realLength=tradeInfo.getOpenPrice()-tradeInfo.getClosePrice();
+  }
+  k.setLowerShadowLength(lowerShadowLength);
+  k.setRealLength(realLength);
+  k.setUpperShadowLength(upperShadowLength);
+  k.setTotalLength(length);
+  return k;
 }
 }

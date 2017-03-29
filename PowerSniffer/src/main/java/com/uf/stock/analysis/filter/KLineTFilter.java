@@ -1,6 +1,8 @@
 package com.uf.stock.analysis.filter;
 
+import com.uf.stock.bean.KLine;
 import com.uf.stock.data.bean.StockTradeInfo;
+import com.uf.stock.util.StockUtil;
 
 public class KLineTFilter implements StockFilter{
   private float lowerShadowPercent;
@@ -17,7 +19,8 @@ public class KLineTFilter implements StockFilter{
     }
     float length=(preDayClosePrice*1.1f)-(preDayClosePrice*0.9f);
     
-    KLine kLine=calculateByTline2(tradeInfo);
+//    KLine kLine=StockUtil.calculateStandardKline(tradeInfo);
+    KLine kLine=calculateByTline(tradeInfo);
     if (length!=0) {
       float lowerUpPower=kLine.getLowerShadowLength()/length;
       float upperDownPower=kLine.getUpperShadowLength()/length;
@@ -32,7 +35,9 @@ public class KLineTFilter implements StockFilter{
     }
     return result;
   }
-  private KLine calculateByTline2(StockTradeInfo tradeInfo){
+  
+  
+  private KLine calculateByTline(StockTradeInfo tradeInfo){
     KLine k=new KLine();
     float preDayClosePrice=tradeInfo.getClosePrice()/(1+(tradeInfo.getUpDownRate()*0.01f));
     float lowerShadowLength,upperShadowLength,realLength;
@@ -49,54 +54,5 @@ public class KLineTFilter implements StockFilter{
     k.setRealLength(realLength);
     k.setUpperShadowLength(upperShadowLength);
     return k;
-  }
-  
-  private KLine calculateByTline(StockTradeInfo tradeInfo){
-    KLine k=new KLine();
-    float preDayClosePrice=tradeInfo.getClosePrice()/(1+(tradeInfo.getUpDownRate()*0.01f));
-    float length=(preDayClosePrice*1.1f)-(preDayClosePrice*0.9f);
-    float lowerShadowLength,upperShadowLength,realLength;
-    if (tradeInfo.getUpDownPrice()>0) {
-      upperShadowLength=tradeInfo.getHighestPrice()-tradeInfo.getClosePrice();
-      lowerShadowLength=tradeInfo.getOpenPrice()-tradeInfo.getLowestPrice();
-      realLength=tradeInfo.getClosePrice()-tradeInfo.getOpenPrice();
-    }else{
-      upperShadowLength=tradeInfo.getHighestPrice()-tradeInfo.getOpenPrice();
-      lowerShadowLength=tradeInfo.getClosePrice()-tradeInfo.getLowestPrice();
-      realLength=tradeInfo.getOpenPrice()-tradeInfo.getClosePrice();
-    }
-    
-    k.setLowerShadowLength(lowerShadowLength);
-    k.setRealLength(realLength);
-    k.setUpperShadowLength(upperShadowLength);
-    return k;
-  }
-  private class KLine{
-    float upperShadowLength,lowerShadowLength,realLength;
-
-    public float getUpperShadowLength() {
-      return upperShadowLength;
-    }
-
-    public void setUpperShadowLength(float upperShadowLength) {
-      this.upperShadowLength = upperShadowLength;
-    }
-
-    public float getLowerShadowLength() {
-      return lowerShadowLength;
-    }
-
-    public void setLowerShadowLength(float lowerShadowLength) {
-      this.lowerShadowLength = lowerShadowLength;
-    }
-
-    public float getRealLength() {
-      return realLength;
-    }
-
-    public void setRealLength(float realLength) {
-      this.realLength = realLength;
-    }
-    
   }
 }

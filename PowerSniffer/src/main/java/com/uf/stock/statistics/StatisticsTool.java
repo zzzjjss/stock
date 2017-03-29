@@ -24,6 +24,7 @@ import com.uf.stock.analysis.filter.EXPMA_Filter;
 import com.uf.stock.analysis.filter.FilterResult;
 import com.uf.stock.analysis.filter.KLineTFilter;
 import com.uf.stock.analysis.filter.MACDFilter;
+import com.uf.stock.analysis.filter.MorningStarFilter;
 import com.uf.stock.analysis.filter.PriceFilter;
 import com.uf.stock.data.bean.StockInfo;
 import com.uf.stock.data.bean.StockTradeInfo;
@@ -139,6 +140,7 @@ public class StatisticsTool {
       List<Float> downs=new ArrayList<Float>();
       DateFormat format=new SimpleDateFormat("yyyy-MM-dd");
       SortedMap<Integer, Integer> statitc=new  TreeMap<Integer, Integer>();
+      int targetDays=5;
        for (StockInfo stockInfo : stocks) {
          if (stockInfo.getName().contains("ST")) {
           continue;
@@ -170,8 +172,8 @@ public class StatisticsTool {
             FilterResult result=tFilter.doFilter(tradeInfo);
             if (result.getIsPass()) {
               int upDays=StockUtil.howmanyDaysToTargetUpPercent(allTradeInfos, start, 2f);
-              if (upDays>10) {
-                Float upDownPercent=StockUtil.updownPercentBetweenStartEnd(allTradeInfos, start+1, start+11);
+              if (upDays>targetDays) {
+                Float upDownPercent=StockUtil.updownPercentBetweenStartEnd(allTradeInfos, start+1, start+targetDays+1);
                 downs.add(upDownPercent);
                 if (upDownPercent<maxDown) {
                   maxDown=upDownPercent;
@@ -194,7 +196,7 @@ public class StatisticsTool {
        int win=0,lose=0;
        for (Map.Entry<Integer, Integer> sta : statitc.entrySet()) {
          Integer key=sta.getKey();
-         if (key<=10) {
+         if (key<=targetDays) {
            win=win+sta.getValue();
         }else {
           lose=lose+sta.getValue();
@@ -212,6 +214,93 @@ public class StatisticsTool {
        }
        System.out.println("avgDownPercent:"+(sum/downs.size())+"%");
       }	
+	
+	public void statisticBuyPointByMorningStar(){
+
+      List<StockInfo> stocks=service.findStocksPeRatioBetween(-1f, 100000f);
+      float maxDown=0f;
+      List<Float> downs=new ArrayList<Float>();
+      DateFormat format=new SimpleDateFormat("yyyy-MM-dd");
+      SortedMap<Integer, Integer> statitc=new  TreeMap<Integer, Integer>();
+      int targetDays=5;
+       for (StockInfo stockInfo : stocks) {
+         if (stockInfo.getName().contains("ST")) {
+          continue;
+         }
+          List<StockTradeInfo> allTradeInfos=service.findAllTradeInfosOrderByDateAsc(stockInfo.getCode());
+          Map<String, Integer> dateToIndexMap=new HashMap<String,Integer>();
+          for (int index=0;index<allTradeInfos.size();index++) {
+            dateToIndexMap.put(format.format(allTradeInfos.get(index).getTradeDate()) ,index);
+          }
+          int start=allTradeInfos.size()-300;
+          if (start<0) {
+            start=0;
+          }
+          int priceFilterStart=allTradeInfos.size()-300;
+          if (priceFilterStart<0) {
+            priceFilterStart=0;
+          }
+          PriceFilter priceFilter=new PriceFilter(allTradeInfos.subList(priceFilterStart,allTradeInfos.size()-1), 50f);
+          MorningStarFilter morningStartFilter=new MorningStarFilter();
+          for(;start<allTradeInfos.size();start++){
+            StockTradeInfo tradeInfo=allTradeInfos.get(start);
+            int before=start-1,beforeBefore=start-2;
+           if (beforeBefore<0){
+             continue;
+           }
+           StockTradeInfo  beforeTradeInfo=allTradeInfos.get(before);
+           StockTradeInfo beforeBeforeTradeInfo=allTradeInfos.get(beforeBefore);
+            FilterResult priceResult=priceFilter.doFilter(tradeInfo);
+            if (!priceResult.getIsPass()) {
+              continue;
+            }
+            FilterResult result=morningStartFilter.doFilter(beforeBeforeTradeInfo,beforeTradeInfo,tradeInfo);
+            if (result.getIsPass()) {
+              int upDays=StockUtil.howmanyDaysToTargetUpPercent(allTradeInfos, start, 2f);
+              if (upDays>targetDays) {
+                Float upDownPercent=StockUtil.updownPercentBetweenStartEnd(allTradeInfos, start+1, start+targetDays+1);
+                downs.add(upDownPercent);
+                if (upDownPercent<maxDown) {
+                  maxDown=upDownPercent;
+                }
+                if (upDownPercent!=null&&upDownPercent<-7f) {
+                  System.out.println(tradeInfo.getStockSymbol()+":"+format.format(tradeInfo.getTradeDate())+" updown:--->"+upDownPercent);
+                }
+              }
+              Integer tmp=statitc.get(upDays);
+              if (tmp==null) {
+                tmp=1;
+              }else {
+                tmp++;
+              }
+              statitc.put(upDays, tmp);
+            }
+          }
+        }
+       System.out.println(statitc);
+       int win=0,lose=0;
+       for (Map.Entry<Integer, Integer> sta : statitc.entrySet()) {
+         Integer key=sta.getKey();
+         if (key<=targetDays) {
+           win=win+sta.getValue();
+        }else {
+          lose=lose+sta.getValue();
+        }
+      }
+       System.out.println("win:"+win+" lose:"+lose);
+       float rate=((float)(win)/(float)(win+lose))*100;
+       System.out.println("winRate:"+rate);
+       float accept=(rate*2f)/(100-rate);
+       System.out.println("accept downPercent:"+accept+"%");
+       System.out.println("maxDownPercent:"+maxDown);
+       float sum=0f;
+       for(Float updown:downs){
+         sum=sum+updown;
+       }
+       System.out.println("avgDownPercent:"+(sum/downs.size())+"%");
+      }
+	
+	
 	
 	public void statisticBuyPointByEXPMA(){
       List<StockInfo> stocks=service.findStocksPeRatioBetween(-1f, 100000f);

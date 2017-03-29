@@ -36,5 +36,9 @@ public class StatisticsTest {
 	  StatisticsTool tool=new StatisticsTool();
 	  tool.statisticBuyPointByTKline();
 	}
-
+	@Test
+    public void testMorningStarBuyPoint(){
+      StatisticsTool tool=new StatisticsTool();
+      tool.statisticBuyPointByMorningStar();
+    }
 }

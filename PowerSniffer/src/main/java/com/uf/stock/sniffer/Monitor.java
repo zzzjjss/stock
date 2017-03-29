@@ -51,7 +51,7 @@ public class Monitor extends Thread {
               StockTradeInfo  tradeInfo= tradeInfoMap.get(stockSymbol);
               String symbol=tradeInfo.getStockSymbol();
               StockInfo stock=stockMap.get(symbol);
-              //System.out.println(stock.getName()+"-->"+tradeInfo.getClosePrice());
+//              System.out.println(stock.getName()+"-->"+tradeInfo.getClosePrice());
               if (stock.getAlarmBuCangPrice()!=null&&tradeInfo.getClosePrice()<=stock.getAlarmBuCangPrice()) {
                 StockBuySellAlarmMsg msg = new StockBuySellAlarmMsg();
                 msg.setStockName(stock.getName());
