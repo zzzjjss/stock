@@ -27,6 +27,7 @@ public interface DataSyncService {
     public void setAlarmStock(StockInfo stock);
     public List<StockTradeInfo> findDateAscTradeInfosBeforeDate(Integer stockCode,Date date,int limitDays);
     public List<StockTradeInfo> findAllTradeInfosOrderByDateAsc(Integer stockCode);
+    public List<StockTradeInfo> findAllTradeInfosOrderByDateAscByCache(Integer stockCode);
     public List<StockTradeInfo> findLimitTradeInfosBeforeDate(Integer stockCode,Date date,int limitTradeInfos);
     public boolean isStockStopTrade(Integer stockCode);
     public void addStockToMonitor(String stockSymbol,Float alarmSellPrice,Float alarmBuCangPrice);

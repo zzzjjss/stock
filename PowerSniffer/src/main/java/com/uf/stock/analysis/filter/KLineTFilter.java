@@ -1,8 +1,8 @@
 package com.uf.stock.analysis.filter;
 
 import com.uf.stock.bean.KLine;
+import com.uf.stock.bean.KLineUpDownPower;
 import com.uf.stock.data.bean.StockTradeInfo;
-import com.uf.stock.util.StockUtil;
 
 public class KLineTFilter implements StockFilter{
   private float lowerShadowPercent;
@@ -11,8 +11,8 @@ public class KLineTFilter implements StockFilter{
   }
   
   @Override
-  public FilterResult doFilter(StockTradeInfo tradeInfo) {
-    FilterResult result=new FilterResult();
+  public FilterResult<KLineUpDownPower> doFilter(StockTradeInfo tradeInfo) {
+    FilterResult<KLineUpDownPower> result=new FilterResult<KLineUpDownPower>();
     float preDayClosePrice=0f;
     if (tradeInfo.getClosePrice()!=null&&tradeInfo.getUpDownRate()!=null&&(1+(tradeInfo.getUpDownRate()*0.01f))!=0f) {
       preDayClosePrice=tradeInfo.getClosePrice()/(1+(tradeInfo.getUpDownRate()*0.01f));
@@ -24,7 +24,10 @@ public class KLineTFilter implements StockFilter{
     if (length!=0) {
       float lowerUpPower=kLine.getLowerShadowLength()/length;
       float upperDownPower=kLine.getUpperShadowLength()/length;
-      result.setFilterValue(lowerUpPower);
+      KLineUpDownPower power=new KLineUpDownPower();
+      power.setDownPowerValue(upperDownPower);
+      power.setUpPowerValue(lowerUpPower);
+      result.setFilterValue(power);
       if(lowerUpPower>lowerShadowPercent&&upperDownPower<0.1f){
         result.setIsPass(true);
       }else{
@@ -40,18 +43,11 @@ public class KLineTFilter implements StockFilter{
   private KLine calculateByTline(StockTradeInfo tradeInfo){
     KLine k=new KLine();
     float preDayClosePrice=tradeInfo.getClosePrice()/(1+(tradeInfo.getUpDownRate()*0.01f));
-    float lowerShadowLength,upperShadowLength,realLength;
-    if (tradeInfo.getUpDownPrice()>0) {
-      upperShadowLength=tradeInfo.getHighestPrice()-tradeInfo.getClosePrice();
-      lowerShadowLength=preDayClosePrice-tradeInfo.getLowestPrice();
-      realLength=tradeInfo.getClosePrice()-preDayClosePrice;
-    }else{
-      lowerShadowLength=tradeInfo.getClosePrice()-tradeInfo.getLowestPrice();
-      upperShadowLength=tradeInfo.getHighestPrice()-preDayClosePrice;
-      realLength=preDayClosePrice-tradeInfo.getClosePrice();
-    }
+    float lowerShadowLength,upperShadowLength;
+      upperShadowLength=Math.abs(tradeInfo.getHighestPrice()-tradeInfo.getClosePrice());
+      lowerShadowLength=Math.abs(tradeInfo.getClosePrice()-tradeInfo.getLowestPrice());
     k.setLowerShadowLength(lowerShadowLength);
-    k.setRealLength(realLength);
+    //k.setRealLength(realLength);
     k.setUpperShadowLength(upperShadowLength);
     return k;
   }

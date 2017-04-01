@@ -11,7 +11,7 @@ import com.uf.stock.data.bean.StockTradeInfo;
 
 public class LowPriceUpStockFilterChain {
   private List<StockFilter> filters=new ArrayList<StockFilter>();
-  private Map<String, Float> filterResult=new HashMap<String, Float>(); 
+  private Map<String, Object> filterResult=new HashMap<String, Object>(); 
   public LowPriceUpStockFilterChain appendStockFilter(StockFilter stockFilter){
     filters.add(stockFilter);
     return this;
@@ -32,7 +32,7 @@ public class LowPriceUpStockFilterChain {
     }
     return true;
   }
-  public Map<String, Float> getFilterChainResult(){
+  public Map<String, Object> getFilterChainResult(){
     return filterResult;
   }
   

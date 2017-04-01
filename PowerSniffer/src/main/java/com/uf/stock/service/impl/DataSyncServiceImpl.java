@@ -441,14 +441,14 @@ public void removeFromMonitor(String stockSymbol) {
     stockInfoDao.saveOrUpdate(stockInfo);
   }
 }
-
+private Set<String> allTradeDate=null;
 @Override
 public boolean isTradeDate(Date date) {
-  List<StockTradeInfo> infos=tradeInfoDao.findLimitByHql("from StockTradeInfo s where s.tradeDate=?", 1, date);
-  if (infos!=null&&infos.size()>0) {
-    return true;
+  if (allTradeDate==null) {
+    allTradeDate=findAllTradeDate();
   }
-  return false;
+  DateFormat format=new SimpleDateFormat("yyyyMMdd");
+  return allTradeDate.contains(format.format(date));
 }
 
 @Override
@@ -470,5 +470,18 @@ public StockTradeInfoWithAnalysisResult syncCurrentStockTradeInfoWithAnalysisRes
     e.printStackTrace();
   }
   return result;
+}
+
+
+private Map<Integer, List<StockTradeInfo>>  cache=new HashMap<Integer, List<StockTradeInfo>>();
+@Override
+public List<StockTradeInfo> findAllTradeInfosOrderByDateAscByCache(Integer stockCode) {
+  if (cache.containsKey(stockCode)) {
+    return cache.get(stockCode);
+  }else {
+    List<StockTradeInfo> infos=(List<StockTradeInfo>)tradeInfoDao.findByHql("from StockTradeInfo t where t.stock.code=?  order by t.tradeDate asc", stockCode);
+    cache.put(stockCode, infos);
+    return infos;
+  }
 }
 }

@@ -11,6 +11,7 @@ import java.util.List;
 import org.junit.Test;
 
 import com.uf.stock.analysis.LowPriceUpStockFilterChain;
+import com.uf.stock.analysis.filter.FilterResult;
 import com.uf.stock.analysis.filter.KLineTFilter;
 import com.uf.stock.analysis.filter.MACDFilter;
 import com.uf.stock.analysis.filter.PriceFilter;
@@ -23,10 +24,10 @@ public class FilterTest {
   @Test
   public void priceFilterTest() {
     DataSyncService service = SpringBeanFactory.getBean(DataSyncService.class);
-    List<StockTradeInfo> infors=service.findDateAscTradeInfosBeforeDate(300498, new Date(), 10);
-    LowPriceUpStockFilterChain  chain=new LowPriceUpStockFilterChain();
-    chain.appendStockFilter(new PriceFilter(infors, 10f));
-    chain.doFilter(infors.get(infors.size()-1));
+    List<StockTradeInfo> infors=service.findDateAscTradeInfosBeforeDate(300498, new Date(), 300);
+    PriceFilter filter=new PriceFilter(infors, 10f);
+    FilterResult result=filter.doFilter(infors.get(infors.size()-1));
+    System.out.println(result.getFilterValue());
   }
   @Test
   public void macdFilterTest() {

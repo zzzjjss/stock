@@ -25,6 +25,7 @@ import com.uf.stock.analysis.filter.FilterResult;
 import com.uf.stock.analysis.filter.KLineTFilter;
 import com.uf.stock.analysis.filter.MACDFilter;
 import com.uf.stock.analysis.filter.PriceFilter;
+import com.uf.stock.bean.KLineUpDownPower;
 import com.uf.stock.data.bean.StockInfo;
 import com.uf.stock.data.bean.StockTradeInfo;
 import com.uf.stock.data.bean.StockTradeInfoWithAnalysisResult;
@@ -82,16 +83,16 @@ public class StockAnalysisAction {
 					chain.appendStockFilter(new PriceFilter(infors, downPercentToLow));
 					PriceSpeedAnalysisResultData data = new PriceSpeedAnalysisResultData();
 					if (chain.doFilter(infors.get(infors.size()-1))) {
-					  Map<String, Float>  result=chain.getFilterChainResult();
-					  data.setDownRateToLowest(result.get(PriceFilter.class.getName()));
+					  Map<String, Object>  result=chain.getFilterChainResult();
+					  data.setDownRateToLowest((Float)result.get(PriceFilter.class.getName()));
 					  data.setStockName(stock.getName());
 					  data.setStockSymbol(stock.getSymbol());
   					  MACDFilter macdFilter=new MACDFilter(infors);
   					  StockTradeInfo latestTradeInfo=infors.get(infors.size()-1);
-  					  FilterResult filterResult=macdFilter.doFilter(latestTradeInfo);
+  					  FilterResult<Float> filterResult=macdFilter.doFilter(latestTradeInfo);
   					  Float macd=filterResult.getFilterValue();
-  					  FilterResult tResult=tFilter.doFilter(latestTradeInfo);
-  					  data.settKLine(tResult.getFilterValue());
+  					  FilterResult<KLineUpDownPower> tResult=tFilter.doFilter(latestTradeInfo);
+  					  data.settKLine(tResult.getFilterValue().getUpPowerValue());
   					  data.setMacd(macd);
 					  datas.add(data);
                     }
