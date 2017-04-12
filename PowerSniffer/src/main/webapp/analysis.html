@@ -89,8 +89,22 @@
 			expmaAnalysisResult();
 
 		});
+		window.setInterval(autoAlarmTrade,60*1000);
 
 	});
+	var hasAlarm=false;
+	function autoAlarmTrade(){
+		var date=new Date();
+		var hour=date.getHours();
+		var min=date.getMinutes();
+		if(!hasAlarm&&hour==14&&min>=45){
+			$("#filterStockUseCurrentInfoBtn").click();
+			alert("tradeTime");
+			hasAlarm=true;
+		}else if(!(hour==14&&min>=45)){
+			hasAlarm=false;
+		}
+	}
 	function filterStockByPrice(useCurrentInfo) {
 		var minPeRatio = $("#minPeRatio").val();
 		var maxPeRatio = $("#maxPeRatio").val();
@@ -116,8 +130,12 @@
 						data:"macd"
 					},{
 						name:"tKLine",
-						title:"T style (>0.3 buy)",
+						title:"T style (>0.4 buy)",
 						data:"tKLine"
+					},{
+						name:"vpUp",
+						title:"vpUp",
+						data:"volumePriceUp"
 					}],
 					destroy : true
 				});

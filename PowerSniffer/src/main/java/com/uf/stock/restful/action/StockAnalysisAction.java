@@ -25,6 +25,7 @@ import com.uf.stock.analysis.filter.FilterResult;
 import com.uf.stock.analysis.filter.KLineTFilter;
 import com.uf.stock.analysis.filter.MACDFilter;
 import com.uf.stock.analysis.filter.PriceFilter;
+import com.uf.stock.analysis.filter.v2p.VolumeUpPriceUpFilter;
 import com.uf.stock.bean.KLineUpDownPower;
 import com.uf.stock.data.bean.StockInfo;
 import com.uf.stock.data.bean.StockTradeInfo;
@@ -76,6 +77,9 @@ public class StockAnalysisAction {
 					  StockTradeInfo currentTradeInfo=currentTradeInfos.get(stock.getSymbol());
 					  if (currentTradeInfo!=null) {
 					    currentTradeInfo.setTradeDate(new Date());
+					    if (stock.getTotalAAmount()!=null) {
+					      currentTradeInfo.setTurnoverRate((currentTradeInfo.getTradeAmount()*100f)/stock.getTotalAAmount());
+                        }
 					    infors.add(currentTradeInfo);
 					  }
                     }
@@ -92,7 +96,13 @@ public class StockAnalysisAction {
   					  FilterResult<Float> filterResult=macdFilter.doFilter(latestTradeInfo);
   					  Float macd=filterResult.getFilterValue();
   					  FilterResult<KLineUpDownPower> tResult=tFilter.doFilter(latestTradeInfo);
-  					  data.settKLine(tResult.getFilterValue().getUpPowerValue());
+  					  data.settKLine(tResult.getFilterValue()==null?0f:tResult.getFilterValue().getUpPowerValue());
+  					  boolean isVPUp=VolumeUpPriceUpFilter.isVolumeUpPriceUp(infors, 3, 4);
+  					  if (isVPUp) {
+                        data.setVolumePriceUp("VolumeUpPriceUp");
+                      }else {
+                        data.setVolumePriceUp("");
+                      }
   					  data.setMacd(macd);
 					  datas.add(data);
                     }

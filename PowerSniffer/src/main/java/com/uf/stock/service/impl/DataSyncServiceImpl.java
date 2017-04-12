@@ -255,6 +255,7 @@ public class DataSyncServiceImpl implements DataSyncService {
         
         if (tradeInfos != null && tradeInfos.size() > 0) {
 //          Collections.sort(tradeInfos);
+          StockTradeInfo latestTradeInfo=null;
           for (StockTradeInfo info : tradeInfos) {
 //            System.out.println(format.format(info.getTradeDate()));
 //            if(beforeTradeInfo!=null){
@@ -269,6 +270,12 @@ public class DataSyncServiceImpl implements DataSyncService {
         	   Constant.latestTradeDate=info.getTradeDate();
            }
             totalRecord++;
+            latestTradeInfo=info;
+          }
+          StockInfo stockInfo=stockInfoDao.findStockBySymbol(latestTradeInfo.getStockSymbol());
+          if (stockInfo!=null&&latestTradeInfo.getTurnoverRate()!=null&&latestTradeInfo.getTurnoverRate()!=0f) {
+            stockInfo.setTotalAAmount((latestTradeInfo.getTradeAmount()*100)/latestTradeInfo.getTurnoverRate());
+            stockInfoDao.update(stockInfo);
           }
         }
         if (end.getTime() >= today.getTime()) {

@@ -146,16 +146,16 @@ public class StatisticsTool {
           for (int index=0;index<allTradeInfos.size();index++) {
             dateToIndexMap.put(format.format(allTradeInfos.get(index).getTradeDate()) ,index);
           }
-          int start=allTradeInfos.size()-200;
+          int start=allTradeInfos.size()-300;
           if (start<0) {
             start=0;
           }
-          int priceFilterStart=allTradeInfos.size()-300;
+          int priceFilterStart=allTradeInfos.size()-500;
           if (priceFilterStart<0) {
             priceFilterStart=0;
           }
           PriceFilter priceFilter=new PriceFilter(allTradeInfos.subList(priceFilterStart,allTradeInfos.size()-1), 50f);
-          KLineTFilter tFilter=new KLineTFilter(0.3f);
+          KLineTFilter tFilter=new KLineTFilter(0.6f);
           for(;start<allTradeInfos.size();start++){
             StockTradeInfo tradeInfo=allTradeInfos.get(start);
             FilterResult priceResult=priceFilter.doFilter(tradeInfo);
@@ -173,7 +173,10 @@ public class StatisticsTool {
             }
             FilterResult result=tFilter.doFilter(tradeInfo);
             if (result.getIsPass()) {
-              int upDays=StockUtil.howmanyDaysToTargetUpPercent(allTradeInfos, start, 2f);
+              int upDays=StockUtil.howmanyDaysToTargetUpPercent(allTradeInfos, start, 3f);
+              if (upDays==-1) {
+                continue;
+              }
               if (upDays>targetDays) {
                 Float upDownPercent=StockUtil.updownPercentBetweenStartEnd(allTradeInfos, start+1, start+targetDays+1);
                 downs.add(upDownPercent);

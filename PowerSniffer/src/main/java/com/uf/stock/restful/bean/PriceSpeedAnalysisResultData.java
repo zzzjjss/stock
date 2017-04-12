@@ -8,8 +8,15 @@ private float sidewayIndex;
 private float slowUpFastDownIndex;
 private float macd;
 private float tKLine;
+private String volumePriceUp;
 
 
+public String getVolumePriceUp() {
+  return volumePriceUp;
+}
+public void setVolumePriceUp(String volumePriceUp) {
+  this.volumePriceUp = volumePriceUp;
+}
 public float gettKLine() {
   return tKLine;
 }

@@ -3,6 +3,7 @@ package com.uf.stock.analysis.filter;
 import com.uf.stock.bean.KLine;
 import com.uf.stock.bean.KLineUpDownPower;
 import com.uf.stock.data.bean.StockTradeInfo;
+import com.uf.stock.util.StockUtil;
 
 public class KLineTFilter implements StockFilter{
   private float lowerShadowPercent;
@@ -19,7 +20,7 @@ public class KLineTFilter implements StockFilter{
     }
     float length=(preDayClosePrice*1.1f)-(preDayClosePrice*0.9f);
     
-//    KLine kLine=StockUtil.calculateStandardKline(tradeInfo);
+    //KLine kLine=StockUtil.calculateStandardKline(tradeInfo);
     KLine kLine=calculateByTline(tradeInfo);
     if (length!=0) {
       float lowerUpPower=kLine.getLowerShadowLength()/length;
