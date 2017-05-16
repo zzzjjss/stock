@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 2013-10-10 21:40:33 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="com.uf.entity.Product" table="product" >
+        <id name="id" type="int">
+            <column name="id" />
+            <generator class="identity" />
+        </id>
+        <property name="name" type="string">
+            <column name="name" length="100" not-null="true" />
+        </property>
+        
+        <property name="description" type="string">
+            <column name="description" length="500" />
+        </property>
+        
+        <property name="sellPrice" type="float">
+            <column name="sell_price" />
+        </property>
+        
+        <property name="buyPrice" type="float">
+            <column name="buy_price" />
+        </property>
+		
+		<property name="searchKeywords" type="string">
+            <column name="search_keywords" length="500" />
+        </property>		
+			
+			
+        <property name="updateTime" type="timestamp">
+            <column name="update_time" />
+        </property>
+		 
+			
+    </class>
+</hibernate-mapping>
