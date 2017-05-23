@@ -1,13 +1,10 @@
 package com.uf.wechat;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -38,14 +35,14 @@ public class PayCommonUtil {
    * @param parameters
    *            请求参数
    * @return
-   */  
-  public static String createSign(String characterEncoding, SortedMap<Object, Object> packageParams, String API_KEY) {  
-      StringBuffer sb = new StringBuffer();  
-      Set es = packageParams.entrySet();  
-      Iterator it = es.iterator();  
-      while (it.hasNext()) {  
-          Map.Entry entry = (Map.Entry) it.next();  
-          String k = (String) entry.getKey();  
+   */
+  public static String createSign(String characterEncoding, SortedMap<Object, Object> packageParams, String API_KEY) {
+      StringBuffer sb = new StringBuffer();
+      Set es = packageParams.entrySet();
+      Iterator it = es.iterator();
+      while (it.hasNext()) {
+          Map.Entry entry = (Map.Entry) it.next();
+          String k = (String) entry.getKey();
           String v = "";
           try {
               v = (String) entry.getValue();
@@ -53,42 +50,42 @@ public class PayCommonUtil {
               // TODO: handle exception
               v = entry.getValue() + "";
           }
-           
-          if (null != v && !"".equals(v) && !"sign".equals(k) && !"key".equals(k)) {  
-              sb.append(k + "=" + v + "&");  
-          }  
-      }  
-      sb.append("key=" + API_KEY);  
+
+          if (null != v && !"".equals(v) && !"sign".equals(k) && !"key".equals(k)) {
+              sb.append(k + "=" + v + "&");
+          }
+      }
+      sb.append("key=" + API_KEY);
       String mysign=null;
       try {
         mysign = DigestUtils.md5Hex(sb.toString().getBytes(characterEncoding)).toLowerCase();
       } catch (UnsupportedEncodingException e) {
         e.printStackTrace();
-      }  
-      return mysign;  
-  }  
+      }
+      return mysign;
+  }
 public static String sha1Sign(String str){
-    try {  
-        //指定sha1算法  
-        MessageDigest digest = MessageDigest.getInstance("SHA-1");  
-        digest.update(str.getBytes());  
-        //获取字节数组  
-        byte messageDigest[] = digest.digest();  
-        // Create Hex String  
-        StringBuffer hexString = new StringBuffer();  
-        // 字节数组转换为 十六进制 数  
-        for (int i = 0; i < messageDigest.length; i++) {  
-            String shaHex = Integer.toHexString(messageDigest[i] & 0xFF);  
-            if (shaHex.length() < 2) {  
-                hexString.append(0);  
-            }  
-            hexString.append(shaHex);  
-        }  
-        return hexString.toString().toLowerCase();  
+    try {
+        //指定sha1算法
+        MessageDigest digest = MessageDigest.getInstance("SHA-1");
+        digest.update(str.getBytes());
+        //获取字节数组
+        byte messageDigest[] = digest.digest();
+        // Create Hex String
+        StringBuffer hexString = new StringBuffer();
+        // 字节数组转换为 十六进制 数
+        for (int i = 0; i < messageDigest.length; i++) {
+            String shaHex = Integer.toHexString(messageDigest[i] & 0xFF);
+            if (shaHex.length() < 2) {
+                hexString.append(0);
+            }
+            hexString.append(shaHex);
+        }
+        return hexString.toString().toLowerCase();
 
-    } catch (NoSuchAlgorithmException e) {  
-        e.printStackTrace();  
-    }  
+    } catch (NoSuchAlgorithmException e) {
+        e.printStackTrace();
+    }
 	return null;
 }
   /**
@@ -98,14 +95,14 @@ public static String sha1Sign(String str){
    * @param parameters
    *            请求参数
    * @return
-   */  
-  public static String getRequestXml(SortedMap<Object, Object> parameters) {  
-      StringBuffer sb = new StringBuffer();  
-      sb.append("<xml>");  
-      Set es = parameters.entrySet();  
-      Iterator it = es.iterator();  
-      while (it.hasNext()) {  
-          Map.Entry entry = (Map.Entry) it.next();  
+   */
+  public static String getRequestXml(SortedMap<Object, Object> parameters) {
+      StringBuffer sb = new StringBuffer();
+      sb.append("<xml>");
+      Set es = parameters.entrySet();
+      Iterator it = es.iterator();
+      while (it.hasNext()) {
+          Map.Entry entry = (Map.Entry) it.next();
           String k = (String) entry.getKey();
           String v = "";
           try {
@@ -114,20 +111,20 @@ public static String sha1Sign(String str){
               // TODO: handle exception
               v = entry.getValue() + "";
           }
-           
-          if ("attach".equalsIgnoreCase(k) || "body".equalsIgnoreCase(k) || "sign".equalsIgnoreCase(k)) {  
-              sb.append("<" + k + ">" + "<![CDATA[" + v + "]]></" + k + ">");  
-          } else {  
-              sb.append("<" + k + ">" + v + "</" + k + ">");  
-          }  
-      }  
-      sb.append("</xml>");  
-      return sb.toString();  
-  }  
-  
+
+          if ("attach".equalsIgnoreCase(k) || "body".equalsIgnoreCase(k) || "sign".equalsIgnoreCase(k)) {
+              sb.append("<" + k + ">" + "<![CDATA[" + v + "]]></" + k + ">");
+          } else {
+              sb.append("<" + k + ">" + v + "</" + k + ">");
+          }
+      }
+      sb.append("</xml>");
+      return sb.toString();
+  }
+
     public static PrePayResponse parsePrePayResponse(String responseXml){
-      if(null == responseXml || "".equals(responseXml)) {  
-        return null;  
+      if(null == responseXml || "".equals(responseXml)) {
+        return null;
       }
       try {
         DocumentBuilder builder=DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -153,10 +150,10 @@ public static String sha1Sign(String str){
       }
       return null;
     }
-  
+
     public static WechatPayResult parsePayResult(String payResultXml){
-      if(null == payResultXml || "".equals(payResultXml)) {  
-        return null;  
+      if(null == payResultXml || "".equals(payResultXml)) {
+        return null;
       }
       try {
         DocumentBuilder builder=DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -183,7 +180,7 @@ public static String sha1Sign(String str){
       }
       return null;
     }
-  
+
     public static Object convert(Object object, Class<?> type) {
         if (object instanceof Number) {
             Number number = (Number) object;
@@ -209,5 +206,5 @@ public static String sha1Sign(String str){
         return object;
     }
 
-  
+
 }

@@ -1,19 +1,30 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+                                   "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <!-- Generated 2013-10-10 21:40:33 by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
-    <class name="com.uf.entity.Customer" table="customer" >
-        <id name="id" type="int">
-            <column name="id" />
-            <generator class="identity" />
-        </id>
-        <property name="userName" type="string">
-            <column name="user_name" length="100" not-null="true" />
-        </property>
-        
-        <property name="password" type="string">
-            <column name="password" length="50" />
-        </property>
-    </class>
+ <class name="com.uf.entity.Customer" table="customer">
+  <id name="id" type="int">
+   <column name="id"/>
+   <generator class="identity"/>
+  </id>
+  <property generated="never" lazy="false" name="userName" type="string">
+   <column length="100" name="user_name" not-null="true"/>
+  </property>
+  <property generated="never" lazy="false" name="password" type="string">
+   <column length="50" name="password"/>
+  </property>
+ <property generated="never" lazy="false" name="phoneNumber" type="string">
+   <column length="50" name="phone_number"/>
+  </property>
+ <property generated="never" lazy="false" name="wechatId" type="string">
+   <column length="50" name="wechat_id"/>
+  </property>
+ <property generated="never" lazy="false" name="wechatOpenId" type="string">
+   <column length="50" name="wechat_open_id"/>
+  </property>
+   <property generated="never" lazy="false" name="wechatNickname" type="string">
+   <column length="50" name="wechat_nickname"/>
+  </property>
+ </class>
 </hibernate-mapping>

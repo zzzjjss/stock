@@ -24,7 +24,7 @@
 				</bean>
 			</list>
 		</property>
-	</bean>  
+	</bean>
 	<context:component-scan base-package="com.uf.controller" />
 	<bean id="viewResolver"
 		class="org.springframework.web.servlet.view.UrlBasedViewResolver">
@@ -32,8 +32,8 @@
 			value="org.springframework.web.servlet.view.JstlView" />
 		<property name="prefix" value="/WEB-INF/view/jsp/" />
 		<property name="suffix" value=".jsp" />
-	</bean> 
-	<!-- 
+	</bean>
+	<!--
 	<bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
     	<property name="templateLoaderPath" value="/WEB-INF/view/freemarker/"/>
 	</bean>
@@ -48,20 +48,20 @@
         <!-- one of the properties available; the maximum file size in bytes -->
         <property name="maxUploadSize" value="10000000" />
     </bean>
-    
-    
+
+
     <context:component-scan base-package="com.uf.service"></context:component-scan>
 	<context:component-scan base-package="com.uf.dao"></context:component-scan>
 	<context:component-scan base-package="com.uf.springbean"></context:component-scan>
-	
+
 	<bean id="myDataSource" class="org.apache.commons.dbcp.BasicDataSource"
 		destroy-method="close">
 		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
-		<property name="url" value="jdbc:mysql://sav-nova-test.cjhssfjyj8vz.us-west-2.rds.amazonaws.com:3306/test?characterEncoding=UTF-8" />
+		<property name="url" value="jdbc:mysql://localhost:3306/test?characterEncoding=UTF-8" />
 		<property name="username" value="root" />
-		<property name="password" value="savadmin" />
+		<property name="password" value="root" />
 	</bean>
-	
+
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
 		<property name="dataSource" ref="myDataSource" />
@@ -73,9 +73,10 @@
 				<value>com/uf/entity/Customer.hbm.xml</value>
 				<value>com/uf/entity/Manager.hbm.xml</value>
 				<value>com/uf/entity/Word.hbm.xml</value>
+				<value>com/uf/entity/Address.hbm.xml</value>
 			</list>
 		</property>
-		
+
 		<property name="hibernateProperties">
 			<value>
 				hibernate.dialect=org.hibernate.dialect.MySQL5InnoDBDialect
@@ -102,7 +103,7 @@
 	<aop:config>
 		<aop:pointcut expression="execution(* com.uf.service.*.*(..))"
 			id="txMethods" />
-		
+
 		<aop:advisor advice-ref="txAdvice" pointcut-ref="txMethods" />
 	</aop:config>
 	<tx:advice id="txAdvice" transaction-manager="transactionManager">

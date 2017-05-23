@@ -40,5 +40,18 @@ public class CustomerActionServiceImpl implements CustomerActionService{
   public void removeProductFromBuycar(Integer customerId,Integer buycarProductInfoId){
     buycarDao.executeUpdateHql("delete from BuycarProductInfo pi where pi.customer.id=? and pi.id=?", customerId,buycarProductInfoId);
   }
-  
+@Override
+public Customer findCustomerByWechatId(String wechatId) {
+	List<Customer> cus=customerDao.findByHql("select c from  Customer c  where c.wechatId=?", wechatId);
+    if(cus!=null&&cus.size()>0){
+      return cus.get(0);
+    }else{
+      return null;
+    }
+}
+@Override
+public void saveOrUpdateCustomer(Customer customer) {
+	customerDao.saveOrUpdate(customer);
+}
+
 }

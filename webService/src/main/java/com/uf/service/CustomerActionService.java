@@ -7,6 +7,8 @@ import com.uf.entity.Customer;
 
 public interface CustomerActionService {
   public Customer  findCustomerByUserName(String userName);
+  public Customer  findCustomerByWechatId(String wechatId);
+  public void saveOrUpdateCustomer(Customer customer);
   public List<BuycarProductInfo>  findCustomerBuycarProductInfo(Integer customerId);
   public BuycarProductInfo findCustomerBuycarProductInfoByProductId(Integer productId,Integer customerId);
   public void saveProductToBuyCar(BuycarProductInfo buyInfo);
