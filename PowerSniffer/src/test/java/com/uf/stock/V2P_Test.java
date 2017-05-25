@@ -22,7 +22,7 @@ public class V2P_Test {
 
   @Test
   public void test() {
-    DataSyncService service = SpringBeanFactory.getBean(DataSyncService.class);
+    DataSyncService  service = SpringBeanFactory.getBean(DataSyncService.class);
     List<StockInfo> stocks=service.findStocksPeRatioBetween(-1f, 100000f);
     List<Float> downs=new ArrayList<Float>();
     DateFormat format=new SimpleDateFormat("yyyy-MM-dd");

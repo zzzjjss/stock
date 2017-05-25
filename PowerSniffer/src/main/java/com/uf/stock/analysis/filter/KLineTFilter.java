@@ -20,7 +20,7 @@ public class KLineTFilter implements StockFilter{
     }
     float length=(preDayClosePrice*1.1f)-(preDayClosePrice*0.9f);
     
-    //KLine kLine=StockUtil.calculateStandardKline(tradeInfo);
+//    KLine kLine=StockUtil.calculateStandardKline(tradeInfo);
     KLine kLine=calculateByTline(tradeInfo);
     if (length!=0) {
       float lowerUpPower=kLine.getLowerShadowLength()/length;

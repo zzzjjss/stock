@@ -161,4 +161,44 @@ public static  KLine calculateStandardKline(StockTradeInfo tradeInfo){
   k.setTotalLength(length);
   return k;
 }
+public static Float calculatePrafit(List<StockTradeInfo> allTradeInfos ,int buyDayIndex,float targetUpPercent,float targetDownPercent){
+  if (buyDayIndex+1>=allTradeInfos.size()) {
+    return null;
+  }
+  float totalUpDownPercent=0f;
+  for(int i=buyDayIndex+1;i<allTradeInfos.size();i++){
+    StockTradeInfo tradeInfo=allTradeInfos.get(i);
+    float openUpdownPercent=(float)(((tradeInfo.getOpenPrice()*(1+tradeInfo.getUpDownRate()*0.01))/tradeInfo.getClosePrice())-1)*100+totalUpDownPercent;
+    float lowestUpDownPercent=(float)(((tradeInfo.getLowestPrice()*(1+tradeInfo.getUpDownRate()*0.01))/tradeInfo.getClosePrice())-1)*100+totalUpDownPercent;
+    float highestUpDownPercent=(float)(((tradeInfo.getHighestPrice()*(1+tradeInfo.getUpDownRate()*0.01))/tradeInfo.getClosePrice())-1)*100+totalUpDownPercent;
+    totalUpDownPercent=totalUpDownPercent+tradeInfo.getUpDownRate();
+    if (openUpdownPercent>=targetUpPercent||openUpdownPercent<=targetDownPercent) {
+      return openUpdownPercent; 
+     }
+     if (lowestUpDownPercent<=targetDownPercent) {
+       return targetDownPercent;
+     }
+     if(highestUpDownPercent>=targetUpPercent){
+       return targetUpPercent;
+     }
+  }
+ return totalUpDownPercent; 
 }
+//昨天收盘价买，今天卖，设置止损止涨幅度，如果未达到止损止涨的价位，按当日收盘价计算当日的涨跌幅，当日尾盘必须卖掉
+public static float calculateWinPercentOnedayTrade(StockTradeInfo tradeInfo,float targetUpPercent,float targetDownPercent){
+          float openUpdownPercent=(float)(((tradeInfo.getOpenPrice()*(1+tradeInfo.getUpDownRate()*0.01))/tradeInfo.getClosePrice())-1)*100;
+          float lowestUpDownPercent=(float)(((tradeInfo.getLowestPrice()*(1+tradeInfo.getUpDownRate()*0.01))/tradeInfo.getClosePrice())-1)*100;
+          float highestUpDownPercent=(float)(((tradeInfo.getHighestPrice()*(1+tradeInfo.getUpDownRate()*0.01))/tradeInfo.getClosePrice())-1)*100;
+          if (openUpdownPercent>=targetUpPercent||openUpdownPercent<=targetDownPercent) {
+           return openUpdownPercent; 
+          }
+          if (lowestUpDownPercent<=targetDownPercent) {
+            return targetDownPercent;
+          }
+          if(highestUpDownPercent>=targetUpPercent){
+            return targetUpPercent;
+          }
+          return tradeInfo.getUpDownRate();
+}
+}
+
