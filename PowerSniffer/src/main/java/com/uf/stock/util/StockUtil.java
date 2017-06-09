@@ -163,10 +163,38 @@ public static  KLine calculateStandardKline(StockTradeInfo tradeInfo){
 }
 public static Float calculatePrafit(List<StockTradeInfo> allTradeInfos ,int buyDayIndex,float targetUpPercent,float targetDownPercent){
   if (buyDayIndex+1>=allTradeInfos.size()) {
-    return null;
+    return 0f;
   }
   float totalUpDownPercent=0f;
   for(int i=buyDayIndex+1;i<allTradeInfos.size();i++){
+    StockTradeInfo tradeInfo=allTradeInfos.get(i);
+    float openUpdownPercent=(float)(((tradeInfo.getOpenPrice()*(1+tradeInfo.getUpDownRate()*0.01))/tradeInfo.getClosePrice())-1)*100+totalUpDownPercent;
+    float lowestUpDownPercent=(float)(((tradeInfo.getLowestPrice()*(1+tradeInfo.getUpDownRate()*0.01))/tradeInfo.getClosePrice())-1)*100+totalUpDownPercent;
+    float highestUpDownPercent=(float)(((tradeInfo.getHighestPrice()*(1+tradeInfo.getUpDownRate()*0.01))/tradeInfo.getClosePrice())-1)*100+totalUpDownPercent;
+    totalUpDownPercent=totalUpDownPercent+tradeInfo.getUpDownRate();
+    if (openUpdownPercent>=targetUpPercent||openUpdownPercent<=targetDownPercent) {
+      return openUpdownPercent; 
+     }
+     if (lowestUpDownPercent<=targetDownPercent) {
+       return targetDownPercent;
+     }
+     if(highestUpDownPercent>=targetUpPercent){
+       return targetUpPercent;
+     }
+  }
+ return totalUpDownPercent; 
+}
+public static Float calculatePrafitAfterFullUp(List<StockTradeInfo> allTradeInfos ,int fullUpDayIndex,float targetUpPercent,float targetDownPercent){
+  if (fullUpDayIndex>=allTradeInfos.size()-2) {
+    return 0f;
+  }
+  StockTradeInfo buyinDay=allTradeInfos.get(fullUpDayIndex+1);
+  float buyDayOpenUpdown=(float)(((buyinDay.getOpenPrice()*(1+buyinDay.getUpDownRate()*0.01))/buyinDay.getClosePrice())-1)*100;
+  if (buyDayOpenUpdown>9.8) {
+    return 0f;
+  }
+  float totalUpDownPercent=buyinDay.getUpDownRate()-buyDayOpenUpdown;
+  for(int i=fullUpDayIndex+2;i<allTradeInfos.size();i++){
     StockTradeInfo tradeInfo=allTradeInfos.get(i);
     float openUpdownPercent=(float)(((tradeInfo.getOpenPrice()*(1+tradeInfo.getUpDownRate()*0.01))/tradeInfo.getClosePrice())-1)*100+totalUpDownPercent;
     float lowestUpDownPercent=(float)(((tradeInfo.getLowestPrice()*(1+tradeInfo.getUpDownRate()*0.01))/tradeInfo.getClosePrice())-1)*100+totalUpDownPercent;

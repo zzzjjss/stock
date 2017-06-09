@@ -9,7 +9,7 @@ private float slowUpFastDownIndex;
 private float macd;
 private float tKLine;
 private String volumePriceUp;
-
+private Boolean openFullDown;
 
 public String getVolumePriceUp() {
   return volumePriceUp;
@@ -58,6 +58,12 @@ public float getSlowUpFastDownIndex() {
 }
 public void setSlowUpFastDownIndex(float slowUpFastDownIndex) {
 	this.slowUpFastDownIndex = slowUpFastDownIndex;
+}
+public Boolean getOpenFullDown() {
+  return openFullDown;
+}
+public void setOpenFullDown(Boolean openFullDown) {
+  this.openFullDown = openFullDown;
 }
 
 }

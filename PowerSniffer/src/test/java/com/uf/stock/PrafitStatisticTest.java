@@ -10,7 +10,8 @@ public class PrafitStatisticTest {
 
   @Test
   public void test() {
-    PrafitStatistic.statisticOnedayTrade();
+//    PrafitStatistic.statisticOnedayTrade();
+    PrafitStatistic.fullDownOpenedStatistic();
   }
 
 }

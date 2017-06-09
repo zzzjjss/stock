@@ -12,7 +12,10 @@ public class VolumeUpPriceUpFilter {
       totalTurnOverRate=totalTurnOverRate+tmp;
     }
     avgTurnoverRate=totalTurnOverRate/(float)tradeInfos.size();
-    List<StockTradeInfo> analysisTradeInfos=tradeInfos.subList(tradeInfos.size()-days, tradeInfos.size());
+    List<StockTradeInfo> analysisTradeInfos=null;
+    if (tradeInfos.size()-days>=0) {
+        analysisTradeInfos=tradeInfos.subList(tradeInfos.size()-days, tradeInfos.size());
+    }
     float tempTurnOverRate=0f;
 //    for (StockTradeInfo stockTradeInfo : analysisTradeInfos) {
 //      if (stockTradeInfo.getTurnoverRate()>=tempTurnOverRate) {
@@ -32,17 +35,23 @@ public class VolumeUpPriceUpFilter {
 //    }else {
 //      return false;
 //    }
-    
+   if(analysisTradeInfos==null){
+    return false; 
+   }
+   float updownPercent=0f;
     for (StockTradeInfo stockTradeInfo : analysisTradeInfos) {
       float tmp=stockTradeInfo.getTurnoverRate()==null?0f:stockTradeInfo.getTurnoverRate();
       if (tmp<avgTurnoverRate*volumeUpMulty) {
         return false;
       }
-      if(stockTradeInfo.getUpDownRate()<0){
-        return false;
-      }
+      updownPercent=updownPercent+stockTradeInfo.getUpDownRate();
     }
-    return true;
+    if (updownPercent>1.0f) {
+      return true;
+    }else {
+      return false;
+    }
+
   }
   
   

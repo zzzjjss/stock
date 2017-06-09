@@ -30,7 +30,7 @@ public interface DataSyncService {
     public List<StockTradeInfo> findAllTradeInfosOrderByDateAscByCache(Integer stockCode);
     public List<StockTradeInfo> findLimitTradeInfosBeforeDate(Integer stockCode,Date date,int limitTradeInfos);
     public boolean isStockStopTrade(Integer stockCode);
-    public void addStockToMonitor(String stockSymbol,Float alarmSellPrice,Float alarmBuCangPrice);
+    public void addStockToMonitor(String stockSymbol, Float alarmLoseSellPrice,Float alarmWinSellPrice, Float alarmBuCangPrice);
     public void removeFromMonitor(String stockSymbol);
     public int syncStockTradeInfoWithAnalysisResult(String stockSymbol);
     public StockTradeInfoWithAnalysisResult syncCurrentStockTradeInfoWithAnalysisResult(String stockSymbol);
