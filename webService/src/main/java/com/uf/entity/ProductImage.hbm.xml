@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Jun 13, 2017 6:02:49 PM by Hibernate Tools 3.5.0.Final -->
+<hibernate-mapping>
+ <class name="com.uf.entity.ProductImage" table="PRODUCTIMAGE">
+  <id name="id" type="java.lang.Integer">
+   <column name="ID"/>
+   <generator class="identity"/>
+  </id>
+  <primitive-array name="image" table="PRODUCTIMAGE">
+   <key>
+    <column name="ID"/>
+   </key>
+   <index/>
+   <element type="byte">
+    <column name="IMAGE"/>
+   </element>
+  </primitive-array>
+  <property generated="never" lazy="false" name="fileName" type="java.lang.String">
+   <column name="FILENAME"/>
+  </property>
+  <many-to-one class="com.uf.entity.Product" fetch="join" name="product">
+   <column name="PRODUCT"/>
+  </many-to-one>
+ </class>
+</hibernate-mapping>

@@ -73,6 +73,8 @@
 				<value>com/uf/entity/Customer.hbm.xml</value>
 				<value>com/uf/entity/Manager.hbm.xml</value>
 				<value>com/uf/entity/Word.hbm.xml</value>
+				<value>com/uf/entity/Order.hbm.xml</value>
+				<value>com/uf/entity/OrderItem.hbm.xml</value>
 				<value>com/uf/entity/Address.hbm.xml</value>
 			</list>
 		</property>
@@ -96,7 +98,7 @@
 		</property>
 	</bean>
 	<bean id="searchEngine" class="com.uf.searcher.SearchEngine">
-		 <constructor-arg value="E:/luceneIndex" name="indexDir"/>
+		 <constructor-arg value="c:/luceneIndex" name="indexDir"/>
 		  <constructor-arg value="false" name="rebuildIndex"/>
 	</bean>
 

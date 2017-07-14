@@ -7,8 +7,10 @@ import org.springframework.stereotype.Service;
 
 import com.uf.dao.BuycarProductInfoDao;
 import com.uf.dao.CustomerDao;
+import com.uf.dao.OrderDao;
 import com.uf.entity.BuycarProductInfo;
 import com.uf.entity.Customer;
+import com.uf.entity.Order;
 import com.uf.service.CustomerActionService;
 @Service("customerActionService")
 public class CustomerActionServiceImpl implements CustomerActionService{
@@ -16,6 +18,8 @@ public class CustomerActionServiceImpl implements CustomerActionService{
   private CustomerDao customerDao;
   @Autowired
   private BuycarProductInfoDao buycarDao;
+  @Autowired
+  private OrderDao orderDao;
   public Customer  findCustomerByUserName(String userName){
     List<Customer> cus=customerDao.findByHql("select c from  Customer c  where c.userName=?", userName);
     if(cus!=null&&cus.size()>0){
@@ -52,6 +56,28 @@ public Customer findCustomerByWechatId(String wechatId) {
 @Override
 public void saveOrUpdateCustomer(Customer customer) {
 	customerDao.saveOrUpdate(customer);
+}
+@Override
+public List<Order> listOrders(Integer customerId) {
+	return (List<Order>)orderDao.findByHql("select o from Order o where o.customer.id", customerId);
+}
+@Override
+public Order findOrderById(Integer orderId) {
+	return orderDao.findById(Order.class, orderId);
+}
+@Override
+public void updateOrderStatus(Integer orderId, String newStatus) {
+	orderDao.executeUpdateHql("update Order o set o.status=? where o.id=?", newStatus,orderId);
+}
+@Override
+public void deleteOrder(Integer orderId, Integer customerId) {
+	orderDao.executeUpdateHql("delete from Order o where o.customer.id=? and o.id=?", customerId,orderId);
+
+}
+@Override
+public void generateOrder(Order order) {
+	orderDao.insert(order);
+
 }
 
 }

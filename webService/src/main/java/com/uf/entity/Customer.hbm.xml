@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Jun 13, 2017 6:02:49 PM by Hibernate Tools 3.5.0.Final -->
+<hibernate-mapping>
+ <class name="com.uf.entity.Customer" table="CUSTOMER">
+  <id name="id" type="java.lang.Integer">
+   <column name="ID"/>
+   <generator class="identity"/>
+  </id>
+  <property generated="never" lazy="false" name="phoneNumber" type="java.lang.String">
+   <column name="PHONENUMBER"/>
+  </property>
+  <property generated="never" lazy="false" name="wechatId" type="java.lang.String">
+   <column name="WECHATID"/>
+  </property>
+  <property generated="never" lazy="false" name="wechatNickname" type="java.lang.String">
+   <column name="WECHATNICKNAME"/>
+  </property>
+  <property generated="never" lazy="false" name="wechatOpenId" type="java.lang.String">
+   <column name="WECHATOPENID"/>
+  </property>
+  <property generated="never" lazy="false" name="userName" type="java.lang.String">
+   <column name="USERNAME"/>
+  </property>
+  <property generated="never" lazy="false" name="password" type="java.lang.String">
+   <column name="PASSWORD"/>
+  </property>
+ </class>
+</hibernate-mapping>

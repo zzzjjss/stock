@@ -9,6 +9,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -16,20 +17,23 @@ import com.google.gson.Gson;
 import com.uf.bean.Result;
 
 /**
- * Servlet Filter implementation class LoginFilter
+ * Servlet Filter implementation class CustomerFilter
  */
-public class LoginFilter implements Filter {
+@WebFilter("/CustomerFilter")
+public class CustomerFilter implements Filter {
 
     /**
      * Default constructor.
      */
-    public LoginFilter() {
+    public CustomerFilter() {
+        // TODO Auto-generated constructor stub
     }
 
 	/**
 	 * @see Filter#destroy()
 	 */
 	public void destroy() {
+		// TODO Auto-generated method stub
 	}
 
 	/**
@@ -38,25 +42,25 @@ public class LoginFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 	     HttpServletRequest  httpRequest=(HttpServletRequest)request;
 	     HttpServletResponse httpResponse = (HttpServletResponse)response;
-	     Object manager=httpRequest.getSession().getAttribute("manager");
-         String requestType = httpRequest.getHeader("X-Requested-With");
-         Result result=new Result();
-         if(manager==null){
-           if (requestType != null && requestType.equals("XMLHttpRequest")) {
-             result.setResult(Result.RESULT_NO_LOGIN);
-             result.setMes("请登录");
-             Gson gson=new Gson();
-             Writer writer=httpResponse.getWriter();
-             writer.write(gson.toJson(result));
-             writer.flush();
-             return;
-           }else{
-             String contextName=httpRequest.getServletContext().getContextPath();
-             httpResponse.sendRedirect(contextName+"/manager");
-             httpResponse.flushBuffer();
-             return;
-           }
-         }
+	     Object manager=httpRequest.getSession().getAttribute("customer");
+        String requestType = httpRequest.getHeader("X-Requested-With");
+        Result result=new Result();
+        if(manager==null){
+          if (requestType != null && requestType.equals("XMLHttpRequest")) {
+            result.setResult(Result.RESULT_NO_LOGIN);
+            result.setMes("请登录");
+            Gson gson=new Gson();
+            Writer writer=httpResponse.getWriter();
+            writer.write(gson.toJson(result));
+            writer.flush();
+            return;
+          }else{
+            String contextName=httpRequest.getServletContext().getContextPath();
+            httpResponse.sendRedirect(contextName);
+            httpResponse.flushBuffer();
+            return;
+          }
+        }
 	     chain.doFilter(request, response);
 	}
 

@@ -6,7 +6,7 @@ public class OrderItem {
 	private int count;
 	private float price;
 	private float amount;
-
+	private Order order;
 	public Long getId() {
 		return id;
 	}
@@ -45,6 +45,14 @@ public class OrderItem {
 
 	public void setAmount(float amount) {
 		this.amount = amount;
+	}
+
+	public Order getOrder() {
+		return order;
+	}
+
+	public void setOrder(Order order) {
+		this.order = order;
 	}
 
 }

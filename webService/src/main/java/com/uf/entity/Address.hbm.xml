@@ -1,15 +1,14 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
                                    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
-<!-- Generated May 22, 2017 4:59:16 PM by Hibernate Tools 3.5.0.Final -->
+<!-- Generated Jun 13, 2017 6:02:49 PM by Hibernate Tools 3.5.0.Final -->
 <hibernate-mapping>
  <class name="com.uf.entity.Address" table="ADDRESS">
   <id name="id" type="java.lang.Integer">
    <column name="ID"/>
    <generator class="identity"/>
   </id>
-  <many-to-one class="com.uf.entity.Customer" fetch="join"
-   name="customer" not-found="ignore">
+  <many-to-one class="com.uf.entity.Customer" fetch="join" name="customer">
    <column name="CUSTOMER"/>
   </many-to-one>
   <property generated="never" lazy="false" name="phoneNumber" type="java.lang.String">
