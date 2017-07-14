@@ -43,13 +43,6 @@
 				</div>
 				<div class="modal-body">
 					<div class="input-group">
-						<span class="input-group-addon">AlarmType</span>
-						<select id="alarmType" class="form-control">
-							<option value="buyAlarm">buyAlarm</option>
-							<option value="sellAlarm">sellAlarm</option>
-						</select>
-					</div>
-					<div class="input-group">
 						<span class="input-group-addon">Stock Symbol</span>
 						<input type="text" class="form-control"  id="stockSymbol">
 					</div>
@@ -58,6 +51,16 @@
 						<input type="text" class="form-control" placeholder="" id="buyPrice" >
 					</div>
 					
+					<div class="input-group">
+						<span class="input-group-addon">Alarm up percent</span>
+						<input type="text" class="form-control" placeholder="10" id="upPercent" value="10" >
+						<span class="input-group-addon">%</span>
+					</div>
+					<div class="input-group">
+						<span class="input-group-addon">Alarm down percent</span>
+						<input type="text" class="form-control" placeholder="5" id="downPercent" value="5" >
+						<span class="input-group-addon">%</span>
+					</div>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -140,9 +143,10 @@ function addToMonitor(){
 		alert("buyPrice must greater 0");
 		return;
 	}
-	var alarmType=$("#alarmType").val();
+	var alarmUpPercent=$("#upPercent").val();
+	var alarmDownPercent=$("#downPercent").val();
 	$.ajax({
-		url : restfulContext + "/analysis/addToMonitor?stockSymbol="+stockSymbol+"&buyPrice="+buyPrice+"&alarmType="+alarmType
+		url : restfulContext + "/analysis/addToMonitor?stockSymbol="+stockSymbol+"&buyPrice="+buyPrice+"&alarmUpPercent="+alarmUpPercent+"&alarmDownPercent="+alarmDownPercent
 	}).done(function(data) {
 		$('#addToMonitorModal').modal('hide');
 		listStocksInMonitor();
@@ -158,7 +162,7 @@ function listStocksInMonitor(){
 			for(var i=0;i<data.length;i++){
 				var stock=data[i];
 				$("#stocks").append('<tr title="'+stock.name+'"><td>'+stock.symbol+'</td>'+
-						'<td>(sell:'+stock.alarmSellPrice+';buy:'+stock.alarmBuCangPrice+')</td>'+
+						'<td>(winSellPrice:'+stock.alarmWinSellPrice+';loseSellPrice:'+stock.alarmLoseSellPrice+')</td>'+
 						'<td><button  id="'+stock.symbol+ '" onclick="removeFromMonitor(this)">Remove</button></td></tr>');
 			}
 		}

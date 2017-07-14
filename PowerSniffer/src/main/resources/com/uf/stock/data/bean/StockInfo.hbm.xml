@@ -21,9 +21,13 @@
 		<property name="isInAlarmMonitor" type="boolean">
 			<column name="is_in_alarm_monitor" default="false"/>
 		</property>
-		<property name="alarmSellPrice" type="float">
-			<column name="alarm_sell_price" />
+		<property name="alarmWinSellPrice" type="float">
+			<column name="alarm_win_sell_price" />
 		</property>
+				<property name="alarmLoseSellPrice" type="float">
+			<column name="alarm_lose_sell_price" />
+		</property>
+		
 		<property name="alarmBuCangPrice" type="float">
 			<column name="alarm_bucang_price" />
 		</property>

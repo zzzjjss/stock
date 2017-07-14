@@ -11,7 +11,8 @@ public class StockInfo {
 	private Float totalAAmount;
 	private Float peRatio;
 	private boolean isInAlarmMonitor;
-	private Float alarmSellPrice;
+	private Float alarmWinSellPrice;
+	private Float alarmLoseSellPrice;
 	private Float alarmBuCangPrice;
 	private Float downPercentToLowest;
 
@@ -80,12 +81,19 @@ public class StockInfo {
 		this.isInAlarmMonitor = isInAlarmMonitor;
 	}
 
-  public Float getAlarmSellPrice() {
-    return alarmSellPrice;
+  public Float getAlarmWinSellPrice() {
+    return alarmWinSellPrice;
   }
 
-  public void setAlarmSellPrice(Float alarmSellPrice) {
-    this.alarmSellPrice = alarmSellPrice;
+  public void setAlarmWinSellPrice(Float alarmWinSellPrice) {
+    this.alarmWinSellPrice = alarmWinSellPrice;
   }
-	
+
+  public Float getAlarmLoseSellPrice() {
+    return alarmLoseSellPrice;
+  }
+
+  public void setAlarmLoseSellPrice(Float alarmLoseSellPrice) {
+    this.alarmLoseSellPrice = alarmLoseSellPrice;
+  }
 }

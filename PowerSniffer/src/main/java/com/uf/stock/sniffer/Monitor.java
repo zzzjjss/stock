@@ -59,7 +59,8 @@ public class Monitor extends Thread {
                 msg.setMsgType(AlarmMsgType.BUY_POINT_MSG);
                 msgs.add(msg);
               }
-              if(stock.getAlarmSellPrice()!=null&&tradeInfo.getClosePrice()>=stock.getAlarmSellPrice()){
+              if((stock.getAlarmLoseSellPrice()!=null&&tradeInfo.getClosePrice()<=stock.getAlarmLoseSellPrice())||
+                  (stock.getAlarmWinSellPrice()!=null&&tradeInfo.getClosePrice()>=stock.getAlarmWinSellPrice())){
                 StockBuySellAlarmMsg msg = new StockBuySellAlarmMsg();
                 msg.setStockName(stock.getName());
                 msg.setStockSymbol(symbol);

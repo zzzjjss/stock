@@ -56,8 +56,8 @@ public class StockAnalysisAction {
 		PriceSpeedAnalysisResultResponse response = new PriceSpeedAnalysisResultResponse();
 		try {
 			List<PriceSpeedAnalysisResultData> datas = new ArrayList<PriceSpeedAnalysisResultData>();
-			List<StockInfo> stocks = service.findStocksPeRatioBetween(minPeRatio, maxPeRation);
-			
+//			List<StockInfo> stocks = service.findStocksPeRatioBetween(minPeRatio, maxPeRation);
+			List<StockInfo> stocks = service.findStocksPeRatioBetween(-1f, Float.MAX_VALUE);
 			KLineTFilter tFilter=new KLineTFilter(0.2f);
 			if (stocks != null && stocks.size() > 0) {
 			  Map<String, StockTradeInfo> currentTradeInfos=null;
@@ -75,6 +75,9 @@ public class StockAnalysisAction {
 					List<StockTradeInfo> infors=service.findDateAscTradeInfosBeforeDate(stock.getCode(), new Date(), analysisDays);
 					if (useCurrentInfo) {
 					  StockTradeInfo currentTradeInfo=currentTradeInfos.get(stock.getSymbol());
+					  if (currentTradeInfo.getUpDownRate()>9.9) {
+                        continue;
+                      }
 					  if (currentTradeInfo!=null) {
 					    currentTradeInfo.setTradeDate(new Date());
 					    if (stock.getTotalAAmount()!=null) {
@@ -87,6 +90,7 @@ public class StockAnalysisAction {
 					chain.appendStockFilter(new PriceFilter(infors, downPercentToLow));
 					PriceSpeedAnalysisResultData data = new PriceSpeedAnalysisResultData();
 					if (chain.doFilter(infors.get(infors.size()-1))) {
+					  StockTradeInfo lastTradeInfo=infors.get(infors.size()-1);
 					  Map<String, Object>  result=chain.getFilterChainResult();
 					  data.setDownRateToLowest((Float)result.get(PriceFilter.class.getName()));
 					  data.setStockName(stock.getName());
@@ -103,6 +107,12 @@ public class StockAnalysisAction {
                       }else {
                         data.setVolumePriceUp("");
                       }
+  					float lowestUpDownPercent=(float)(((lastTradeInfo.getLowestPrice()*(1+lastTradeInfo.getUpDownRate()*0.01))/lastTradeInfo.getClosePrice())-1)*100;
+  			        if (lowestUpDownPercent<=-9.8&&lastTradeInfo.getUpDownRate()>-9.8) {
+  			         data.setOpenFullDown(true); 
+  			        }else {
+                      data.setOpenFullDown(false);
+                    }
   					  data.setMacd(macd);
 					  datas.add(data);
                     }
@@ -244,18 +254,16 @@ public class StockAnalysisAction {
 	  return gson.toJson(stage);
 	}
 	
-	@Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @GET
-    @Path("/addToMonitor")
-    public String addToMonitor(@QueryParam("stockSymbol") String stockSymbol,@QueryParam("buyPrice") float buyPrice,@QueryParam("alarmType") String alarmType) {
-	  if ("buyAlarm".equals(alarmType)) {
-	    service.addStockToMonitor(stockSymbol, null, buyPrice);
-      }else {
-        service.addStockToMonitor(stockSymbol, buyPrice*1.02f, null); 
-      }
-	 return "{}";
-	}
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+  @GET
+  @Path("/addToMonitor")
+  public String addToMonitor(@QueryParam("stockSymbol") String stockSymbol, @QueryParam("buyPrice") float buyPrice, @QueryParam("alarmUpPercent") float alarmUpPercent, @QueryParam("alarmUpPercent") float alarmDownPercent) {
+    float alarmLoseSellPrice = buyPrice * (1 - alarmDownPercent * 0.01f);
+    float alarmWinSellPrice = buyPrice * (1 + alarmUpPercent * 0.01f);
+    service.addStockToMonitor(stockSymbol, alarmLoseSellPrice, alarmWinSellPrice, null);
+    return "{}";
+  }
 	@Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @GET

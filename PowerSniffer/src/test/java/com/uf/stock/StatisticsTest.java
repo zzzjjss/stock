@@ -31,4 +31,14 @@ public class StatisticsTest {
       StatisticsTool tool=new StatisticsTool();
       tool.statisticBuyPointByMorningStar();
     }
+	@Test
+	 public void testMostDownBuyPoint(){
+	      StatisticsTool tool=new StatisticsTool();
+	      tool.statisticByMaxDown();
+	 }
+	@Test
+	public void testVPUpBuyPoint(){
+	  StatisticsTool tool=new StatisticsTool();
+	  tool.statisticBuyPointByVolumeUpPriceUp();
+	}
 }
