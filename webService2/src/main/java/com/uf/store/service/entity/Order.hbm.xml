@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Jun 13, 2017 5:31:35 PM by Hibernate Tools 3.5.0.Final -->
+<hibernate-mapping>
+ <class name="com.uf.store.service.entity.Order" table="ORDER">
+  <id name="id" type="java.lang.Long">
+   <column name="ID"/>
+   <generator class="identity"/>
+  </id>
+  <many-to-one class="com.uf.store.service.entity.Customer" fetch="join" name="customer">
+   <column name="CUSTOMER"/>
+  </many-to-one>
+  <property generated="never" lazy="false" name="status" type="int">
+   <column name="STATUS"/>
+  </property>
+  <property generated="never" lazy="false" name="phoneNumber" type="java.lang.String">
+   <column name="PHONENUMBER"/>
+  </property>
+  <property generated="never" lazy="false" name="realName" type="java.lang.String">
+   <column name="REALNAME"/>
+  </property>
+  <property generated="never" lazy="false" name="province" type="java.lang.String">
+   <column name="PROVINCE"/>
+  </property>
+  <property generated="never" lazy="false" name="city" type="java.lang.String">
+   <column name="CITY"/>
+  </property>
+  <property generated="never" lazy="false" name="county" type="java.lang.String">
+   <column name="COUNTY"/>
+  </property>
+  <property generated="never" lazy="false" name="arear" type="java.lang.String">
+   <column name="AREAR"/>
+  </property>
+  <property generated="never" lazy="false" name="address" type="java.lang.String">
+   <column name="ADDRESS"/>
+  </property>
+  <property generated="never" lazy="false" name="totalAmount" type="float">
+   <column name="TOTALAMOUNT"/>
+  </property>
+  <list lazy="true" name="items" table="ORDERITEM">
+   <key>
+    <column name="order_id"/>
+   </key>
+   <list-index base="0"/>
+   <one-to-many class="com.uf.store.service.entity.OrderItem"/>
+  </list>
+ </class>
+</hibernate-mapping>

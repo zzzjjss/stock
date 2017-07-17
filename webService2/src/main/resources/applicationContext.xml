@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx.xsd
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop.xsd">
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+		<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/test?characterEncoding=UTF-8"></property>
+		<property name="user" value="root"></property>
+		<property name="password" value="root"></property>
+		<property name="minPoolSize" value="10" />
+		<property name="maxPoolSize" value="100" />
+		<property name="maxIdleTime" value="1800" />
+		<property name="acquireIncrement" value="3" />
+		<property name="maxStatements" value="1000" />
+		<property name="initialPoolSize" value="10" />
+		<property name="idleConnectionTestPeriod" value="60" />
+		<property name="acquireRetryAttempts" value="30" />
+		<property name="breakAfterAcquireFailure" value="true" />
+		<property name="testConnectionOnCheckout" value="false" />
+	</bean>
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="mappingResources">
+			<list>
+				<value>com/uf/store/service/entity/Product.hbm.xml</value>
+				<value>com/uf/store/service/entity/ProductImage.hbm.xml</value>
+				<value>com/uf/store/service/entity/BuycarProductInfo.hbm.xml</value>
+				<value>com/uf/store/service/entity/Customer.hbm.xml</value>
+				<value>com/uf/store/service/entity/Word.hbm.xml</value>
+				<value>com/uf/store/service/entity/Order.hbm.xml</value>
+				<value>com/uf/store/service/entity/OrderItem.hbm.xml</value>
+				<value>com/uf/store/service/entity/Address.hbm.xml</value>
+			</list>
+		</property>
+
+		<property name="hibernateProperties">
+			<value>
+				hibernate.dialect=org.hibernate.dialect.MySQL5InnoDBDialect
+				hibernate.show_sql=true
+				javax.persistence.validation.mode=none
+				hibernate.hbm2ddl.auto=update
+			</value>
+		</property>
+	</bean>
+
+	<bean id="hibernateTemplate" class="org.springframework.orm.hibernate4.HibernateTemplate">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<aop:config>
+		<aop:pointcut expression="execution(* com.uf.store.service.impl.*.*(..))"
+			id="txMethods" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="txMethods" />
+	</aop:config>
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="*" propagation="REQUIRED" />
+		</tx:attributes>
+	</tx:advice>
+	<context:component-scan base-package="com.uf.store.service" />
+	<context:component-scan base-package="com.uf.store.springbean" />
+
+	<bean id="searchEngine" class="com.uf.store.searcher.SearchEngine">
+		<constructor-arg name="indexDir" value="c:/luceneIndex"  />
+		<constructor-arg  name="rebuildIndex"  value="false"/>
+	</bean>
+	<bean id="systemConfig" class="com.uf.store.springbean.SystemConfig">
+
+	</bean>
+</beans>

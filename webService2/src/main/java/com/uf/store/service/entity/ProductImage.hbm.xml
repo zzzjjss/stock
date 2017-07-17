@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Jun 13, 2017 6:02:49 PM by Hibernate Tools 3.5.0.Final -->
+<hibernate-mapping>
+ <class name="com.uf.store.service.entity.ProductImage" table="PRODUCTIMAGE">
+  <id name="id" type="java.lang.Integer">
+   <column name="ID"/>
+   <generator class="identity"/>
+  </id>
+  <property generated="never" lazy="false" name="fileName" type="java.lang.String">
+   <column name="FILENAME"/>
+  </property>
+  <property column="image" name="image" type="clob"/>
+  <many-to-one class="com.uf.store.service.entity.Product" fetch="join" name="product">
+   <column name="PRODUCT" not-null="false"/>
+  </many-to-one>
+ </class>
+</hibernate-mapping>

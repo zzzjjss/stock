@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Jun 13, 2017 6:02:49 PM by Hibernate Tools 3.5.0.Final -->
+<hibernate-mapping>
+ <class name="com.uf.store.service.entity.Product" table="PRODUCT">
+  <id name="id" type="java.lang.Integer">
+   <column name="ID"/>
+   <generator class="identity"/>
+  </id>
+  <property generated="never" lazy="false" name="name" type="java.lang.String">
+   <column name="NAME"/>
+  </property>
+  <property generated="never" lazy="false" name="description" type="java.lang.String">
+   <column name="DESCRIPTION"/>
+  </property>
+  <property generated="never" lazy="false" name="searchKeywords" type="java.lang.String">
+   <column name="SEARCHKEYWORDS"/>
+  </property>
+  <property generated="never" lazy="false" name="buyPrice" type="java.lang.Float">
+   <column name="BUYPRICE"/>
+  </property>
+  <property generated="never" lazy="false" name="sellPrice" type="java.lang.Float">
+   <column name="SELLPRICE"/>
+  </property>
+  <property generated="never" lazy="false" name="updateTime" type="java.util.Date">
+   <column name="UPDATETIME"/>
+  </property>
+ </class>
+</hibernate-mapping>
