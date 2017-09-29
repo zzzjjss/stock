@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import com.uf.book.robot.controller.bean.DownloadUrlInfo;
-import com.uf.book.robot.dao.BookInfo;
-import com.uf.book.robot.dao.BookInfoRepository;
+import com.uf.book.robot.dao.mysql.BookInfo;
+import com.uf.book.robot.dao.mysql.BookInfoRepository;
 
 @RestController
 @RequestMapping("book")

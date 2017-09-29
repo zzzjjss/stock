@@ -1,4 +1,4 @@
-package com.uf.book.robot.dao;
+package com.uf.book.robot.dao.mysql;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
