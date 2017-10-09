@@ -1,33 +1,36 @@
 $(document).ready(function() {
 	var index=0;
 	var bookNames=books.books;
-	var foundDownUrl;
+	var foundDownUrl=new Set();
+	var domTime;
 	$("body").on("DOMSubtreeModified",function(){
-		var downLoadUrl = $("body .localbook_download").attr("href");
-		if(downLoadUrl!=undefined&&downLoadUrl!=foundDownUrl){
-			foundDownUrl=downLoadUrl;
-			window.location=downLoadUrl;
-			index++;
-			setInterval(function(){
-				$("#SearchWord").val(bookNames[index]);
-				$("#SearchButton").click();
-			},10000);
+		var date=new Date();
+		domTime=date.getTime();
+		var downLoadUrl = $("body a.localbook_download");	
+		if(downLoadUrl!=null&&downLoadUrl.length>0){
+			downLoadUrl.each(function(index){
+				var downUrl=$(this).attr("href");
+				if(!foundDownUrl.has(downUrl)){
+//					console.log(downUrl);
+					window.open(downUrl);
+					foundDownUrl.add(downUrl);
+				}
+			});
 		}
-		if(foundDownUrl==downLoadUrl){
-			return;
-		}
-		
 		});
 
 
 		$("#SearchWord").val(bookNames[index]);
 		$("#SearchButton").click();
-
-		
-//		setTimeout(function() {
-//			var downLoadUrl = $("body .localbook_download").attr("href");
-//			window.location = downLoadUrl;	
-//						
-//		}, 5000);
+		setInterval(function(){
+			var date=new Date();
+			if(date.getTime()-domTime>10*1000){
+				foundDownUrl.clear();
+				index++;
+				$("#SearchWord").val(bookNames[index]);
+				$("#SearchButton").click();
+				domTime=date.getTime();
+			}
+		},10000);	
 	
 });
