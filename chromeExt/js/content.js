@@ -11,7 +11,6 @@ $(document).ready(function() {
 			downLoadUrl.each(function(index){
 				var downUrl=$(this).attr("href");
 				if(!foundDownUrl.has(downUrl)){
-//					console.log(downUrl);
 					window.open(downUrl);
 					foundDownUrl.add(downUrl);
 				}
