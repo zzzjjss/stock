@@ -1,7 +1,7 @@
 package com.uf.book.robot.searcher;
 
 import java.io.File;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,18 +38,16 @@ public class RegExpressBookSearcher implements BookSearcher {
 				}
 			}
 		}
+		List<File> wordSearchRe=new ArrayList<File>();
 		if (searchResult.size()>1) {
 			String wordRegExp=buildWordRegExpresstion(bookName);
-			Iterator<File> files=searchResult.iterator();
-			while(files.hasNext()) {
-				File file=files.next();
-				if (!file.getName().matches(wordRegExp)) {
-					files.remove();
-					searchResult.remove(file);
+			searchResult.forEach(file->{
+				if (file.getName().matches(wordRegExp)) {
+					wordSearchRe.add(file);
 				}
-			}
+			});
 		}
-		return searchResult;
+		return wordSearchRe.size()>0?wordSearchRe:searchResult;
 	}
 
 	private String buildRegExpresstion(String bookName) {
