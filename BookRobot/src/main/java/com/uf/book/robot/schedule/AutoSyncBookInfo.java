@@ -25,7 +25,7 @@ public class AutoSyncBookInfo {
 	@Autowired
 	private BookInfoRepository bookInfoRepo;
 	
-	@Scheduled(fixedDelay = 1000 * 3600 * 24)
+//	@Scheduled(fixedDelay = 1000 * 3600 * 24)
 	public void incrementSyncBookInfo() {
 		int concurrent=10;
 		Executor pool=Executors.newFixedThreadPool(concurrent);
