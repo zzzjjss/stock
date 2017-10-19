@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.uf.book.robot.controller.bean.DownloadPathInfo;
 import com.uf.book.robot.dao.mysql.BookInfoRepository;
-import com.uf.book.robot.searcher.SearchEngine;
+import com.uf.book.robot.searcher.BookSearcher;
 import com.uf.book.robot.util.DownloadUtil;
 
 @RestController
@@ -27,10 +27,13 @@ import com.uf.book.robot.util.DownloadUtil;
 public class BookDownloadController {
 	@Autowired
 	private BookInfoRepository bookInfoRepo;
-	
+	@Autowired
+	private BookSearcher searcher;
+	@Autowired
+	private DownloadUtil downloadUtil;
 	@RequestMapping(value = "download", method = RequestMethod.GET)
 	public ResponseEntity<InputStreamResource> downloadBook(String downloadPath, HttpServletResponse response) throws Exception {
-		String localFilePath=DownloadUtil.findLocalFilePath(downloadPath);
+		String localFilePath=downloadUtil.findLocalFilePath(downloadPath);
 		if (localFilePath==null) {
 			return null;
 		}
@@ -51,11 +54,11 @@ public class BookDownloadController {
 	public List<DownloadPathInfo> generateDownloadUrl(String searchWord) {
 		System.out.println("searchWord:"+searchWord);
 		List<DownloadPathInfo> result=new ArrayList<DownloadPathInfo>();	
-		List<File> files=SearchEngine.search(searchWord);
+		List<File> files=searcher.searchBooks(searchWord);
 		if (files!=null) {
 			files.forEach(file->{
 				DownloadPathInfo info = new DownloadPathInfo();
-				String downloadPath=DownloadUtil.generateDownloadPath(file.getAbsolutePath());
+				String downloadPath=downloadUtil.generateDownloadPath(file.getAbsolutePath());
 				info.setDownloadPath(downloadPath);
 				info.setFileName(file.getName());
 				result.add(info);

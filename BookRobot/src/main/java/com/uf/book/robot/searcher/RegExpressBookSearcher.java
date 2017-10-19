@@ -5,12 +5,14 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+@Component
 public class RegExpressBookSearcher implements BookSearcher {
-	private File searchFolder[];
+	private String searchFolder[];
 
-	public RegExpressBookSearcher(File ...searchFolder) {
+	public RegExpressBookSearcher(@Value("${searcher.folder}") String ...searchFolder) {
 		this.searchFolder = searchFolder;
-
 	}
 
 	@Override
@@ -20,7 +22,8 @@ public class RegExpressBookSearcher implements BookSearcher {
 			return searchResult;
 		}
 		String regExp=buildRegExpresstion(bookName);
-		for (File folder : searchFolder) {
+		for (String folderStr : searchFolder) {
+			File folder=new File(folderStr);
 			if (folder.isFile()) {
 				continue;
 			}
