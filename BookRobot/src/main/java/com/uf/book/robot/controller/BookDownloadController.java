@@ -2,12 +2,16 @@ package com.uf.book.robot.controller;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,7 +29,7 @@ public class BookDownloadController {
 	private BookInfoRepository bookInfoRepo;
 	
 	@RequestMapping(value = "download", method = RequestMethod.GET)
-	public ResponseEntity<InputStreamResource> downloadBook(String downloadPath) throws Exception {
+	public ResponseEntity<InputStreamResource> downloadBook(String downloadPath, HttpServletResponse response) throws Exception {
 		String localFilePath=DownloadUtil.findLocalFilePath(downloadPath);
 		if (localFilePath==null) {
 			return null;
@@ -36,9 +40,11 @@ public class BookDownloadController {
 		}
 		InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
 		HttpHeaders header = new HttpHeaders();
-		header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName().replaceAll(" ", "_"));
+		String fileName=file.getName().replaceAll(" ", "_");
+		System.out.println(fileName);
+		header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + URLEncoder.encode(fileName,"utf-8"));
 		header.setContentLength(file.length());
-		return ResponseEntity.ok().headers(header).body(resource);
+		return new ResponseEntity<InputStreamResource>(resource, header, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "searchBooks", method = RequestMethod.GET)
@@ -51,6 +57,7 @@ public class BookDownloadController {
 				DownloadPathInfo info = new DownloadPathInfo();
 				String downloadPath=DownloadUtil.generateDownloadPath(file.getAbsolutePath());
 				info.setDownloadPath(downloadPath);
+				info.setFileName(file.getName());
 				result.add(info);
 			});
 		}

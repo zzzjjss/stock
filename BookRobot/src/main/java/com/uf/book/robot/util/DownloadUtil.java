@@ -15,7 +15,7 @@ import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.PrimaryKey;
 
 public class DownloadUtil {
-	public static final int LIVE_TIME_MINUTE = 1;
+	public static final int LIVE_TIME_MINUTE = 10;
 	private static PrimaryIndex<String, DownloadInfo> index;
 	private static EntityStore store;
 	private static Environment envmnt;
@@ -41,13 +41,18 @@ public class DownloadUtil {
 		info.setGenerateTime(System.currentTimeMillis());
 		info.setUuid(uuid);
 		index.put(info);
+		store.sync();
 		return uuid;
 	}
 
 	public static String findLocalFilePath(String downloadPath) {
 		DownloadInfo info = index.get(downloadPath);
+		if(info==null) {
+			return null;
+		}
 		if (info != null && (System.currentTimeMillis() - info.getGenerateTime()) >= 1000 * 60 * LIVE_TIME_MINUTE) {
 			index.delete(downloadPath);
+			System.out.println("delete the timeout  downloadPath:"+downloadPath);
 			return null;
 		}
 		return info.getFilePath();
@@ -113,7 +118,6 @@ public class DownloadUtil {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
-		System.out.println(listAllDownloadInfos().size());
-
+//		System.out.println(listAllDownloadInfos().size());
 	}
 }

@@ -1,8 +1,16 @@
 package com.uf.book.robot.controller.bean;
 
 public class DownloadPathInfo {
+	private String fileName;
 	private String downloadPath;
 	private long remainTime;
+	
+	public String getFileName() {
+		return fileName;
+	}
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
 	public String getDownloadPath() {
 		return downloadPath;
 	}
