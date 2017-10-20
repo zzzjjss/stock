@@ -12,7 +12,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,12 +19,11 @@ import com.uf.book.robot.dao.mysql.BookInfo;
 import com.uf.book.robot.dao.mysql.BookInfoRepository;
 import com.uf.book.robot.util.HttpUtil;
 
-@Component
 public class AutoSyncBookInfo {
 	@Autowired
 	private BookInfoRepository bookInfoRepo;
 	
-//	@Scheduled(fixedDelay = 1000 * 3600 * 24)
+	@Scheduled(fixedDelay = 1000 * 3600 * 24)
 	public void incrementSyncBookInfo() {
 		int concurrent=10;
 		Executor pool=Executors.newFixedThreadPool(concurrent);

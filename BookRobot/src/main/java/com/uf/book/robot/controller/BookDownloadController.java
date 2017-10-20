@@ -18,15 +18,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uf.book.robot.controller.bean.DownloadPathInfo;
-import com.uf.book.robot.dao.mysql.BookInfoRepository;
 import com.uf.book.robot.searcher.BookSearcher;
 import com.uf.book.robot.util.DownloadUtil;
 
 @RestController
 @RequestMapping("book")
 public class BookDownloadController {
-	@Autowired
-	private BookInfoRepository bookInfoRepo;
 	@Autowired
 	private BookSearcher searcher;
 	@Autowired
