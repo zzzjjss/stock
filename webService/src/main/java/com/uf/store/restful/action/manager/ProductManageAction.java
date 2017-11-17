@@ -8,6 +8,8 @@ import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,6 +34,7 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("manager")
 @Api(tags = "manage  product interface")
 public class ProductManageAction {
+	private Logger logger=LoggerFactory.getLogger(ProductManageAction.class);
 	@Autowired
 	private ProductManageService productManage;
 	@Autowired
@@ -55,7 +58,7 @@ public class ProductManageAction {
 				response.setMes("userName or password was  wrong");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("",e);
 			response.setResultCode(ResultCode.FAIL);
 			response.setMes(e.getMessage());
 		}
@@ -82,7 +85,7 @@ public class ProductManageAction {
 				response.setMes("Upload file is empty");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("",e);
 			if (imageFile!=null) {
 				imageFile.delete();
 			}
@@ -97,6 +100,7 @@ public class ProductManageAction {
 	public SaveProductResponse  saveProduct(@RequestBody SaveProductRequest request) {
 		SaveProductResponse  response=new SaveProductResponse();
 		try {
+			List<File> imageFiles=new ArrayList<File>();
 			if (request.getProduct()!=null) {
 				List<byte[]> images=new ArrayList<byte[]>();
 				request.getImageNames().forEach(imageName->{
@@ -105,12 +109,20 @@ public class ProductManageAction {
 						try {
 							byte[] content=FileUtils.readFileToByteArray(imageFile);
 							images.add(content);
+							imageFiles.add(imageFile);
 						} catch (IOException e) {
-							e.printStackTrace();
+							logger.error("",e);
 						}
 					}
 				});
 				productManage.saveProduct(request.getProduct(),images);
+				imageFiles.forEach(file->{
+					try {
+						FileUtils.moveFile(file, new File(imagePath+"/"+request.getProduct().getId()+"/"+file.getName()));
+					} catch (IOException e) {
+						logger.error("move file :"+file.getAbsolutePath()+" fail ",e);
+					}
+				});
 				response.setProductId(request.getProduct().getId());
 				response.setResultCode(ResultCode.OK);
 			}else {
@@ -118,7 +130,7 @@ public class ProductManageAction {
 				response.setMes("product is empty");	
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("",e);
 			response.setResultCode(ResultCode.FAIL);
 			response.setMes(e.getMessage());
 		}
@@ -131,7 +143,7 @@ public class ProductManageAction {
 			productManage.deleteProduct(id);
 			response.setResultCode(ResultCode.OK);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("",e);
 			response.setResultCode(ResultCode.FAIL);
 			response.setMes(e.getMessage());
 		}
