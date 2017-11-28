@@ -67,16 +67,16 @@ public class ProductManageAction {
 
 	
 	@RequestMapping(value="uploadProductImage",method=RequestMethod.POST)
-	public UploadImageResponse uploadProductImage(@RequestParam("imageFile") MultipartFile file) {
+	public UploadImageResponse uploadProductImage(@RequestParam("imageFile") MultipartFile uploadFile) {
 		UploadImageResponse  response=new UploadImageResponse();
 		File imageFile=null;
 		try {
-			if (file!=null) {
+			if (uploadFile!=null) {
 				String uuid=UUID.randomUUID().toString();
-				String uploadFileName=file.getOriginalFilename();
+				String uploadFileName=uploadFile.getOriginalFilename();
 				String fileExt=FilenameUtils.getExtension(uploadFileName);
 				imageFile=new File(imagePath,uuid+"."+fileExt);
-				FileUtils.copyInputStreamToFile(file.getInputStream(),imageFile);
+				FileUtils.copyInputStreamToFile(uploadFile.getInputStream(),imageFile);
 				//TODO  adjust the image to fixed size
 				response.setImagePath(imageBaseUrl+"/"+imageFile.getName());
 				response.setResultCode(ResultCode.OK);

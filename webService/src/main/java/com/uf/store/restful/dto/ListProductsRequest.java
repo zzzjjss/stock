@@ -1,19 +1,26 @@
 package com.uf.store.restful.dto;
 
 public class ListProductsRequest {
-	private int startIndex;
-	private int length;
-	public int getStartIndex() {
-		return startIndex;
+	private int pageIndex;
+	private int pageSize;
+	private String keyWord;
+	public String getKeyWord() {
+		return keyWord;
 	}
-	public void setStartIndex(int startIndex) {
-		this.startIndex = startIndex;
+	public void setKeyWord(String keyWord) {
+		this.keyWord = keyWord;
 	}
-	public int getLength() {
-		return length;
+	public int getPageIndex() {
+		return pageIndex;
 	}
-	public void setLength(int length) {
-		this.length = length;
+	public void setPageIndex(int pageIndex) {
+		this.pageIndex = pageIndex;
+	}
+	public int getPageSize() {
+		return pageSize;
+	}
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
 	}
 	
 }

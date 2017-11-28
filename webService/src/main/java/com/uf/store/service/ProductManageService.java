@@ -1,11 +1,15 @@
 package com.uf.store.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.base.Strings;
 import com.uf.store.dao.mysql.ProductImageRepository;
 import com.uf.store.dao.mysql.ProductRepository;
 import com.uf.store.dao.mysql.po.Product;
@@ -32,5 +36,14 @@ public class ProductManageService{
 		productImageRepo.deleteByProductId(id);
 		productRepo.deleteById(id);
 	}
-
+	public Page<Product> getPagedProducts(int pageIndex,int pageSize,String keyword){
+		PageRequest pageRequest=new PageRequest(pageIndex,pageSize);
+		if (Strings.isNullOrEmpty(keyword)) {
+			return productRepo.findAll(pageRequest);
+		}else {
+			//TODO  search product in lucene  by keyword
+			List<Integer> ids=new ArrayList<Integer>();
+			return productRepo.findByIdIn(ids, pageRequest);
+		}
+	}
 }
