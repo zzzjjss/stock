@@ -118,6 +118,7 @@ public class ProductManageAction {
 				productManage.saveProduct(request.getProduct(),images);
 				imageFiles.forEach(file->{
 					try {
+						//TODO generate snapshot image to product directory
 						FileUtils.moveFile(file, new File(imagePath+"/"+request.getProduct().getId()+"/"+file.getName()));
 					} catch (IOException e) {
 						logger.error("move file :"+file.getAbsolutePath()+" fail ",e);

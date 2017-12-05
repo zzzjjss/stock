@@ -3,15 +3,16 @@ package com.uf.store.restful.dto;
 import java.util.List;
 
 public class ProductSellInfo {
-	private Integer id;
+	private Long id;
 	private String name;
 	private String description;
 	private Float sellPrice;
+	private String snapshotImgUrl;
 	private List<String> imgUrls;
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	public String getName() {
@@ -38,5 +39,10 @@ public class ProductSellInfo {
 	public void setImgUrls(List<String> imgUrls) {
 		this.imgUrls = imgUrls;
 	}
-	
+	public String getSnapshotImgUrl() {
+		return snapshotImgUrl;
+	}
+	public void setSnapshotImgUrl(String snapshotImgUrl) {
+		this.snapshotImgUrl = snapshotImgUrl;
+	}
 }

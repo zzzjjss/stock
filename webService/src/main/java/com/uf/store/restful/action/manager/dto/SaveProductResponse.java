@@ -3,13 +3,13 @@ package com.uf.store.restful.action.manager.dto;
 import com.uf.store.restful.dto.RestfulResponse;
 
 public class SaveProductResponse extends RestfulResponse{
-	private Integer productId;
+	private Long productId;
 
-	public Integer getProductId() {
+	public Long getProductId() {
 		return productId;
 	}
 
-	public void setProductId(Integer productId) {
+	public void setProductId(Long productId) {
 		this.productId = productId;
 	}
 	

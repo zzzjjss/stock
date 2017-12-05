@@ -14,6 +14,7 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.uf.store.dao.mysql.po.Customer;
 import com.uf.store.dao.mysql.po.Manager;
 import com.uf.store.service.cache.CacheService;
 
@@ -32,8 +33,8 @@ public class CacheRealm extends AuthorizingRealm {
 		Set<String> userRoles = new HashSet<>();
 		if (principal instanceof Manager) {
 			userRoles.add("manager");
-		}else {
-			userRoles.add("user");
+		}else if(principal instanceof Customer) {
+			userRoles.add("customer");
 		}
 		SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
 		authorizationInfo.addRoles(userRoles);

@@ -6,7 +6,7 @@ import java.util.List;
 public class ListPagedProductsResponse extends RestfulResponse{
 	private List<ProductSellInfo> productInfors=new ArrayList<ProductSellInfo>();
 	private int pageIndex;
-	
+	private int totalPage;
 	public int getPageIndex() {
 		return pageIndex;
 	}
@@ -21,6 +21,14 @@ public class ListPagedProductsResponse extends RestfulResponse{
 
 	public void setProductInfors(List<ProductSellInfo> productInfors) {
 		this.productInfors = productInfors;
+	}
+
+	public int getTotalPage() {
+		return totalPage;
+	}
+
+	public void setTotalPage(int totalPage) {
+		this.totalPage = totalPage;
 	}
 	
 }

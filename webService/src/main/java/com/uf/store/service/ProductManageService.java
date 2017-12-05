@@ -46,4 +46,7 @@ public class ProductManageService{
 			return productRepo.findByIdIn(ids, pageRequest);
 		}
 	}
+	public Product getProductById(long productId) {
+		return productRepo.findOne(productId);
+	}
 }

@@ -93,6 +93,11 @@
 			<artifactId>lucene-analyzers-smartcn</artifactId>
 			<version>5.4.0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.uf</groupId>
+			<artifactId>wechatApi</artifactId>
+			<version>1.0</version>
+		</dependency>
 		<!-- <dependency> <groupId>org.apache.shiro</groupId> <artifactId>shiro-spring-boot-web-starter</artifactId> 
 			<version>1.4.0-RC2</version> </dependency> -->
 	</dependencies>

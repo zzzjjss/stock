@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.uf.store.dao.mysql.po.Product;
 import com.uf.store.restful.dto.ListProductsRequest;
 import com.uf.store.restful.dto.ProductSellInfo;
+import com.uf.store.restful.dto.RestfulResponse.ResultCode;
+import com.uf.store.restful.dto.GetProductDetailResponse;
 import com.uf.store.restful.dto.ListPagedProductsResponse;
 import com.uf.store.service.ProductManageService;
 
@@ -44,6 +46,7 @@ public class CommonAction {
 			List<ProductSellInfo> productInfors=new ArrayList<ProductSellInfo>();
 			response.setPageIndex(products.getNumber());
 			response.setProductInfors(productInfors);
+			response.setTotalPage(products.getTotalPages());
 			if (products!=null) {
 				products.forEach(p->{
 					ProductSellInfo info=new ProductSellInfo();
@@ -51,17 +54,7 @@ public class CommonAction {
 					info.setId(p.getId());
 					info.setName(p.getName());
 					info.setSellPrice(p.getSellPrice());
-					List<String> productImgUrls=new ArrayList<String>();
-					File productImgFolder=new File(imagePath,"/"+p.getId());
-					if(productImgFolder.exists()) {
-						File []imgs=productImgFolder.listFiles();
-						if(imgs!=null&&imgs.length>0) {
-							for(File img:imgs) {
-								productImgUrls.add(imageBaseUrl+"/"+p.getId()+"/"+img.getName());
-							}
-						}
-					}
-					info.setImgUrls(productImgUrls);
+					info.setSnapshotImgUrl(imageBaseUrl+"/"+p.getId()+"/snapshot.jpg");
 					productInfors.add(info);
 				});
 			}
@@ -70,5 +63,35 @@ public class CommonAction {
 		}
 		return response;
 	}
-
+	@RequestMapping(value = "getProductDetail", method = RequestMethod.GET)	
+	public GetProductDetailResponse getProductDetail(String productId) {
+		GetProductDetailResponse response=new GetProductDetailResponse();
+		try {
+			Product product=productManage.getProductById(Long.parseLong(productId));
+			if (product==null) {
+				response.setMes("noProdut");
+				response.setResultCode(ResultCode.FAIL);
+				return response;
+			}
+			ProductSellInfo info=new ProductSellInfo();
+			info.setDescription(product.getDescription());
+			info.setId(product.getId());
+			info.setName(product.getName());
+			info.setSellPrice(product.getSellPrice());
+			List<String> productImgUrls=new ArrayList<String>();
+			File productImgFolder=new File(imagePath,"/"+product.getId());
+			if(productImgFolder.exists()) {
+				File []imgs=productImgFolder.listFiles();
+				if(imgs!=null&&imgs.length>0) {
+					for(File img:imgs) {
+						productImgUrls.add(imageBaseUrl+"/"+product.getId()+"/"+img.getName());
+					}
+				}
+			}
+			info.setImgUrls(productImgUrls);
+		} catch (Exception e) {
+			logger.error("",e);
+		}
+		return response;	
+	}
 }

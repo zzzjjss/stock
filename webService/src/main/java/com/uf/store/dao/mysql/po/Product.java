@@ -11,7 +11,7 @@ import javax.persistence.Id;
 public class Product {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Integer id;
+	private Long id;
 	private String name;
 	private String description;
 	private String searchKeywords;
@@ -20,11 +20,12 @@ public class Product {
 	private Boolean onLine;
 	private Date updateTime;
 
-	public Integer getId() {
+
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
