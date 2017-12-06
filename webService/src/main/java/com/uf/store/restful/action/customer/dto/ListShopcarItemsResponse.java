@@ -6,13 +6,13 @@ import com.uf.store.restful.dto.RestfulResponse;
 
 
 public class ListShopcarItemsResponse extends RestfulResponse{
-	private List<ShopcarItem> items=new ArrayList<ShopcarItem>();
+	private List<ShopcarItemInfo> items=new ArrayList<ShopcarItemInfo>();
 
-	public List<ShopcarItem> getItems() {
+	public List<ShopcarItemInfo> getItems() {
 		return items;
 	}
 
-	public void setItems(List<ShopcarItem> items) {
+	public void setItems(List<ShopcarItemInfo> items) {
 		this.items = items;
 	}
 	

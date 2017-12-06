@@ -9,6 +9,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -22,8 +24,33 @@ public class Order {
 	private Float totalMoney;
 	@Enumerated(EnumType.STRING)
 	private OrderStatus status;
+	@Enumerated(EnumType.STRING)
+	private PaymentStatus paymentStaus;
 	@OneToMany(mappedBy="order")
 	private List<OrderItem> orderItem;
+	@ManyToOne
+	@JoinColumn(name="address_id")
+	private Address address;
+	
+	
+	public PaymentStatus getPaymentStaus() {
+		return paymentStaus;
+	}
+	public void setPaymentStaus(PaymentStatus paymentStaus) {
+		this.paymentStaus = paymentStaus;
+	}
+	public OrderStatus getStatus() {
+		return status;
+	}
+	public void setStatus(OrderStatus status) {
+		this.status = status;
+	}
+	public Address getAddress() {
+		return address;
+	}
+	public void setAddress(Address address) {
+		this.address = address;
+	}
 	public Long getId() {
 		return id;
 	}

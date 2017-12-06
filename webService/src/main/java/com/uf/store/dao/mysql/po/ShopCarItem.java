@@ -17,8 +17,8 @@ public class ShopCarItem {
 	private Product product;
 	private int amount;
 	@ManyToOne
-	@JoinColumn(name="shop_car_id")
-	private ShopCar shopCar;
+	@JoinColumn(name="customer_id")
+	private Customer customer;
 	public Long getId() {
 		return id;
 	}
@@ -43,11 +43,11 @@ public class ShopCarItem {
 		this.product = product;
 	}
 
-	public ShopCar getShopCar() {
-		return shopCar;
+	public Customer getCustomer() {
+		return customer;
 	}
 
-	public void setShopCar(ShopCar shopCar) {
-		this.shopCar = shopCar;
+	public void setCustomer(Customer customer) {
+		this.customer = customer;
 	}
 }

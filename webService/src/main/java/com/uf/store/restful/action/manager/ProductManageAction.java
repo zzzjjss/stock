@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
 import com.uf.store.restful.action.manager.dto.LoginRequest;
 import com.uf.store.restful.action.manager.dto.LoginResponse;
 import com.uf.store.restful.action.manager.dto.SaveProductRequest;
@@ -27,6 +28,8 @@ import com.uf.store.restful.dto.RestfulResponse;
 import com.uf.store.restful.dto.RestfulResponse.ResultCode;
 import com.uf.store.service.ManagerAccountService;
 import com.uf.store.service.ProductManageService;
+import com.uf.store.util.ImageUtil;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -116,9 +119,12 @@ public class ProductManageAction {
 					}
 				});
 				productManage.saveProduct(request.getProduct(),images);
+				if (imageFiles!=null&&imageFiles.size()>0) {
+					File file=imageFiles.get(0);
+					ImageUtil.resize(file, new File(imagePath+"/"+request.getProduct().getId()+"/snapshot."+FilenameUtils.getExtension(file.getName())), 100, 100);
+				}
 				imageFiles.forEach(file->{
 					try {
-						//TODO generate snapshot image to product directory
 						FileUtils.moveFile(file, new File(imagePath+"/"+request.getProduct().getId()+"/"+file.getName()));
 					} catch (IOException e) {
 						logger.error("move file :"+file.getAbsolutePath()+" fail ",e);

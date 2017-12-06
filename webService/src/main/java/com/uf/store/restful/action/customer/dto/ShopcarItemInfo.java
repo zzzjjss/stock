@@ -1,6 +1,6 @@
 package com.uf.store.restful.action.customer.dto;
 
-public class ShopcarItem {
+public class ShopcarItemInfo {
 	private Long productId;
 	private String productSnapshotImgUrl;
 	private String description;

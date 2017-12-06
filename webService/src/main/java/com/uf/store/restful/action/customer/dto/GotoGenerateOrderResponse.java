@@ -7,7 +7,7 @@ import com.uf.store.dao.mysql.po.Address;
 import com.uf.store.restful.dto.RestfulResponse;
 
 public class GotoGenerateOrderResponse extends RestfulResponse{
-	private List<ShopcarItem> orderPreItem=new ArrayList<ShopcarItem>();
+	private List<ShopcarItemInfo> orderPreItem=new ArrayList<ShopcarItemInfo>();
 	private Float totalMoney;
 	private Address defautAddress;
 	
@@ -27,11 +27,11 @@ public class GotoGenerateOrderResponse extends RestfulResponse{
 		this.totalMoney = totalMoney;
 	}
 
-	public List<ShopcarItem> getOrderPreItem() {
+	public List<ShopcarItemInfo> getOrderPreItem() {
 		return orderPreItem;
 	}
 
-	public void setOrderPreItem(List<ShopcarItem> orderPreItem) {
+	public void setOrderPreItem(List<ShopcarItemInfo> orderPreItem) {
 		this.orderPreItem = orderPreItem;
 	}
 	
