@@ -1,8 +1,11 @@
 package com.uf.store.restful.action.customer;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,12 +14,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uf.store.dao.mysql.po.Customer;
+import com.uf.store.dao.mysql.po.Product;
+import com.uf.store.dao.mysql.po.ShopCarItem;
 import com.uf.store.restful.action.customer.dto.AddProductToShopCarRequest;
 import com.uf.store.restful.action.customer.dto.GenerateOrderRequest;
+import com.uf.store.restful.action.customer.dto.GenerateOrderRequestItem;
 import com.uf.store.restful.action.customer.dto.GenerateOrderResponse;
 import com.uf.store.restful.action.customer.dto.GotoGenerateOrderRequest;
 import com.uf.store.restful.action.customer.dto.GotoGenerateOrderResponse;
 import com.uf.store.restful.action.customer.dto.ListShopcarItemsResponse;
+import com.uf.store.restful.action.customer.dto.ShopcarItemInfo;
 import com.uf.store.restful.dto.RestfulResponse;
 import com.uf.store.restful.dto.RestfulResponse.ResultCode;
 import com.uf.store.service.ShoppingService;
@@ -29,17 +36,15 @@ public class ShoppingAction {
 	@Autowired
 	private CacheService cache;
 	@Autowired
-	private ShoppingService shoppingService;	
+	private ShoppingService shoppingService;
+	@Value("${webServer.imageBaseUrl}") 
+	private String imageBaseUrl;
+
 	@RequestMapping(value = "saveProductToShopCar", method = RequestMethod.POST)
 	public RestfulResponse saveProductToShopCar(@RequestBody AddProductToShopCarRequest request,@RequestHeader(value="Authorization") String token) {
 		RestfulResponse response=new RestfulResponse();
 		try {
 			Object customer=cache.getCachedObject(token);
-			if (customer==null||!(customer instanceof Customer)) {
-				response.setMes("token expired");
-				response.setResultCode(ResultCode.NO_LOGIN);
-				return response;
-			}
 			shoppingService.saveProductToShopCar(request.getProductId(),request.getAmount(), (Customer)customer);
 		} catch (Exception e) {
 			logger.error("",e);
@@ -54,11 +59,6 @@ public class ShoppingAction {
 		try {
 			//must  verify the shopcar item is owned by  the  customer
 			Object customer=cache.getCachedObject(token);
-			if (customer==null||!(customer instanceof Customer)) {
-				response.setMes("token expired");
-				response.setResultCode(ResultCode.NO_LOGIN);
-				return response;
-			}
 			shoppingService.removeShopcarItem(shopCarItemId, (Customer)customer);
 		} catch (Exception e) {
 			logger.error("",e);
@@ -72,6 +72,19 @@ public class ShoppingAction {
 		ListShopcarItemsResponse  response=new ListShopcarItemsResponse();
 		try {
 			//find  Customer from cache, and return the customer's shopcar
+			Customer customer=(Customer)cache.getCachedObject(token);
+			List<ShopCarItem> items=shoppingService.findCustomerShopcarItems(customer);
+			if (items!=null) {
+				items.forEach(i->{
+					ShopcarItemInfo info=new ShopcarItemInfo();
+					info.setAmount(i.getAmount());
+					info.setDescription(i.getProduct().getDescription());
+					info.setProductId(i.getProduct().getId());
+					info.setProductSnapshotImgUrl(imageBaseUrl+"/"+i.getProduct().getId()+"/snapshot.jpg");
+					info.setSellPrice(i.getProduct().getSellPrice());
+					response.getItems().add(info);
+				});
+			}
 		} catch (Exception e) {
 			logger.error("",e);
 			response.setResultCode(ResultCode.FAIL);
@@ -84,6 +97,24 @@ public class ShoppingAction {
 		GotoGenerateOrderResponse   response=new GotoGenerateOrderResponse();
 		try {
 			//generate the order total infor   by  calculating  the  price  in some rule 
+			List<GenerateOrderRequestItem> requestItems=request.getOrderItems();
+			if (requestItems!=null&&requestItems.size()>0) {
+				requestItems.forEach(item->{
+					Product product=shoppingService.findProductById(item.getProductId());
+					if (product!=null) {
+						ShopcarItemInfo info=new ShopcarItemInfo();
+						info.setAmount(item.getAmount());
+						info.setDescription(product.getDescription());
+						info.setProductId(item.getProductId());
+						info.setProductSnapshotImgUrl(imageBaseUrl+"/"+product.getId()+"/snapshot.jpg");
+						info.setSellPrice(product.getSellPrice());
+						response.getOrderPreItem().add(info);
+					}
+				});
+			}
+			Double totalMoney=response.getOrderPreItem().stream().mapToDouble(item->item.getSellPrice().doubleValue()*item.getAmount()).sum();
+			response.setTotalMoney(totalMoney.floatValue());
+			response.setDefautAddress(shoppingService.findCustomerDefaultAddress((Customer)cache.getCachedObject(token)));
 		} catch (Exception e) {
 			logger.error("",e);
 			response.setResultCode(ResultCode.FAIL);
@@ -98,6 +129,7 @@ public class ShoppingAction {
 		GenerateOrderResponse response=new GenerateOrderResponse();
 		try {
 			//generate the order total infor   by  calculating  the  price  in some rule 
+			shoppingService.generateOrder(request.getOrderItems(),request.getAddressId());
 		} catch (Exception e) {
 			logger.error("",e);
 			response.setResultCode(ResultCode.FAIL);

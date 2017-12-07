@@ -1,5 +1,7 @@
 package com.uf.store.dao.mysql;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -13,4 +15,6 @@ public interface ShopCarItemRepository extends JpaRepository<ShopCarItem,Long> {
 	@Modifying
 	@Query("delete from ShopCarItem sc where sc.id=:id and sc.customer.id =:cid")
 	public void deleteCustomerShopcarItem(@Param("id")Long itemId,@Param("cid")Long customerId);
+	@Query("select i from ShopCarItem i where i.customer.id=:cid")
+	public List<ShopCarItem> findByCustomer(@Param("cid")Long cusotmerId);
 }

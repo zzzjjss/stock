@@ -20,6 +20,7 @@ public class Order {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
+	private String orderNumber;
 	private Date generateTime;
 	private Float totalMoney;
 	@Enumerated(EnumType.STRING)
@@ -33,6 +34,12 @@ public class Order {
 	private Address address;
 	
 	
+	public String getOrderNumber() {
+		return orderNumber;
+	}
+	public void setOrderNumber(String orderNumber) {
+		this.orderNumber = orderNumber;
+	}
 	public PaymentStatus getPaymentStaus() {
 		return paymentStaus;
 	}
