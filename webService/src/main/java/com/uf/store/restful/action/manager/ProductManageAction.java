@@ -19,11 +19,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.uf.store.dao.mysql.po.Product;
+import com.uf.store.restful.action.manager.dto.GetProductDetailResponse;
 import com.uf.store.restful.action.manager.dto.LoginRequest;
 import com.uf.store.restful.action.manager.dto.LoginResponse;
 import com.uf.store.restful.action.manager.dto.SaveProductRequest;
 import com.uf.store.restful.action.manager.dto.SaveProductResponse;
 import com.uf.store.restful.action.manager.dto.UploadImageResponse;
+import com.uf.store.restful.dto.ProductSellInfo;
 import com.uf.store.restful.dto.RestfulResponse;
 import com.uf.store.restful.dto.RestfulResponse.ResultCode;
 import com.uf.store.service.ManagerAccountService;
@@ -108,6 +111,9 @@ public class ProductManageAction {
 				List<byte[]> images=new ArrayList<byte[]>();
 				request.getImageNames().forEach(imageName->{
 					File imageFile=new File(imagePath+"/"+imageName);
+					if(!imageFile.exists()&&request.getProduct().getId()!=null) {
+						imageFile=new File(imagePath+"/"+request.getProduct().getId()+"/"+imageName);
+					}
 					if (imageFile.exists()) {
 						try {
 							byte[] content=FileUtils.readFileToByteArray(imageFile);
@@ -119,18 +125,22 @@ public class ProductManageAction {
 					}
 				});
 				productManage.saveProduct(request.getProduct(),images);
+				Long productId=request.getProduct().getId();
 				if (imageFiles!=null&&imageFiles.size()>0) {
 					File file=imageFiles.get(0);
-					ImageUtil.resize(file, new File(imagePath+"/"+request.getProduct().getId()+"/snapshot."+FilenameUtils.getExtension(file.getName())), 100, 100);
+					ImageUtil.resize(file, new File(imagePath+"/"+productId+"/snapshot."+FilenameUtils.getExtension(file.getName())), 100, 100);
 				}
 				imageFiles.forEach(file->{
 					try {
-						FileUtils.moveFile(file, new File(imagePath+"/"+request.getProduct().getId()+"/"+file.getName()));
+						File destination=new File(imagePath+"/"+productId+"/"+file.getName());
+						if (!destination.exists()) {
+							FileUtils.moveFile(file, destination);
+						}
 					} catch (IOException e) {
 						logger.error("move file :"+file.getAbsolutePath()+" fail ",e);
 					}
 				});
-				response.setProductId(request.getProduct().getId());
+				response.setProductId(productId);
 				response.setResultCode(ResultCode.OK);
 			}else {
 				response.setResultCode(ResultCode.FAIL);
@@ -144,7 +154,7 @@ public class ProductManageAction {
 		return response;
 	}
 	@RequestMapping(value="deleteProduct",method=RequestMethod.GET)
-	public RestfulResponse deleteProduct(Integer id) {
+	public RestfulResponse deleteProduct(Long id) {
 		RestfulResponse  response=new RestfulResponse();
 		try {
 			productManage.deleteProduct(id);
@@ -156,4 +166,45 @@ public class ProductManageAction {
 		}
 		return response;	
 	}
+	@RequestMapping(value="getProductDetail",method=RequestMethod.GET)
+	public GetProductDetailResponse getProductDetail(Integer id) {
+		GetProductDetailResponse response=new GetProductDetailResponse();
+		try {
+			Product product=productManage.getProductById(id);
+			if (product==null) {
+				response.setMes("noProdut");
+				response.setResultCode(ResultCode.FAIL);
+				return response;
+			}
+			ProductSellInfo info=new ProductSellInfo();
+			info.setDescription(product.getDescription());
+			info.setId(product.getId());
+			info.setName(product.getName());
+			info.setSellPrice(product.getSellPrice());
+			List<String> productImgUrls=new ArrayList<String>();
+			File productImgFolder=new File(imagePath,"/"+product.getId());
+			if(productImgFolder.exists()) {
+				File []imgs=productImgFolder.listFiles();
+				if(imgs!=null&&imgs.length>0) {
+					for(File img:imgs) {
+						if (img.getName().startsWith("snapshot")) {
+							info.setSnapshotImgUrl(imageBaseUrl+"/"+product.getId()+"/"+img.getName());
+						}
+						productImgUrls.add(imageBaseUrl+"/"+product.getId()+"/"+img.getName());
+					}
+				}
+			}
+			info.setImgUrls(productImgUrls);
+			response.setBuyPrice(product.getBuyPrice());
+			response.setOnLine(product.getOnLine());
+			response.setProductInfo(info);
+			response.setSearchKeywords(product.getSearchKeywords());
+		} catch (Exception e) {
+			logger.error("",e);
+			response.setResultCode(ResultCode.FAIL);
+			response.setMes(e.getMessage());
+		}
+		return response;	
+	}
+
 }

@@ -44,5 +44,11 @@ public class OrderItem {
 	public void setTotalMoney(Float totalMoney) {
 		this.totalMoney = totalMoney;
 	}
+	public Order getOrder() {
+		return order;
+	}
+	public void setOrder(Order order) {
+		this.order = order;
+	}
 	
 }

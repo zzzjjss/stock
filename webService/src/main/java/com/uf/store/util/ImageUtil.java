@@ -35,6 +35,9 @@ public class ImageUtil {
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			g.drawRenderedImage(source, AffineTransform.getScaleInstance(sx, sy));
 			g.dispose();
+			if (!targetFile.getParentFile().exists()) {
+				targetFile.getParentFile().mkdirs();
+			}
 			ImageIO.write(target,fileType ,targetFile);
 			return true;
 		} catch (Exception e) {
@@ -42,4 +45,5 @@ public class ImageUtil {
 		}
 		return false;
 	}
+	
 }

@@ -18,11 +18,18 @@ public class Address {
 	private String name;
 	private String province;
 	private String city;
+	private String area;
 	private String addressDetail;
 	private String phone;
 	private boolean isDefault;
 	
 	
+	public String getArea() {
+		return area;
+	}
+	public void setArea(String area) {
+		this.area = area;
+	}
 	public String getName() {
 		return name;
 	}

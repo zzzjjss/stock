@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uf.store.dao.mysql.po.Customer;
+import com.uf.store.dao.mysql.po.Order;
+import com.uf.store.dao.mysql.po.OrderItem;
+import com.uf.store.dao.mysql.po.OrderStatus;
 import com.uf.store.dao.mysql.po.Product;
 import com.uf.store.dao.mysql.po.ShopCarItem;
 import com.uf.store.restful.action.customer.dto.AddProductToShopCarRequest;
@@ -22,7 +25,9 @@ import com.uf.store.restful.action.customer.dto.GenerateOrderRequestItem;
 import com.uf.store.restful.action.customer.dto.GenerateOrderResponse;
 import com.uf.store.restful.action.customer.dto.GotoGenerateOrderRequest;
 import com.uf.store.restful.action.customer.dto.GotoGenerateOrderResponse;
+import com.uf.store.restful.action.customer.dto.ListOrderResponse;
 import com.uf.store.restful.action.customer.dto.ListShopcarItemsResponse;
+import com.uf.store.restful.action.customer.dto.OrderInfo;
 import com.uf.store.restful.action.customer.dto.ShopcarItemInfo;
 import com.uf.store.restful.dto.RestfulResponse;
 import com.uf.store.restful.dto.RestfulResponse.ResultCode;
@@ -46,6 +51,7 @@ public class ShoppingAction {
 		try {
 			Object customer=cache.getCachedObject(token);
 			shoppingService.saveProductToShopCar(request.getProductId(),request.getAmount(), (Customer)customer);
+			response.setResultCode(ResultCode.OK);
 		} catch (Exception e) {
 			logger.error("",e);
 			response.setResultCode(ResultCode.FAIL);
@@ -137,5 +143,38 @@ public class ShoppingAction {
 		}
 		return response;
 	}	
+
+	@RequestMapping(value = "listOrdersByStatus", method = RequestMethod.GET)
+	public ListOrderResponse  listOrdersByStatus(@RequestParam(value="status") String status,@RequestHeader(value="Authorization") String token) {
+		ListOrderResponse response=new ListOrderResponse();
+		try {
+			Customer customer=(Customer)cache.getCachedObject(token);
+			List<Order> orders=shoppingService.listCustomerOrdersByStatus(customer,OrderStatus.valueOf(status));
+			if (orders!=null) {
+				orders.stream().forEach(o->{
+					OrderInfo orderInfo=new OrderInfo();
+					orderInfo.setAddress(o.getAddress());
+					orderInfo.setStatus(status);
+					List<OrderItem> items=o.getOrderItem();
+					items.forEach(oi->{
+						ShopcarItemInfo info=new ShopcarItemInfo();
+						info.setAmount(oi.getAmount());
+						Product product=oi.getProduct();
+						info.setDescription(product.getDescription());
+						info.setProductId(product.getId());
+						info.setProductSnapshotImgUrl(imageBaseUrl+"/"+product.getId()+"/snapshot.jpg");
+						info.setSellPrice(product.getSellPrice());
+						orderInfo.getOrderPreItem().add(info);
+					});
+					response.getOrders().add(orderInfo);
+				});
+			}
+		} catch (Exception e) {
+			logger.error("",e);
+			response.setResultCode(ResultCode.FAIL);
+			response.setMes(e.getMessage());
+		}
+		return response;	
+	}
 	
 }

@@ -2,7 +2,7 @@ package com.uf.store.restful.dto;
 
 import java.util.List;
 
-public class GetProductDetailResponse extends RestfulResponse {
+public class GetProductInfoResponse extends RestfulResponse {
 	private ProductSellInfo productSellInfo;
 	private List<ProductOrderInfo> orderInfos;
 	public ProductSellInfo getProductSellInfo() {

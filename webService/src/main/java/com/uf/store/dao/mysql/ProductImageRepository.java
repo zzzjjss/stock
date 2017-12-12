@@ -8,5 +8,5 @@ import com.uf.store.dao.mysql.po.ProductImage;
 public interface ProductImageRepository extends JpaRepository<ProductImage, Long> {
 	@Modifying
 	@Query("delete from ProductImage pi where pi.product.id =?")
-	public void deleteByProductId(Integer productId);
+	public void deleteByProductId(Long productId);
 }

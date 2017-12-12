@@ -10,8 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Strings;
+import com.uf.store.dao.mysql.OrderItemRepository;
 import com.uf.store.dao.mysql.ProductImageRepository;
 import com.uf.store.dao.mysql.ProductRepository;
+import com.uf.store.dao.mysql.po.OrderItem;
 import com.uf.store.dao.mysql.po.Product;
 import com.uf.store.dao.mysql.po.ProductImage;
 
@@ -22,9 +24,12 @@ public class ProductManageService{
 	private ProductRepository productRepo;
 	@Autowired
 	private ProductImageRepository productImageRepo;
+	@Autowired
+	private OrderItemRepository orderItemRepository;
 
 	public void saveProduct(Product p,List<byte[]> imageData) throws Exception {
 		productRepo.save(p);
+		productImageRepo.deleteByProductId(p.getId());
 		imageData.forEach(data->{
 			ProductImage image=new ProductImage();
 			image.setImageContent(data);;
@@ -32,9 +37,9 @@ public class ProductManageService{
 			productImageRepo.save(image);
 		});
 	}
-	public void deleteProduct(Integer id) {
+	public void deleteProduct(Long id) {
 		productImageRepo.deleteByProductId(id);
-		productRepo.deleteById(id);
+		productRepo.delete(id);
 	}
 	public Page<Product> getPagedProducts(int pageIndex,int pageSize,String keyword){
 		PageRequest pageRequest=new PageRequest(pageIndex,pageSize);
@@ -49,4 +54,9 @@ public class ProductManageService{
 	public Product getProductById(long productId) {
 		return productRepo.findOne(productId);
 	}
+	public List<OrderItem> listProductOrderItems(long productId,int pageIndex,int pageSize){
+		PageRequest pageRequest=new PageRequest(pageIndex,pageSize);
+		return orderItemRepository.findPagedByProductId(productId, pageRequest);
+	}
 }
+

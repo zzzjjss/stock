@@ -1,15 +1,12 @@
 package com.uf.store.service;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.uf.store.dao.mysql.AddressRepository;
 import com.uf.store.dao.mysql.OrderItemRepository;
 import com.uf.store.dao.mysql.OrderRepository;
@@ -80,7 +77,6 @@ public class ShoppingService {
 			order.setOrderNumber(UUID.randomUUID().toString());
 			orderRepository.save(order);
 			List<Float> itemPrices=new ArrayList<Float>();
-			Long orderId=order.getId();
 			orderItems.forEach(item->{
 				OrderItem oItem=new OrderItem();
 				oItem.setAmount(item.getAmount());
@@ -98,5 +94,8 @@ public class ShoppingService {
 			return order;
 		}
 		return null;
+	}
+	public List<Order> listCustomerOrdersByStatus(Customer customer,OrderStatus status){
+		return orderRepository.findByCustomerAndStauts(customer.getId(), status);
 	}
 }

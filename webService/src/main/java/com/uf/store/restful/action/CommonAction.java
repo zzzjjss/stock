@@ -14,11 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.uf.store.dao.mysql.po.OrderItem;
 import com.uf.store.dao.mysql.po.Product;
 import com.uf.store.restful.dto.ListProductsRequest;
+import com.uf.store.restful.dto.ProductOrderInfo;
 import com.uf.store.restful.dto.ProductSellInfo;
 import com.uf.store.restful.dto.RestfulResponse.ResultCode;
-import com.uf.store.restful.dto.GetProductDetailResponse;
+import com.uf.store.restful.dto.GetProductInfoResponse;
 import com.uf.store.restful.dto.ListPagedProductsResponse;
 import com.uf.store.service.ProductManageService;
 
@@ -60,12 +62,14 @@ public class CommonAction {
 			}
 		} catch (Exception e) {
 			logger.error("",e);
+			response.setMes(e.getMessage());
+			response.setResultCode(ResultCode.FAIL);
 		}
 		return response;
 	}
-	@RequestMapping(value = "getProductDetail", method = RequestMethod.GET)	
-	public GetProductDetailResponse getProductDetail(String productId) {
-		GetProductDetailResponse response=new GetProductDetailResponse();
+	@RequestMapping(value = "getProductInfo", method = RequestMethod.GET)	
+	public GetProductInfoResponse getProductInfo(String productId) {
+		GetProductInfoResponse response=new GetProductInfoResponse();
 		try {
 			Product product=productManage.getProductById(Long.parseLong(productId));
 			if (product==null) {
@@ -84,13 +88,29 @@ public class CommonAction {
 				File []imgs=productImgFolder.listFiles();
 				if(imgs!=null&&imgs.length>0) {
 					for(File img:imgs) {
+						if (img.getName().startsWith("snapshot")) {
+							info.setSnapshotImgUrl(imageBaseUrl+"/"+product.getId()+"/"+img.getName());
+						}
 						productImgUrls.add(imageBaseUrl+"/"+product.getId()+"/"+img.getName());
 					}
 				}
 			}
 			info.setImgUrls(productImgUrls);
+			response.setProductSellInfo(info);
+			List<OrderItem> items=productManage.listProductOrderItems(product.getId(), 0, 10);
+			if (items!=null) {
+				items.forEach(it->{
+					ProductOrderInfo orderInfo=new ProductOrderInfo();
+					orderInfo.setBuyProductNumber(it.getAmount());
+					orderInfo.setCustomerName(it.getOrder().getCustomer().getName());
+					orderInfo.setEvaluate("");
+					response.getOrderInfos().add(orderInfo);
+				});
+			}
 		} catch (Exception e) {
 			logger.error("",e);
+			response.setMes(e.getMessage());
+			response.setResultCode(ResultCode.FAIL);
 		}
 		return response;	
 	}

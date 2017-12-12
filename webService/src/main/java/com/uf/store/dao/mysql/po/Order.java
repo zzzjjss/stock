@@ -20,6 +20,9 @@ public class Order {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
+	@ManyToOne
+	@JoinColumn(name="customer_id")
+	private Customer customer;
 	private String orderNumber;
 	private Date generateTime;
 	private Float totalMoney;
@@ -34,6 +37,12 @@ public class Order {
 	private Address address;
 	
 	
+	public Customer getCustomer() {
+		return customer;
+	}
+	public void setCustomer(Customer customer) {
+		this.customer = customer;
+	}
 	public String getOrderNumber() {
 		return orderNumber;
 	}
