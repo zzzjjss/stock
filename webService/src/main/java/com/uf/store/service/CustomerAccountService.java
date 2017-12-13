@@ -1,5 +1,6 @@
 package com.uf.store.service;
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.transaction.Transactional;
@@ -53,13 +54,34 @@ public class CustomerAccountService {
 	}
 	public void saveCustomerAddress(Address address,Customer customer) {
 		address.setCustomer(customer);
+		if(address.isDefault()) {
+			addressRepository.updateAddressToNotDefault(customer.getId());
+		}
+		List<Address> addresses=addressRepository.findByCustomer(customer);
+		if(addresses==null||addresses.size()==0) {
+			address.setDefault(true);
+		}
+		addressRepository.save(address);
+	}
+	public void setAddressToDefault(Long addressId,Customer customer) {
+		Address address=addressRepository.findOne(addressId);
+		if (address==null) {
+			return ;
+		}
+		addressRepository.updateAddressToNotDefault(customer.getId());
+		address.setDefault(true);
 		addressRepository.save(address);
 	}
 	public void deleteCustomerAddress(Long addressId,Long customerId) {
 		addressRepository.deleteCustomerAddressById(addressId, customerId);
 	}
 	
-	
+	public Address findCustomerDefaultAddress(Customer customer) {
+		return addressRepository.findCustomerDefaultAddress(customer.getId());
+	}
+	public List<Address> listCustomerAddress(Customer customer){
+		return addressRepository.findByCustomer(customer);
+	}
 	
 	
 }

@@ -1,4 +1,5 @@
 package com.uf.store.restful.action.customer;
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang3.math.NumberUtils;
@@ -9,10 +10,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uf.store.dao.mysql.po.Address;
 import com.uf.store.dao.mysql.po.Customer;
+import com.uf.store.restful.action.customer.dto.AddressInfo;
+import com.uf.store.restful.action.customer.dto.GetDefaultAddressResponse;
+import com.uf.store.restful.action.customer.dto.ListAddressResponse;
 import com.uf.store.restful.action.customer.dto.SaveAddressRequest;
 import com.uf.store.restful.action.customer.dto.SaveAddressResponse;
 import com.uf.store.restful.action.customer.dto.WechatLoginRequest;
@@ -122,5 +127,71 @@ public class AccountAction {
 		
 		return response;
 	}
+	@RequestMapping(value = "getDefaultAddress", method = RequestMethod.GET)
+	public GetDefaultAddressResponse getDefaultAddress(@RequestHeader(value="Authorization") String token) {
+		GetDefaultAddressResponse  response=new GetDefaultAddressResponse();
+		try {
+			Customer customer=(Customer)cacheService.getCachedObject(token);
+			Address address=accountService.findCustomerDefaultAddress(customer);
+			if (address!=null) {
+				response.setAddressInfo(swap(address));
+			}
+			response.setResultCode(ResultCode.OK);
+		} catch (Exception e) {
+			logger.error("",e);
+			response.setResultCode(ResultCode.FAIL);
+			response.setMes(e.getMessage());
+		}
+		return response;
+	}
 	
+	@RequestMapping(value = "setDefautAddress", method = RequestMethod.GET)
+	public RestfulResponse setDefaultAddress(@RequestParam(value="id")Long defaultAddressId,@RequestHeader(value="Authorization") String token) {
+		RestfulResponse response=new RestfulResponse();
+		try {
+			Customer customer=(Customer)cacheService.getCachedObject(token);
+			accountService.setAddressToDefault(defaultAddressId, customer);
+			response.setResultCode(ResultCode.OK);
+		} catch (Exception e) {
+			logger.error("",e);
+			response.setResultCode(ResultCode.FAIL);
+			response.setMes(e.getMessage());
+		}
+		return response;
+	}
+	
+	
+	@RequestMapping(value = "listAddress", method = RequestMethod.GET)
+	public ListAddressResponse listAddress(@RequestHeader(value="Authorization") String token) {
+		ListAddressResponse response=new ListAddressResponse();
+		try {
+			Customer customer=(Customer)cacheService.getCachedObject(token);
+			List<Address> address=accountService.listCustomerAddress(customer);
+			if (address!=null) {
+				for(Address a:address) {
+					response.getAddressInfos().add(swap(a));
+				}
+			}
+			response.setResultCode(ResultCode.OK);
+		} catch (Exception e) {
+			logger.error("",e);
+			response.setResultCode(ResultCode.FAIL);
+			response.setMes(e.getMessage());
+		}
+		return response;
+	}
+	
+	
+private AddressInfo  swap(Address address) {
+	AddressInfo info=new AddressInfo();
+	info.setAddressDetail(address.getAddressDetail());
+	info.setArea(address.getArea());
+	info.setCity(address.getCity());
+	info.setDefault(address.isDefault());
+	info.setId(address.getId());
+	info.setName(address.getName());
+	info.setPhone(address.getPhone());
+	info.setProvince(address.getProvince());
+	return info;
+}
 }

@@ -17,5 +17,8 @@ public interface AddressRepository extends JpaRepository<Address,Long>{
 	@Query("delete from Address a where a.id=:aId and a.customer.id=:cId ")
 	public int deleteCustomerAddressById(@Param("aId") Long aId,@Param("cId")Long customerId);
 	public List<Address> findByCustomer(Customer customer);
+	@Modifying
+	@Query("update Address a set a.isDefault=false where  a.customer.id=:cId ")
+	public int updateAddressToNotDefault(@Param("cId")Long customerId);
 	
 }

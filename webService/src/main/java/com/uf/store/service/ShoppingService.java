@@ -35,8 +35,10 @@ public class ShoppingService {
 	private OrderRepository  orderRepository;
 	@Autowired
 	private OrderItemRepository orderItemRepository;
-
-	public void saveProductToShopCar(Long productId, int amount, Customer customer) {
+	public ShopCarItem  findShopCarItemById(Long id) {
+		return shopCarItemRepository.findOne(id);
+	}
+	public ShopCarItem saveProductToShopCar(Long productId, int amount, Customer customer) {
 		ShopCarItem scit = shopCarItemRepository.findTopByProductAndCustomer(productId, customer.getId());
 		if (scit != null) {
 			scit.setAmount(scit.getAmount() + amount);
@@ -49,8 +51,11 @@ public class ShoppingService {
 			scit.setProduct(product);
 		}
 		shopCarItemRepository.save(scit);
+		return scit;
 	}
-
+	public void changeOrderStatus(OrderStatus status,Long orderId,Long customerId) {
+		orderRepository.updateOrderStatus(status, orderId, customerId);
+	}
 	public void removeShopcarItem(Long itemId, Customer customer) {
 		shopCarItemRepository.deleteCustomerShopcarItem(itemId, customer.getId());
 	}
@@ -65,7 +70,7 @@ public class ShoppingService {
 	public Address findCustomerDefaultAddress(Customer customer) {
 		return addressRepository.findCustomerDefaultAddress(customer.getId());
 	}
-	public Order generateOrder(List<GenerateOrderRequestItem> orderItems ,Long addressId) {
+	public Order generateOrder(Customer customer ,List<GenerateOrderRequestItem> orderItems ,Long addressId) {
 		if (orderItems!=null&&orderItems.size()>0) {
 			Address address=new Address();
 			address.setId(addressId);
@@ -79,6 +84,7 @@ public class ShoppingService {
 			List<Float> itemPrices=new ArrayList<Float>();
 			orderItems.forEach(item->{
 				OrderItem oItem=new OrderItem();
+				oItem.setOrder(order);
 				oItem.setAmount(item.getAmount());
 				Product product=productRepository.findOne(item.getProductId());
 				product.setId(item.getProductId());
@@ -90,6 +96,7 @@ public class ShoppingService {
 			});
 			Double sum=itemPrices.stream().mapToDouble(p->p.doubleValue()).sum();
 			order.setTotalMoney(sum.floatValue());
+			order.setCustomer(customer);
 			orderRepository.save(order);
 			return order;
 		}
@@ -97,5 +104,8 @@ public class ShoppingService {
 	}
 	public List<Order> listCustomerOrdersByStatus(Customer customer,OrderStatus status){
 		return orderRepository.findByCustomerAndStauts(customer.getId(), status);
+	}
+	public Order getOrderById(Long id) {
+		return orderRepository.getOne(id);
 	}
 }

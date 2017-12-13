@@ -3,21 +3,12 @@ package com.uf.store.restful.action.customer.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.uf.store.dao.mysql.po.Address;
 import com.uf.store.restful.dto.RestfulResponse;
 
 public class GotoGenerateOrderResponse extends RestfulResponse{
 	private List<ShopcarItemInfo> orderPreItem=new ArrayList<ShopcarItemInfo>();
 	private Float totalMoney;
-	private Address defautAddress;
 	
-	public Address getDefautAddress() {
-		return defautAddress;
-	}
-
-	public void setDefautAddress(Address defautAddress) {
-		this.defautAddress = defautAddress;
-	}
 
 	public Float getTotalMoney() {
 		return totalMoney;

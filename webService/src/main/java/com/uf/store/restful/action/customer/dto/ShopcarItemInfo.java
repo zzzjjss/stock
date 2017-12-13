@@ -1,11 +1,19 @@
 package com.uf.store.restful.action.customer.dto;
 
 public class ShopcarItemInfo {
+	private Long id;
 	private Long productId;
 	private String productSnapshotImgUrl;
 	private String description;
 	private int amount;
 	private Float sellPrice;
+	
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
 	public Long getProductId() {
 		return productId;
 	}

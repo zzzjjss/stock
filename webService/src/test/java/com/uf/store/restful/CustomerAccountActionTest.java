@@ -55,10 +55,31 @@ public class CustomerAccountActionTest {
 					.andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 		System.out.println("save Address Response:"+saveResponse);
 		SaveAddressResponse saveAddressResponse=mapper.readValue(saveResponse, SaveAddressResponse.class);	
+		
+		String listAddressResponse=mockMvc.perform(MockMvcRequestBuilders.get("/customer/listAddress")
+				.header("Authorization", token))
+				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+		System.out.println("listAddress response:"+listAddressResponse);
+		
+		
+		String defaultAddressResponse=mockMvc.perform(MockMvcRequestBuilders.get("/customer/getDefaultAddress")
+				.header("Authorization", token))
+				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+		System.out.println("get default address response:"+defaultAddressResponse);
+		
 		String deleteResponse=mockMvc.perform(MockMvcRequestBuilders.get("/customer/deleteAddress").param("addressId", String.valueOf(saveAddressResponse.getAddressId()))
 				.header("Authorization", token))
 				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 		System.out.println("delete Address Response:"+deleteResponse);
+		
+	}
+	
+	@Test
+	public void testSetDefaultAddress()throws Exception{
+		String setDefaultAddressResponse=mockMvc.perform(MockMvcRequestBuilders.get("/customer/setDefautAddress").param("id","9")
+				.header("Authorization", token))
+				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+		System.out.println("setDefaultAddressResponse:"+setDefaultAddressResponse);
 	}
 
 }

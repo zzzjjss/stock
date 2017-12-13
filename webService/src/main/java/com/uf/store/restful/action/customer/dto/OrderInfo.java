@@ -3,13 +3,20 @@ package com.uf.store.restful.action.customer.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.uf.store.dao.mysql.po.Address;
-
 public class OrderInfo {
-	private List<ShopcarItemInfo> orderPreItem=new ArrayList<ShopcarItemInfo>();
+	private List<ShopcarItemInfo> orderItemsInfo=new ArrayList<ShopcarItemInfo>();
 	private Float totalMoney;
 	private String status;
-	private Address address;
+	private AddressInfo address;
+	private Long id;
+	
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 	public String getStatus() {
 		return status;
@@ -19,11 +26,12 @@ public class OrderInfo {
 		this.status = status;
 	}
 
-	public Address getAddress() {
+
+	public AddressInfo getAddress() {
 		return address;
 	}
 
-	public void setAddress(Address address) {
+	public void setAddress(AddressInfo address) {
 		this.address = address;
 	}
 
@@ -35,13 +43,14 @@ public class OrderInfo {
 		this.totalMoney = totalMoney;
 	}
 
-	public List<ShopcarItemInfo> getOrderPreItem() {
-		return orderPreItem;
+	public List<ShopcarItemInfo> getOrderItemsInfo() {
+		return orderItemsInfo;
 	}
 
-	public void setOrderPreItem(List<ShopcarItemInfo> orderPreItem) {
-		this.orderPreItem = orderPreItem;
+	public void setOrderItemsInfo(List<ShopcarItemInfo> orderItemsInfo) {
+		this.orderItemsInfo = orderItemsInfo;
 	}
+
 	
 
 
