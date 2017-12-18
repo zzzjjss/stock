@@ -34,7 +34,7 @@ public class CommonActionTest {
 	@Test
 	public void testListPagedProduct() throws Exception {
 		ListProductsRequest  listProductsRequest=new ListProductsRequest();
-		listProductsRequest.setKeyWord("");
+		listProductsRequest.setKeyWord("卡西欧");
 		listProductsRequest.setPageIndex(0);
 		listProductsRequest.setPageIndex(0);
 		listProductsRequest.setPageSize(10);

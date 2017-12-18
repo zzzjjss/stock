@@ -71,7 +71,7 @@ public class ProductManageActionTest {
 			product.setDescription("descript");
 			product.setName("first pro");
 			product.setOnLine(true);
-			product.setSearchKeywords("pp aa");
+			product.setSearchKeywords("casio 卡西欧 G-SHOCK");
 			product.setSellPrice(11f);
 			product.setUpdateTime(new Date());
 			saveProductRequest.setProduct(product);
@@ -85,7 +85,7 @@ public class ProductManageActionTest {
 			System.out.println(getProDetailResponse);
 			
 			
-			product.setSearchKeywords("halllo");
+			product.setSearchKeywords(product.getSearchKeywords()+" 石英表");
 			product.setId(saveProductResponse.getProductId());
 			String editProductResponse=mockMvc.perform(post("/manager/saveProduct").content(mapper.writeValueAsString(saveProductRequest).getBytes()).contentType(MediaType.APPLICATION_JSON_UTF8))
 					.andExpect(status().isOk()).andReturn().getResponse().getContentAsString();

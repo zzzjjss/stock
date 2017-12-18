@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
@@ -38,22 +40,29 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Component;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.uf.store.dao.mysql.po.Product;
-
+import com.uf.store.service.ProductManageService;
+@Component
 public class SearchEngine {
 	private Logger logger=LoggerFactory.getLogger(SearchEngine.class);
+	@Autowired
+	private ProductManageService  productManageService;
 	private Directory directory = null;
 	private String indexDir = System.getProperty("user.dir");
 	private boolean rebuildIndex = false;
 
-	public SearchEngine(String indexDir, boolean rebuildIndex) {
+	public SearchEngine	(@Value("${searcher.index.folder}")String indexDir,@Value("${searcher.reindex}") boolean rebuildIndex) {
 		this.indexDir = indexDir;
 		this.rebuildIndex = rebuildIndex;
 	}
-
+	@PostConstruct
 	public void init() {
 		try {
 			Path path = Paths.get(indexDir);
@@ -61,6 +70,20 @@ public class SearchEngine {
 				FileUtils.deleteDirectory(new File(indexDir));
 			}
 			directory = FSDirectory.open(path);
+			if(rebuildIndex){
+				int index=0,pageSize=20;
+				Page<Product> result=productManageService.getPagedProducts(0, pageSize, null);
+				for(Product p:result.getContent()){
+					this.addProductInfoToIndex(p);
+				}
+				int totalPage=result.getTotalPages();
+				for(index=index+1;index<=totalPage;index++){
+					result=productManageService.getPagedProducts(index,pageSize,null);
+					for(Product p:result.getContent()){
+						this.addProductInfoToIndex(p);
+					}
+				}
+			}
 		} catch (IOException e) {
 			logger.error("",e);
 		}
@@ -110,8 +133,8 @@ public class SearchEngine {
 
 	}
 
-	public List<Integer> searchProductIds(String keyword) {
-		List<Integer> ids = new ArrayList<Integer>();
+	public List<Long> searchProductIds(String keyword) {
+		List<Long> ids = new ArrayList<Long>();
 		try {
 			DirectoryReader ireader = DirectoryReader.open(directory);
 			IndexSearcher isearcher = new IndexSearcher(ireader);
@@ -137,9 +160,8 @@ public class SearchEngine {
 				for (ScoreDoc sdoc : topDocs.scoreDocs) {
 					System.out.println("score:-->" + sdoc.score);
 					Document searcheddoc = isearcher.doc(sdoc.doc);
-					ids.add(Integer.parseInt(searcheddoc.getField("id").stringValue()));
-					System.out.println(searcheddoc.getField("id").stringValue() + "---->>>"
-							+ searcheddoc.getField("product").stringValue());
+					ids.add(Long.parseLong(searcheddoc.getField("id").stringValue()));
+					System.out.println(searcheddoc.getField("id").stringValue() + "---->>>" + searcheddoc.getField("product").stringValue());
 				}
 			}
 
