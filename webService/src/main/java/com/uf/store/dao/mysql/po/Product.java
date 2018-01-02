@@ -15,11 +15,20 @@ public class Product {
 	private String name;
 	private String description;
 	private String searchKeywords;
+	private String brand;
 	private Float buyPrice;
 	private Float sellPrice;
 	private Boolean onLine;
 	private Date updateTime;
 
+
+	public String getBrand() {
+		return brand;
+	}
+
+	public void setBrand(String brand) {
+		this.brand = brand;
+	}
 
 	public Long getId() {
 		return id;
