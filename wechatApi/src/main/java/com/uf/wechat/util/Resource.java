@@ -7,7 +7,7 @@ import java.util.Properties;
 public class Resource {
 	private static 	Properties properties=new Properties();
 	static{
-		InputStream  inputStream=Resource.class.getResourceAsStream("/application.properties");
+		InputStream  inputStream=Resource.class.getResourceAsStream("/wechatConfig.properties");
 		try {
 			properties.load(inputStream);
 		} catch (IOException e) {

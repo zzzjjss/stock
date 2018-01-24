@@ -39,7 +39,7 @@ public class WechatApi {
 		if (oauth2Response != null) {
 			String url = String.format(get_user_info, oauth2Response.getAccess_token(), oauth2Response.getOpenid());
 			JsonObject jsonObject = HttpsUtil.httpGet_ResponseJson(url);
-			if (jsonObject != null && jsonObject.has("unionid")) {
+			if (jsonObject != null && jsonObject.has("openid")) {
 				Gson gson = new Gson();
 				WechatUserInfo userInfo = gson.fromJson(jsonObject, WechatUserInfo.class);
 				return userInfo;
