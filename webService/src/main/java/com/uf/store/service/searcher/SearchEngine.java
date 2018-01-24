@@ -97,7 +97,7 @@ public class SearchEngine {
 			iWriter = new IndexWriter(directory, config);
 			Document doc = new Document();
 			StringField idField = new StringField("id", String.valueOf(product.getId()), Store.YES);
-			TextField productField = new TextField("product", product.getSearchKeywords(), Store.YES);
+			TextField productField = new TextField("product",product.getBrand()+" "+product.getSearchKeywords(), Store.YES);
 			doc.add(idField);
 			doc.add(productField);
 			iWriter.addDocument(doc);

@@ -46,10 +46,10 @@ public class CommonAction {
 		try {
 			Page<Product>  products=productManage.getPagedProducts(request.getPageIndex(), request.getPageSize(), request.getKeyWord());
 			List<ProductSellInfo> productInfors=new ArrayList<ProductSellInfo>();
-			response.setPageIndex(products.getNumber());
+			response.setPageIndex(request.getPageIndex());
 			response.setProductInfors(productInfors);
-			response.setTotalPage(products.getTotalPages());
 			if (products!=null) {
+				response.setTotalPage(products.getTotalPages());
 				products.forEach(p->{
 					ProductSellInfo info=new ProductSellInfo();
 					info.setDescription(p.getDescription());

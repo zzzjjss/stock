@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import com.uf.store.Application;
 import com.uf.store.restful.dto.ListProductsRequest;
 @RunWith(SpringRunner.class)
@@ -38,6 +39,8 @@ public class CommonActionTest {
 		listProductsRequest.setPageIndex(0);
 		listProductsRequest.setPageIndex(0);
 		listProductsRequest.setPageSize(10);
+		Gson gson=new Gson();
+		System.out.println(gson.toJson(listProductsRequest));
 		String listPagedProductResponse=mockMvc.perform(MockMvcRequestBuilders.post("/listPagedProducts").content(mapper.writeValueAsString(listProductsRequest).getBytes()).contentType(MediaType.APPLICATION_JSON_UTF8))
 				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 		System.out.println("listPagedProductResponse:"+listPagedProductResponse);

@@ -14,33 +14,30 @@ import com.uf.store.dao.mysql.CustomerRepository;
 import com.uf.store.dao.mysql.po.Address;
 import com.uf.store.dao.mysql.po.Customer;
 import com.uf.store.service.cache.CacheService;
+import com.uf.wechat.WechatApi;
 import com.uf.wechat.WechatAppApi;
 import com.uf.wechat.bean.JsCode2SessionResponse;
 import com.uf.wechat.bean.WechatAppConfig;
+import com.uf.wechat.bean.WechatUserInfo;
 
 @Service
 @Transactional
 public class CustomerAccountService {
-	@Value("wechatApp.appId")
-	private String appId;
-	@Value("wechatApp.appSecret")
-	private String appSecret;
 	@Autowired
 	private CacheService cacheService;
 	@Autowired
 	private CustomerRepository customerRepository;
 	@Autowired
 	private AddressRepository addressRepository;
-	private WechatAppApi wechatAppApi=new WechatAppApi(new WechatAppConfig(appId, appSecret));
 	
 	public String wechatLoginGenerateToken(String code) {
-		JsCode2SessionResponse response=wechatAppApi.jsCode2SessionResponse(code);
-		if (response!=null) {
-			Customer customer=customerRepository.findTopByUnionid(response.getUnionid());
+		WechatUserInfo userInfo=WechatApi.getWechatUserInfo(code);
+		if (userInfo!=null) {
+			Customer customer=customerRepository.findTopByUnionid(userInfo.getUnionid());
 			if (customer==null) {
 				customer=new Customer();
-				customer.setOpenid(response.getOpenid());
-				customer.setUnionid(response.getUnionid());
+				customer.setOpenid(userInfo.getOpenid());
+				customer.setUnionid(userInfo.getUnionid());
 				customerRepository.save(customer);
 			}
 			String token=UUID.randomUUID().toString();

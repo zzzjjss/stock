@@ -2,6 +2,9 @@ package com.uf.store.restful.action.customer;
 import java.util.List;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,25 +40,17 @@ public class AccountAction {
 	private CustomerAccountService accountService;
 	@Autowired
 	private CacheService cacheService;	
-	@RequestMapping(value = "loginWithWechat", method = RequestMethod.POST)
+	@RequestMapping(value = "loginWithWechat", method = RequestMethod.GET)
 	@ApiOperation(value = "customer login ", notes = "customer login with  wechat")
-	public LoginResponse loginWithWechat(@RequestBody WechatLoginRequest request) {
-		LoginResponse response=new LoginResponse();
+	public void  loginWithWechat(HttpServletRequest request,HttpServletResponse response) {
+        String code = request.getParameter("code");
 		try {
-			String token=accountService.wechatLoginGenerateToken(request.getCode());
-			if (token!=null) {
-				response.setToken(token);
-				response.setResultCode(ResultCode.OK);
-			}else {
-				response.setResultCode(ResultCode.FAIL);
-				response.setMes("wechat login fail");
-			}
+			String token=accountService.wechatLoginGenerateToken(code);
+			String responseScript="<script>window.location='/weui/view/index.html?appSessionId="+token+"'; </script>";
+			response.getWriter().write(responseScript);
 		} catch (Exception e) {
 			logger.error("",e);
-			response.setResultCode(ResultCode.FAIL);
-			response.setMes(e.getMessage());
 		}
-		return response;
 	}
 	@RequestMapping(value = "login", method = RequestMethod.GET)
 	public LoginResponse login() {

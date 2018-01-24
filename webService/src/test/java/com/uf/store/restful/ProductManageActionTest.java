@@ -5,8 +5,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -55,23 +57,29 @@ public class ProductManageActionTest {
 	@Test
 	public void testProductManage() throws Exception {
 		for(int i=0;i<11;i++) {
-			String fileName="test.jpg";
-			InputStream inputStream=this.getClass().getResourceAsStream(fileName);
-			MockMultipartFile file=new MockMultipartFile("imageFile",fileName,null, inputStream);
-			String result=mockMvc.perform(MockMvcRequestBuilders.fileUpload("/manager/uploadProductImage").file(file))
-					.andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-			UploadImageResponse response=mapper.readValue(result, UploadImageResponse.class);
-			String path=response.getImagePath();
-			String imgFileName=path.substring(path.lastIndexOf("/")+1);
-			System.out.println(imgFileName);
+			List<String> imgFileNames=new ArrayList<String>();
+			for(int j=1;j<4;j++) {
+				String fileName=j+".jpg";
+				InputStream inputStream=this.getClass().getResourceAsStream(fileName);
+				MockMultipartFile file=new MockMultipartFile("imageFile",fileName,null, inputStream);
+				String result=mockMvc.perform(MockMvcRequestBuilders.fileUpload("/manager/uploadProductImage").file(file))
+						.andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+				UploadImageResponse response=mapper.readValue(result, UploadImageResponse.class);
+				String path=response.getImagePath();
+				String imgFileName=path.substring(path.lastIndexOf("/")+1);
+				System.out.println(imgFileName);
+				imgFileNames.add(imgFileName);
+			}
+			
 			SaveProductRequest saveProductRequest=new SaveProductRequest();
-			saveProductRequest.setImageNames(Arrays.asList(imgFileName));
+			saveProductRequest.setImageNames(imgFileNames);
 			Product product=new Product();
 			product.setBuyPrice(10f);
 			product.setDescription("descript");
 			product.setName("first pro");
 			product.setOnLine(true);
-			product.setSearchKeywords("casio 卡西欧 G-SHOCK");
+			product.setBrand("浪琴");
+			product.setSearchKeywords("langines 浪琴 G-SHOCK");
 			product.setSellPrice(11f);
 			product.setUpdateTime(new Date());
 			saveProductRequest.setProduct(product);
