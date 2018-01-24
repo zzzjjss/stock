@@ -90,6 +90,7 @@ public class CommonAction {
 					for(File img:imgs) {
 						if (img.getName().startsWith("snapshot")) {
 							info.setSnapshotImgUrl(imageBaseUrl+"/"+product.getId()+"/"+img.getName());
+							continue;
 						}
 						productImgUrls.add(imageBaseUrl+"/"+product.getId()+"/"+img.getName());
 					}
