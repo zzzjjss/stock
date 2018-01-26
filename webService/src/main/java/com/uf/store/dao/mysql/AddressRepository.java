@@ -13,6 +13,7 @@ import com.uf.store.dao.mysql.po.Customer;
 public interface AddressRepository extends JpaRepository<Address,Long>{
 	@Query("from Address a where a.customer.id=:cid and a.isDefault=true")
 	public Address findCustomerDefaultAddress(@Param("cid")Long customerId);
+	public Address findTopByCustomerAndId(Customer customer,Long  id);
 	@Modifying
 	@Query("delete from Address a where a.id=:aId and a.customer.id=:cId ")
 	public int deleteCustomerAddressById(@Param("aId") Long aId,@Param("cId")Long customerId);

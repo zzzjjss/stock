@@ -3,11 +3,18 @@ package com.uf.store.restful.action.customer.dto;
 public class ShopcarItemInfo {
 	private Long id;
 	private Long productId;
+	private String name;
 	private String productSnapshotImgUrl;
 	private String description;
 	private int amount;
 	private Float sellPrice;
 	
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
 	public Long getId() {
 		return id;
 	}

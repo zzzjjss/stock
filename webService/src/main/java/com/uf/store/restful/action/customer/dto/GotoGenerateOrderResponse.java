@@ -8,7 +8,15 @@ import com.uf.store.restful.dto.RestfulResponse;
 public class GotoGenerateOrderResponse extends RestfulResponse{
 	private List<ShopcarItemInfo> orderPreItem=new ArrayList<ShopcarItemInfo>();
 	private Float totalMoney;
-	
+	private AddressInfo addressInfo;
+
+	public AddressInfo getAddressInfo() {
+		return addressInfo;
+	}
+
+	public void setAddressInfo(AddressInfo addressInfo) {
+		this.addressInfo = addressInfo;
+	}
 
 	public Float getTotalMoney() {
 		return totalMoney;

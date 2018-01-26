@@ -31,9 +31,13 @@ public class CustomerAccountService {
 	private AddressRepository addressRepository;
 	
 	public String wechatLoginGenerateToken(String code) {
-		WechatUserInfo userInfo=WechatApi.getWechatUserInfo(code);
+//		WechatUserInfo userInfo=WechatApi.getWechatUserInfo(code);
+		WechatUserInfo userInfo=new WechatUserInfo();
+		userInfo.setNickname("testWechatUser");
+		userInfo.setOpenid(code);
+		userInfo.setUnionid("uuidValue");
 		if (userInfo!=null) {
-			Customer customer=customerRepository.findTopByUnionid(userInfo.getUnionid());
+			Customer customer=customerRepository.findTopByOpenid(userInfo.getOpenid());
 			if (customer==null) {
 				customer=new Customer();
 				customer.setOpenid(userInfo.getOpenid());
@@ -75,6 +79,9 @@ public class CustomerAccountService {
 	
 	public Address findCustomerDefaultAddress(Customer customer) {
 		return addressRepository.findCustomerDefaultAddress(customer.getId());
+	}
+	public Address findCustomerAddress(Customer customer,Long addressId) {
+		return addressRepository.findTopByCustomerAndId(customer, addressId);
 	}
 	public List<Address> listCustomerAddress(Customer customer){
 		return addressRepository.findByCustomer(customer);

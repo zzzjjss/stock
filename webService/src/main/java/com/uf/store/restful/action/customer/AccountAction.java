@@ -9,6 +9,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.logging.LoggingInitializationContext;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -139,6 +140,24 @@ public class AccountAction {
 		}
 		return response;
 	}
+	@RequestMapping(value = "getAddressById", method = RequestMethod.GET)
+	public GetDefaultAddressResponse getAddress(String addressId,@RequestHeader(value="Authorization") String token) {
+		GetDefaultAddressResponse  response=new GetDefaultAddressResponse();
+		try {
+			Customer customer=(Customer)cacheService.getCachedObject(token);
+			Address address=accountService.findCustomerAddress(customer, Long.valueOf(addressId));
+			if (address!=null) {
+				response.setAddressInfo(swap(address));
+			}
+			response.setResultCode(ResultCode.OK);
+		} catch (Exception e) {
+			logger.error("",e);
+			response.setResultCode(ResultCode.FAIL);
+			response.setMes(e.getMessage());
+		}
+		return response;
+	}
+
 	
 	@RequestMapping(value = "setDefautAddress", method = RequestMethod.GET)
 	public RestfulResponse setDefaultAddress(@RequestParam(value="id")Long defaultAddressId,@RequestHeader(value="Authorization") String token) {

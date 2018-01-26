@@ -35,6 +35,7 @@ import com.uf.store.restful.action.customer.dto.OrderInfo;
 import com.uf.store.restful.action.customer.dto.ShopcarItemInfo;
 import com.uf.store.restful.dto.RestfulResponse;
 import com.uf.store.restful.dto.RestfulResponse.ResultCode;
+import com.uf.store.service.CustomerAccountService;
 import com.uf.store.service.ShoppingService;
 import com.uf.store.service.cache.CacheService;
 
@@ -48,7 +49,9 @@ public class ShoppingAction {
 	private ShoppingService shoppingService;
 	@Value("${webServer.imageBaseUrl}") 
 	private String imageBaseUrl;
-
+	@Autowired
+	private CustomerAccountService accountService;
+	
 	@RequestMapping(value = "saveProductToShopCar", method = RequestMethod.POST)
 	public AddProductToShopCarResponse saveProductToShopCar(@RequestBody AddProductToShopCarRequest request,@RequestHeader(value="Authorization") String token) {
 		AddProductToShopCarResponse response=new AddProductToShopCarResponse();
@@ -143,6 +146,7 @@ public class ShoppingAction {
 					Product product=shoppingService.findProductById(item.getProductId());
 					if (product!=null) {
 						ShopcarItemInfo info=new ShopcarItemInfo();
+						info.setName(product.getName());
 						info.setAmount(item.getAmount());
 						info.setDescription(product.getDescription());
 						info.setProductId(item.getProductId());
@@ -153,6 +157,11 @@ public class ShoppingAction {
 				});
 			}
 			Double totalMoney=response.getOrderPreItem().stream().mapToDouble(item->item.getSellPrice().doubleValue()*item.getAmount()).sum();
+			Customer customer=(Customer)cache.getCachedObject(token);
+			Address address=accountService.findCustomerDefaultAddress(customer);
+			if (address!=null) {
+				response.setAddressInfo(swap(address));
+			}
 			response.setTotalMoney(totalMoney.floatValue());
 			response.setResultCode(ResultCode.OK);
 		} catch (Exception e) {
