@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.uf.store.dao.mysql.po.Address;
 import com.uf.store.dao.mysql.po.Customer;
 import com.uf.store.dao.mysql.po.Order;
+import com.uf.store.dao.mysql.po.OrderAddress;
 import com.uf.store.dao.mysql.po.OrderItem;
 import com.uf.store.dao.mysql.po.OrderStatus;
 import com.uf.store.dao.mysql.po.Product;
@@ -27,6 +28,7 @@ import com.uf.store.restful.action.customer.dto.GenerateOrderRequest;
 import com.uf.store.restful.action.customer.dto.GenerateOrderRequestItem;
 import com.uf.store.restful.action.customer.dto.GenerateOrderResponse;
 import com.uf.store.restful.action.customer.dto.GetShopcarItemInfoResponse;
+import com.uf.store.restful.action.customer.dto.GetShopcartItemAmountResponse;
 import com.uf.store.restful.action.customer.dto.GotoGenerateOrderRequest;
 import com.uf.store.restful.action.customer.dto.GotoGenerateOrderResponse;
 import com.uf.store.restful.action.customer.dto.ListOrderResponse;
@@ -108,6 +110,22 @@ public class ShoppingAction {
 		return response;
 	}
 
+	@RequestMapping(value = "getShopcartItemAmount", method = RequestMethod.GET)
+	public GetShopcartItemAmountResponse getShopcartItemAmount(@RequestHeader(value="Authorization") String token) {
+		GetShopcartItemAmountResponse  response=new GetShopcartItemAmountResponse();
+		try {
+			Customer customer=(Customer)cache.getCachedObject(token);
+			Long itemNum=shoppingService.countCustomerShopcartItem(customer);
+			response.setItemNumber(itemNum==null?0:itemNum);
+			response.setResultCode(ResultCode.OK);
+		} catch (Exception e) {
+			logger.error("",e);
+			response.setResultCode(ResultCode.FAIL);
+			response.setMes(e.getMessage());
+		}
+		return response;	
+	}
+	
 	@RequestMapping(value = "listShopcarItems", method = RequestMethod.GET)
 	public ListShopcarItemsResponse listShopcarItems(@RequestHeader(value="Authorization") String token) {
 		ListShopcarItemsResponse  response=new ListShopcarItemsResponse();
@@ -119,6 +137,7 @@ public class ShoppingAction {
 				items.forEach(i->{
 					ShopcarItemInfo info=new ShopcarItemInfo();
 					info.setAmount(i.getAmount());
+					info.setName(i.getProduct().getName());
 					info.setDescription(i.getProduct().getDescription());
 					info.setProductId(i.getProduct().getId());
 					info.setProductSnapshotImgUrl(imageBaseUrl+"/"+i.getProduct().getId()+"/snapshot.jpg");
@@ -180,6 +199,7 @@ public class ShoppingAction {
 			//generate the order total infor   by  calculating  the  price  in some rule 
 			Customer customer=(Customer)cache.getCachedObject(token);
 			Order order=shoppingService.generateOrder(customer,request.getOrderItems(),request.getAddressId());
+			//TODO  WechatApi.prePay()  to generate prepay  information.
 			response.setOrderId(order.getId());
 			response.setResultCode(ResultCode.OK);
 		} catch (Exception e) {
@@ -200,7 +220,7 @@ public class ShoppingAction {
 				orders.stream().forEach(o->{
 					OrderInfo orderInfo=new OrderInfo();
 					orderInfo.setId(o.getId());
-					orderInfo.setAddress(swap(o.getAddress()));
+					orderInfo.setAddress(swap(o.getOrderAddress()));
 					orderInfo.setStatus(status);
 					orderInfo.setTotalMoney(o.getTotalMoney());
 					List<OrderItem> items=o.getOrderItem();
@@ -209,6 +229,7 @@ public class ShoppingAction {
 						info.setAmount(oi.getAmount());
 						Product product=oi.getProduct();
 						info.setDescription(product.getDescription());
+						info.setName(product.getName());
 						info.setProductId(product.getId());
 						info.setProductSnapshotImgUrl(imageBaseUrl+"/"+product.getId()+"/snapshot.jpg");
 						info.setSellPrice(product.getSellPrice());
@@ -247,12 +268,22 @@ public class ShoppingAction {
 		}
 		return response;	
 	}	
-	private AddressInfo  swap(Address address) {
+	private AddressInfo  swap(OrderAddress address) {
 		AddressInfo info=new AddressInfo();
 		info.setAddressDetail(address.getAddressDetail());
 		info.setArea(address.getArea());
 		info.setCity(address.getCity());
-		info.setDefault(address.isDefault());
+		info.setId(address.getId());
+		info.setName(address.getName());
+		info.setPhone(address.getPhone());
+		info.setProvince(address.getProvince());
+		return info;
+	}
+	private AddressInfo swap(Address address) {
+		AddressInfo info=new AddressInfo();
+		info.setAddressDetail(address.getAddressDetail());
+		info.setArea(address.getArea());
+		info.setCity(address.getCity());
 		info.setId(address.getId());
 		info.setName(address.getName());
 		info.setPhone(address.getPhone());

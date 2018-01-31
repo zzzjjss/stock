@@ -1,5 +1,6 @@
 package com.uf.store.service;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.uf.store.dao.mysql.AddressRepository;
+import com.uf.store.dao.mysql.OrderAddressRepository;
 import com.uf.store.dao.mysql.OrderItemRepository;
 import com.uf.store.dao.mysql.OrderRepository;
 import com.uf.store.dao.mysql.ProductRepository;
@@ -15,6 +17,7 @@ import com.uf.store.dao.mysql.ShopCarItemRepository;
 import com.uf.store.dao.mysql.po.Address;
 import com.uf.store.dao.mysql.po.Customer;
 import com.uf.store.dao.mysql.po.Order;
+import com.uf.store.dao.mysql.po.OrderAddress;
 import com.uf.store.dao.mysql.po.OrderItem;
 import com.uf.store.dao.mysql.po.OrderStatus;
 import com.uf.store.dao.mysql.po.PaymentStatus;
@@ -35,6 +38,8 @@ public class ShoppingService {
 	private OrderRepository  orderRepository;
 	@Autowired
 	private OrderItemRepository orderItemRepository;
+	@Autowired
+	private OrderAddressRepository orderAddressRepository;
 	public ShopCarItem  findShopCarItemById(Long id) {
 		return shopCarItemRepository.findOne(id);
 	}
@@ -59,8 +64,14 @@ public class ShoppingService {
 	public void removeShopcarItem(Long itemId, Customer customer) {
 		shopCarItemRepository.deleteCustomerShopcarItem(itemId, customer.getId());
 	}
+	public void removeShopcarItemByProduct(Long productId,Customer customer) {
+		shopCarItemRepository.deleteCustomerShopcarItemByProduct(productId, customer.getId());
+	}
 	public List<ShopCarItem> findCustomerShopcarItems(Customer custoer){
 		return shopCarItemRepository.findByCustomer(custoer.getId());
+	}
+	public Long countCustomerShopcartItem(Customer customer) {
+		return shopCarItemRepository.countByCustomer(customer.getId());
 	}
 	
 	public Product findProductById(Long productId) {
@@ -70,12 +81,19 @@ public class ShoppingService {
 	public Address findCustomerDefaultAddress(Customer customer) {
 		return addressRepository.findCustomerDefaultAddress(customer.getId());
 	}
-	public Order generateOrder(Customer customer ,List<GenerateOrderRequestItem> orderItems ,Long addressId) {
+	public Order generateOrder(Customer customer ,List<GenerateOrderRequestItem> orderItems ,Long addressId)throws InvalidParameterException {
 		if (orderItems!=null&&orderItems.size()>0) {
-			Address address=new Address();
-			address.setId(addressId);
+			Address address=addressRepository.findOne(addressId);
+			OrderAddress orderAddress=new OrderAddress();
+			orderAddress.setAddressDetail(address.getAddressDetail());
+			orderAddress.setArea(address.getArea());
+			orderAddress.setCity(address.getCity());
+			orderAddress.setName(address.getName());
+			orderAddress.setPhone(address.getPhone());
+			orderAddress.setProvince(address.getProvince());
+			orderAddressRepository.save(orderAddress);
 			Order order=new Order();
-			order.setAddress(address);
+			order.setOrderAddress(orderAddress);
 			order.setGenerateTime(new Date());
 			order.setPaymentStaus(PaymentStatus.NOPAY);
 			order.setStatus(OrderStatus.NOPAY);
@@ -87,7 +105,10 @@ public class ShoppingService {
 				oItem.setOrder(order);
 				oItem.setAmount(item.getAmount());
 				Product product=productRepository.findOne(item.getProductId());
-				product.setId(item.getProductId());
+				if (product==null) {
+					throw new InvalidParameterException("can't find product");
+				}
+				removeShopcarItemByProduct(product.getId(), customer);
 				oItem.setProduct(product);
 				Float itMoney=item.getAmount()*product.getSellPrice();
 				itemPrices.add(itMoney);

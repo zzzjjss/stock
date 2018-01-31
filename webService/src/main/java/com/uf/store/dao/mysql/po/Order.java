@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -32,9 +33,8 @@ public class Order {
 	private PaymentStatus paymentStaus;
 	@OneToMany(mappedBy="order")
 	private List<OrderItem> orderItem;
-	@ManyToOne
-	@JoinColumn(name="address_id")
-	private Address address;
+	@OneToOne
+	private OrderAddress orderAddress;
 	
 	
 	public Customer getCustomer() {
@@ -61,11 +61,12 @@ public class Order {
 	public void setStatus(OrderStatus status) {
 		this.status = status;
 	}
-	public Address getAddress() {
-		return address;
+
+	public OrderAddress getOrderAddress() {
+		return orderAddress;
 	}
-	public void setAddress(Address address) {
-		this.address = address;
+	public void setOrderAddress(OrderAddress orderAddress) {
+		this.orderAddress = orderAddress;
 	}
 	public Long getId() {
 		return id;

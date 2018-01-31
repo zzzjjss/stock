@@ -15,6 +15,11 @@ public interface ShopCarItemRepository extends JpaRepository<ShopCarItem,Long> {
 	@Modifying
 	@Query("delete from ShopCarItem sc where sc.id=:id and sc.customer.id =:cid")
 	public void deleteCustomerShopcarItem(@Param("id")Long itemId,@Param("cid")Long customerId);
+	@Modifying
+	@Query("delete from ShopCarItem sc where sc.product.id=:pId and sc.customer.id =:cid")
+	public void deleteCustomerShopcarItemByProduct(@Param("pId")Long productId,@Param("cid")Long customerId);
 	@Query("select i from ShopCarItem i where i.customer.id=:cid")
 	public List<ShopCarItem> findByCustomer(@Param("cid")Long cusotmerId);
+	@Query("select sum(amount) from ShopCarItem i where i.customer.id=:cid")
+	public Long countByCustomer(@Param("cid")Long cusotmerId);
 }
