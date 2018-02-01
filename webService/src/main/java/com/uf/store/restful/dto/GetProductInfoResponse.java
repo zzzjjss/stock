@@ -1,10 +1,11 @@
 package com.uf.store.restful.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GetProductInfoResponse extends RestfulResponse {
 	private ProductSellInfo productSellInfo;
-	private List<ProductOrderInfo> orderInfos;
+	private List<ProductOrderInfo> orderInfos=new ArrayList<ProductOrderInfo>();
 	public ProductSellInfo getProductSellInfo() {
 		return productSellInfo;
 	}
