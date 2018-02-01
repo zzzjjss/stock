@@ -126,6 +126,9 @@ public class ShoppingService {
 	public List<Order> listCustomerOrdersByStatus(Customer customer,OrderStatus status){
 		return orderRepository.findByCustomerAndStauts(customer.getId(), status);
 	}
+	public List<Order> listCustomerOrdersByPayStatus(Customer customer,PaymentStatus payStatus){
+		return orderRepository.findByCustomerAndPaymentStaus(customer.getId(), payStatus);
+	}
 	public Order getOrderById(Long id) {
 		return orderRepository.getOne(id);
 	}

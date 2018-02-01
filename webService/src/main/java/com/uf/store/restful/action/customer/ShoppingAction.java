@@ -19,6 +19,7 @@ import com.uf.store.dao.mysql.po.Order;
 import com.uf.store.dao.mysql.po.OrderAddress;
 import com.uf.store.dao.mysql.po.OrderItem;
 import com.uf.store.dao.mysql.po.OrderStatus;
+import com.uf.store.dao.mysql.po.PaymentStatus;
 import com.uf.store.dao.mysql.po.Product;
 import com.uf.store.dao.mysql.po.ShopCarItem;
 import com.uf.store.restful.action.customer.dto.AddProductToShopCarRequest;
@@ -211,18 +212,19 @@ public class ShoppingAction {
 	}	
 
 	@RequestMapping(value = "listOrdersByStatus", method = RequestMethod.GET)
-	public ListOrderResponse  listOrdersByStatus(@RequestParam(value="status") String status,@RequestHeader(value="Authorization") String token) {
+	public ListOrderResponse  listOrdersByStatus(@RequestParam(value="payStatus") String payStatus,@RequestHeader(value="Authorization") String token) {
 		ListOrderResponse response=new ListOrderResponse();
 		try {
 			Customer customer=(Customer)cache.getCachedObject(token);
-			List<Order> orders=shoppingService.listCustomerOrdersByStatus(customer,OrderStatus.valueOf(status));
+			List<Order> orders=shoppingService.listCustomerOrdersByPayStatus(customer,PaymentStatus.valueOf(payStatus));
 			if (orders!=null) {
 				orders.stream().forEach(o->{
 					OrderInfo orderInfo=new OrderInfo();
 					orderInfo.setId(o.getId());
 					orderInfo.setAddress(swap(o.getOrderAddress()));
-					orderInfo.setStatus(status);
+					orderInfo.setStatus(o.getStatus().toString());
 					orderInfo.setTotalMoney(o.getTotalMoney());
+					orderInfo.setOrderNumber(o.getOrderNumber());
 					List<OrderItem> items=o.getOrderItem();
 					items.forEach(oi->{
 						ShopcarItemInfo info=new ShopcarItemInfo();

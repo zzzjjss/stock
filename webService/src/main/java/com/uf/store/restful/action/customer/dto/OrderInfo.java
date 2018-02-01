@@ -7,6 +7,7 @@ public class OrderInfo {
 	private List<ShopcarItemInfo> orderItemsInfo=new ArrayList<ShopcarItemInfo>();
 	private Float totalMoney;
 	private String status;
+	private String orderNumber;
 	private AddressInfo address;
 	private Long id;
 	
@@ -16,6 +17,14 @@ public class OrderInfo {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public String getOrderNumber() {
+		return orderNumber;
+	}
+
+	public void setOrderNumber(String orderNumber) {
+		this.orderNumber = orderNumber;
 	}
 
 	public String getStatus() {
