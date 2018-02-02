@@ -132,4 +132,8 @@ public class ShoppingService {
 	public Order getOrderById(Long id) {
 		return orderRepository.getOne(id);
 	}
+	public void deleteCustomerOrder(Long orderId,Long customerId) {
+		orderItemRepository.deleteOrderItems(orderId);
+		orderRepository.deleteCustomerOrder(orderId, customerId);
+	}
 }

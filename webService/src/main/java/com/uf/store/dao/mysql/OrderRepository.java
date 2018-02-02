@@ -19,4 +19,7 @@ public interface OrderRepository extends JpaRepository<Order,Long>{
 	@Modifying
 	@Query("update Order o set o.status=:s where  o.id=:oid and o.customer.id=:cid")
 	public void updateOrderStatus(@Param("s")OrderStatus status,@Param("oid")Long orderId,@Param("cid")Long customerId);
+	@Modifying
+	@Query("delete from Order o where  o.id=:oid and o.customer.id=:cid")
+	public int deleteCustomerOrder(@Param("oid")Long orderId,@Param("cid")Long customerId);
 }

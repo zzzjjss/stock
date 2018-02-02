@@ -223,6 +223,7 @@ public class ShoppingAction {
 					orderInfo.setId(o.getId());
 					orderInfo.setAddress(swap(o.getOrderAddress()));
 					orderInfo.setStatus(o.getStatus().toString());
+					orderInfo.setStatusString(getOrderStatusString(o.getStatus()));
 					orderInfo.setTotalMoney(o.getTotalMoney());
 					orderInfo.setOrderNumber(o.getOrderNumber());
 					List<OrderItem> items=o.getOrderItem();
@@ -248,6 +249,16 @@ public class ShoppingAction {
 		}
 		return response;	
 	}
+	private String getOrderStatusString(OrderStatus status) {
+		switch(status) {
+		case NOPAY:return "未支付";
+		case WAIT_DELIVER:return "待发货";
+		case WAIT_RECEIVE:return "待收货";
+		case CANCELED:return "取消待退款";
+		case FINISH:return "完成";
+		}
+		return "";
+	}
 	@RequestMapping(value = "cancelOrder", method = RequestMethod.GET)
 	public  RestfulResponse cancelOrder(@RequestParam(value="orderId")Long orderId,@RequestHeader(value="Authorization") String token) {
 		RestfulResponse response=new RestfulResponse();
@@ -255,12 +266,39 @@ public class ShoppingAction {
 			Customer customer=(Customer)cache.getCachedObject(token);
 			Order order=shoppingService.getOrderById(orderId);
 			if (order!=null) {
-				if(order.getStatus()!=OrderStatus.NOPAY) {
-					response.setMes("order status is wrong");
+				if(order.getStatus()!=OrderStatus.WAIT_DELIVER) {
+					response.setMes("未发货的订单才能被取消");
 					response.setResultCode(ResultCode.FAIL);
 					return response;
 				}
 				shoppingService.changeOrderStatus(OrderStatus.CANCELED, orderId, customer.getId());
+			}
+			response.setResultCode(ResultCode.OK);
+		} catch (Exception e) {
+			logger.error("",e);
+			response.setResultCode(ResultCode.FAIL);
+			response.setMes(e.getMessage());
+		}
+		return response;	
+	}	
+	@RequestMapping(value = "deleteOrder", method = RequestMethod.GET)
+	public  RestfulResponse deleteOrder(@RequestParam(value="orderId")Long orderId,@RequestHeader(value="Authorization") String token) {
+		RestfulResponse response=new RestfulResponse();
+		try {
+			Customer customer=(Customer)cache.getCachedObject(token);
+			Order order=shoppingService.getOrderById(orderId);
+			if (order!=null) {
+				if(order.getStatus()!=OrderStatus.NOPAY) {
+					response.setMes("不能删除已付款的订单");
+					response.setResultCode(ResultCode.FAIL);
+					return response;
+				}
+				if(order.getCustomer().getId().longValue()!=customer.getId().longValue()) {
+					response.setMes("不能删除别人的订单");
+					response.setResultCode(ResultCode.FAIL);
+					return response;	
+				}
+				shoppingService.deleteCustomerOrder(orderId, customer.getId());
 			}
 			response.setResultCode(ResultCode.OK);
 		} catch (Exception e) {

@@ -6,11 +6,23 @@ import java.util.List;
 public class OrderInfo {
 	private List<ShopcarItemInfo> orderItemsInfo=new ArrayList<ShopcarItemInfo>();
 	private Float totalMoney;
+	private String statusString;
 	private String status;
 	private String orderNumber;
 	private AddressInfo address;
 	private Long id;
 	
+	
+	
+
+	public String getStatusString() {
+		return statusString;
+	}
+
+	public void setStatusString(String statusString) {
+		this.statusString = statusString;
+	}
+
 	public Long getId() {
 		return id;
 	}
