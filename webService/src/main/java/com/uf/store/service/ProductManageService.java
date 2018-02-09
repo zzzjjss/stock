@@ -1,6 +1,7 @@
 package com.uf.store.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,7 @@ public class ProductManageService{
 	private WordTool wordTool;
 	@Autowired
 	private SearchEngine searchEngine;	
-	public void saveProduct(Product p,List<byte[]> imageData) throws Exception {
+	public void saveProduct(Product p,Map<String,byte[]> imageData) throws Exception {
 		if(!Strings.isNullOrEmpty(p.getSearchKeywords())){
 	    	  List<String> words=Splitter.on(' ').trimResults().omitEmptyStrings().splitToList(p.getSearchKeywords());
 				for(String word:words){
@@ -63,16 +64,20 @@ public class ProductManageService{
 			searchEngine.updateProductIndex(p);
 		}
 		productImageRepo.deleteByProductId(p.getId());
-		imageData.forEach(data->{
+		imageData.forEach((key,val)->{
 			ProductImage image=new ProductImage();
-			image.setImageContent(data);;
+			image.setImageContent(val);;
 			image.setProduct(p);
+			image.setFileName(key);
 			productImageRepo.save(image);
 		});
 	}
 	public void deleteProduct(Long id) {
 		productImageRepo.deleteByProductId(id);
 		productRepo.delete(id);
+	}
+	public List<ProductImage>  listProductImages(Product product){
+		return productImageRepo.findByProduct(product);
 	}
 	public Page<Product> getPagedProducts(int pageIndex,int pageSize,String keyword){
 		PageRequest pageRequest=new PageRequest(pageIndex,pageSize);

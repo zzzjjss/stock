@@ -21,6 +21,14 @@ public class ProductImage {
 	@Basic(fetch = FetchType.LAZY)
 	@Column(length=10000000)
 	private byte[] imageContent;
+	private String fileName;
+	
+	public String getFileName() {
+		return fileName;
+	}
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
 	public Integer getId() {
 		return id;
 	}

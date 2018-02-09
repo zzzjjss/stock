@@ -1,9 +1,12 @@
 package com.uf.store.restful.action;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.uf.store.dao.mysql.po.OrderItem;
 import com.uf.store.dao.mysql.po.Product;
+import com.uf.store.dao.mysql.po.ProductImage;
 import com.uf.store.restful.dto.ListProductsRequest;
 import com.uf.store.restful.dto.ProductOrderInfo;
 import com.uf.store.restful.dto.ProductSellInfo;
@@ -23,6 +27,7 @@ import com.uf.store.restful.dto.RestfulResponse.ResultCode;
 import com.uf.store.restful.dto.GetProductInfoResponse;
 import com.uf.store.restful.dto.ListPagedProductsResponse;
 import com.uf.store.service.ProductManageService;
+import com.uf.store.util.ImageUtil;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -58,6 +63,7 @@ public class CommonAction {
 					info.setSellPrice(p.getSellPrice());
 					info.setSnapshotImgUrl(imageBaseUrl+"/"+p.getId()+"/snapshot.jpg");
 					productInfors.add(info);
+					generateImgToFolder(p);
 				});
 			}
 		} catch (Exception e) {
@@ -66,6 +72,31 @@ public class CommonAction {
 			response.setResultCode(ResultCode.FAIL);
 		}
 		return response;
+	}
+	private void generateImgToFolder(Product p) {
+		Long productId=p.getId();
+		File productImgFolder=new File(imagePath+"/"+productId);
+		if (productImgFolder.exists()&&productImgFolder.listFiles().length>0) {
+			return;
+		}else {
+			productImgFolder.mkdirs();
+		}
+		List<ProductImage> images=productManage.listProductImages(p);
+		images.forEach(image->{
+			try {
+				File destination=new File(productImgFolder,image.getFileName());
+				if (!destination.exists()) {
+					FileUtils.writeByteArrayToFile(destination, image.getImageContent());
+				}
+			} catch (IOException e) {
+				logger.error("generate product image fail ",e);
+			}
+		});
+		File imgs[]=productImgFolder.listFiles();
+		if (imgs!=null&&imgs.length>0) {
+			File file=imgs[0];
+			ImageUtil.resize(file, new File(productImgFolder,"/snapshot."+FilenameUtils.getExtension(file.getName())), 100, 100);
+		}
 	}
 	@RequestMapping(value = "getProductInfo", method = RequestMethod.GET)	
 	public GetProductInfoResponse getProductInfo(String productId) {

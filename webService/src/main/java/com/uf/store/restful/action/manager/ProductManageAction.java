@@ -3,7 +3,9 @@ package com.uf.store.restful.action.manager;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
@@ -108,7 +110,7 @@ public class ProductManageAction {
 		try {
 			List<File> imageFiles=new ArrayList<File>();
 			if (request.getProduct()!=null) {
-				List<byte[]> images=new ArrayList<byte[]>();
+				Map<String,byte[]> images=new HashMap<String,byte[]>();
 				request.getImageNames().forEach(imageName->{
 					File imageFile=new File(imagePath+"/"+imageName);
 					if(!imageFile.exists()&&request.getProduct().getId()!=null) {
@@ -117,7 +119,7 @@ public class ProductManageAction {
 					if (imageFile.exists()) {
 						try {
 							byte[] content=FileUtils.readFileToByteArray(imageFile);
-							images.add(content);
+							images.put(imageFile.getName(), content);
 							imageFiles.add(imageFile);
 						} catch (IOException e) {
 							logger.error("",e);
