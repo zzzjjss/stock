@@ -16,11 +16,13 @@ import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.uf.store.dao.mysql.OrderItemRepository;
 import com.uf.store.dao.mysql.ProductImageRepository;
+import com.uf.store.dao.mysql.ProductPropertiesRepository;
 import com.uf.store.dao.mysql.ProductRepository;
 import com.uf.store.dao.mysql.WordRepository;
 import com.uf.store.dao.mysql.po.OrderItem;
 import com.uf.store.dao.mysql.po.Product;
 import com.uf.store.dao.mysql.po.ProductImage;
+import com.uf.store.dao.mysql.po.ProductProperties;
 import com.uf.store.dao.mysql.po.Word;
 import com.uf.store.service.searcher.SearchEngine;
 import com.uf.store.service.searcher.WordTool;
@@ -37,6 +39,8 @@ public class ProductManageService{
 	private OrderItemRepository orderItemRepository;
 	@Autowired
 	private WordRepository wordRepository;
+	@Autowired
+	private ProductPropertiesRepository propertiesRepository;
 	@Autowired
 	private WordTool wordTool;
 	@Autowired
@@ -71,6 +75,13 @@ public class ProductManageService{
 			image.setFileName(key);
 			productImageRepo.save(image);
 		});
+	}
+	
+	public void saveProductProperties(List<ProductProperties> properties) {
+		if (properties!=null&&properties.size()>0) {
+			propertiesRepository.deleteByProductId(properties.get(0).getProduct().getId());
+			propertiesRepository.save(properties);
+		}
 	}
 	public void deleteProduct(Long id) {
 		productImageRepo.deleteByProductId(id);
