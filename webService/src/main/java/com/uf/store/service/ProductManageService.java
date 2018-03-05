@@ -6,8 +6,11 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,7 +48,9 @@ public class ProductManageService{
 	private WordTool wordTool;
 	@Autowired
 	private SearchEngine searchEngine;	
-	public void saveProduct(Product p,Map<String,byte[]> imageData) throws Exception {
+	
+	 @Retryable(value = {CannotAcquireLockException.class}, maxAttempts = 1000,backoff=@Backoff(delay=100))
+	public void saveProduct(Product p,Map<String,byte[]> imageData) {
 		if(!Strings.isNullOrEmpty(p.getSearchKeywords())){
 	    	  List<String> words=Splitter.on(' ').trimResults().omitEmptyStrings().splitToList(p.getSearchKeywords());
 				for(String word:words){
@@ -62,19 +67,19 @@ public class ProductManageService{
 			isInsert=true;
 		}
 		productRepo.save(p);
-		if(isInsert) {
-			searchEngine.addProductInfoToIndex(p);
-		}else {
-			searchEngine.updateProductIndex(p);
-		}
+//		if(isInsert) {
+//			searchEngine.addProductInfoToIndex(p);
+//		}else {
+//			searchEngine.updateProductIndex(p);
+//		}
 		productImageRepo.deleteByProductId(p.getId());
-		imageData.forEach((key,val)->{
+		for(String key:imageData.keySet()) {
 			ProductImage image=new ProductImage();
-			image.setImageContent(val);;
+			image.setImageContent(imageData.get(key));;
 			image.setProduct(p);
 			image.setFileName(key);
 			productImageRepo.save(image);
-		});
+		}
 	}
 	
 	public void saveProductProperties(List<ProductProperties> properties) {
@@ -82,6 +87,9 @@ public class ProductManageService{
 			propertiesRepository.deleteByProductId(properties.get(0).getProduct().getId());
 			propertiesRepository.save(properties);
 		}
+	}
+	public List<ProductProperties> listProductProperties(Product product){
+		return propertiesRepository.findByProduct(product);
 	}
 	public void deleteProduct(Long id) {
 		productImageRepo.deleteByProductId(id);

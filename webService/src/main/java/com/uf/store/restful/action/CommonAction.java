@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.uf.store.dao.mysql.po.OrderItem;
 import com.uf.store.dao.mysql.po.Product;
 import com.uf.store.dao.mysql.po.ProductImage;
+import com.uf.store.dao.mysql.po.ProductProperties;
 import com.uf.store.restful.dto.ListProductsRequest;
 import com.uf.store.restful.dto.ProductOrderInfo;
 import com.uf.store.restful.dto.ProductSellInfo;
@@ -138,6 +139,16 @@ public class CommonAction {
 					orderInfo.setEvaluate("");
 					response.getOrderInfos().add(orderInfo);
 				});
+			}
+			
+			List<ProductProperties> props=productManage.listProductProperties(product);
+			if (props!=null&&props.size()>0) {
+				for(ProductProperties p:props) {
+					if (p.getPropKey().equalsIgnoreCase("jdUrl")) {
+						continue;
+					}
+					response.getProductProp().put(p.getPropKey(), p.getPropValue());
+				}
 			}
 		} catch (Exception e) {
 			logger.error("",e);

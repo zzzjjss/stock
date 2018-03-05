@@ -50,31 +50,35 @@ public class ProductListener {
 			@Override
 			public void run() {
 				try {
-					Executor pool = Executors.newFixedThreadPool(5);
 					WatchService watcher = FileSystems.getDefault().newWatchService();
 					Path path = Paths.get(listenFolder);
 					path.register(watcher, StandardWatchEventKinds.ENTRY_CREATE);
 					WatchKey key = null;
-					do {
-						try {
-							key = watcher.take();
-							List<WatchEvent<?>> events = key.pollEvents();
-							for (WatchEvent<?> event : events) {
+					int i=0;
+					while((key=watcher.take())!=null) {
+						List<WatchEvent<?>> events = key.pollEvents();
+						for (WatchEvent<?> event : events) {
+							try {
 								WatchEvent.Kind<?> kind = event.kind();
 								if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
 									Path eventPath = (Path) event.context();
 									Path prodPath = path.resolve(eventPath);
 									if (prodPath.toFile().isDirectory()) {
 										logger.info(prodPath.toFile().getAbsolutePath() + ":" + kind.name());
-										pool.execute(new AddProductTask(prodPath.toFile()));
+//										pool.execute(new AddProductTask(prodPath.toFile()));
+										new AddProductTask(prodPath.toFile()).run();
+										i++;
+										logger.info(i+" save product "+prodPath.toFile().getAbsolutePath());
 									}
 								}
+								
+							}catch (Exception e) {
+								e.printStackTrace();
 							}
-						} catch (InterruptedException e) {
-							e.printStackTrace();
 						}
-					} while (key.reset());
-				} catch (IOException e) {
+						key.reset();
+					}
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -114,7 +118,6 @@ public class ProductListener {
 						}
 					}
 				}
-				logger.info("add  product  from " + folder.getAbsolutePath());
 				if (files != null) {
 					Map<String, byte[]> images = new HashMap<String, byte[]>();
 					Product product=new Product();
@@ -130,7 +133,8 @@ public class ProductListener {
 					            List <String> replaced = lines.map(line -> line.replaceAll("：", ":")).collect(Collectors.toList());
 					            Files.write(path, replaced);
 					            lines.close();
-								properties.load(new InputStreamReader(new FileInputStream(file), "UTF-8"));	
+					            FileInputStream fInputStream=new FileInputStream(file);
+								properties.load(new InputStreamReader(fInputStream, "UTF-8"));	
 								Set<String> keys=properties.stringPropertyNames();
 								for(String key:keys) {
 									String value=properties.getProperty(key);
@@ -152,6 +156,7 @@ public class ProductListener {
 									pro.setPropValue(value);
 									productProperties.add(pro);
 								}
+								fInputStream.close();
 							}
 							
 						} catch (IOException e) {
@@ -162,6 +167,8 @@ public class ProductListener {
 					try {
 						productService.saveProduct(product, images);
 						productService.saveProductProperties(productProperties);
+						logger.info("add  product  from " + folder.getAbsolutePath());
+						FileUtils.deleteDirectory(folder);
 					} catch (Exception e) {
 						logger.error("",e);
 					}
