@@ -178,7 +178,7 @@ public class SearchEngine {
 				List<String> keywords = Splitter.on(" ").omitEmptyStrings().trimResults().splitToList(keyword);
 				for (String key : keywords) {
 					Query query = new TermQuery(new Term("product", key));
-					builder.add(query, Occur.SHOULD);
+					builder.add(query, Occur.MUST);
 				}
 				TopDocs topDocs = isearcher.search(builder.build(), Integer.MAX_VALUE);
 				// if(topDocs.scoreDocs==null||topDocs.scoreDocs.length<=0){
