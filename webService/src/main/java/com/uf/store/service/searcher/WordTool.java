@@ -18,9 +18,13 @@ import com.uf.store.service.searcher.wordtree.WordTree;
 public class WordTool {
 	@Autowired
 	private WordRepository  wordRepository;
-	private WordTree wordTree=new WordTree();
+	private WordTree wordTree;
 	@PostConstruct
 	public void init(){
+		rebuid();
+	}
+	public void rebuid() {
+		wordTree=new WordTree();
 		int pageIndex=0,pageSize=500;
 		PageRequest pageRequest=new PageRequest(pageIndex,pageSize);
 		Page<Word> words=wordRepository.findAll(pageRequest);

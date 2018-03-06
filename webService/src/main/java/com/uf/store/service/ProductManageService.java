@@ -1,7 +1,10 @@
 package com.uf.store.service;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,11 +70,11 @@ public class ProductManageService{
 			isInsert=true;
 		}
 		productRepo.save(p);
-//		if(isInsert) {
-//			searchEngine.addProductInfoToIndex(p);
-//		}else {
-//			searchEngine.updateProductIndex(p);
-//		}
+		if(isInsert) {
+			searchEngine.addProductInfoToIndex(p);
+		}else {
+			searchEngine.updateProductIndex(p);
+		}
 		productImageRepo.deleteByProductId(p.getId());
 		for(String key:imageData.keySet()) {
 			ProductImage image=new ProductImage();
@@ -81,7 +84,7 @@ public class ProductManageService{
 			productImageRepo.save(image);
 		}
 	}
-	
+	 
 	public void saveProductProperties(List<ProductProperties> properties) {
 		if (properties!=null&&properties.size()>0) {
 			propertiesRepository.deleteByProductId(properties.get(0).getProduct().getId());
@@ -118,6 +121,9 @@ public class ProductManageService{
 	public List<OrderItem> listProductOrderItems(long productId,int pageIndex,int pageSize){
 		PageRequest pageRequest=new PageRequest(pageIndex,pageSize);
 		return orderItemRepository.findPagedByProductId(productId, pageRequest);
+	}
+	public void rebuildSearchIndex() {
+		
 	}
 }
 

@@ -5,8 +5,11 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -45,15 +48,25 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.uf.store.dao.mysql.ProductPropertiesRepository;
+import com.uf.store.dao.mysql.ProductRepository;
 import com.uf.store.dao.mysql.po.Product;
+import com.uf.store.dao.mysql.po.ProductProperties;
 import com.uf.store.service.ProductManageService;
 @Component
 public class SearchEngine {
 	private Logger logger=LoggerFactory.getLogger(SearchEngine.class);
 	@Autowired
 	private ProductManageService  productManageService;
+	@Autowired
+	private ProductRepository productRepo;
+	@Autowired
+	private WordTool wordTool;
+	@Autowired
+	private ProductPropertiesRepository propertiesRepository;
 	private Directory directory = null;
 	private String indexDir = System.getProperty("user.dir");
 	private boolean rebuildIndex = false;
@@ -66,29 +79,48 @@ public class SearchEngine {
 	public void init() {
 		try {
 			Path path = Paths.get(indexDir);
+			directory = FSDirectory.open(path);
 			if (rebuildIndex) {
 				FileUtils.deleteDirectory(new File(indexDir));
-			}
-			directory = FSDirectory.open(path);
-			if(rebuildIndex){
-				int index=0,pageSize=20;
-				Page<Product> result=productManageService.getPagedProducts(0, pageSize, null);
-				for(Product p:result.getContent()){
-					this.addProductInfoToIndex(p);
-				}
-				int totalPage=result.getTotalPages();
-				for(index=index+1;index<=totalPage;index++){
-					result=productManageService.getPagedProducts(index,pageSize,null);
-					for(Product p:result.getContent()){
-						this.addProductInfoToIndex(p);
-					}
-				}
+				rebuildIndex();
 			}
 		} catch (IOException e) {
 			logger.error("",e);
 		}
 	}
-
+	public void rebuildIndex() {
+		int index=0,pageSize=20;
+		Page<Product> result=productManageService.getPagedProducts(0, pageSize, null);
+		for(Product p:result.getContent()){
+			processKeywords(p);
+			this.addProductInfoToIndex(p);
+		}
+		int totalPage=result.getTotalPages();
+		for(index=index+1;index<=totalPage;index++){
+			result=productManageService.getPagedProducts(index,pageSize,null);
+			for(Product p:result.getContent()){
+				processKeywords(p);
+				this.addProductInfoToIndex(p);
+			}
+		}
+	}
+	private void processKeywords(Product p) {
+		List<ProductProperties> productPros=propertiesRepository.findByProduct(p);
+		Set<String> pWords=new HashSet<String>();
+		if(productPros!=null) {
+			for(ProductProperties pp:productPros) {
+				List<String> words=wordTool.parseWords(pp.getPropValue());
+				pWords.addAll(words);
+			}
+		}
+		if(!Strings.isNullOrEmpty(p.getSearchKeywords())){
+			pWords.addAll(Arrays.asList(p.getSearchKeywords().split(" ")));
+		}
+		pWords.add(p.getBrand());
+		String keyWords=Joiner.on(" ").join(pWords);
+		p.setSearchKeywords(keyWords);
+		productRepo.save(p);
+	}
 	public void addProductInfoToIndex(Product product) {
 		IndexWriter iWriter = null;
 		try {
@@ -198,7 +230,7 @@ public class SearchEngine {
 			Analyzer analyzer = new WhitespaceAnalyzer();
 			IndexWriterConfig config = new IndexWriterConfig(analyzer);
 			iWriter = new IndexWriter(directory, config);
-			TextField productField = new TextField("product", product.getSearchKeywords(), Store.YES);
+			TextField productField = new TextField("product", product.getBrand()+" "+product.getSearchKeywords(), Store.YES);
 			StringField idField = new StringField("id", String.valueOf(product.getId()), Store.YES);
 			List<IndexableField> fields = new ArrayList<IndexableField>();
 			fields.add(productField);
