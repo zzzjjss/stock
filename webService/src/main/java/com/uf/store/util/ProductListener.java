@@ -20,18 +20,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import javax.annotation.PostConstruct;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
 import com.uf.store.dao.mysql.po.Product;
 import com.uf.store.dao.mysql.po.ProductProperties;
 import com.uf.store.service.ProductManageService;
@@ -148,6 +150,14 @@ public class ProductListener {
 									}
 									if(key.equalsIgnoreCase("brand")) {
 										product.setBrand(value);
+										continue;
+									}
+									if(key.equalsIgnoreCase("id")&&NumberUtils.isCreatable(value)) {
+										Product product2=productService.getProductById(Long.parseLong(value));
+										if (product2!=null) {
+											product.setId(product2.getId());
+											product.setSearchKeywords(product2.getSearchKeywords());
+										}
 										continue;
 									}
 									ProductProperties pro=new ProductProperties();
