@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Splitter;
 import com.uf.store.dao.mysql.po.Product;
 import com.uf.store.dao.mysql.po.ProductProperties;
 import com.uf.store.service.ProductManageService;
@@ -98,80 +99,99 @@ public class ProductListener {
 		public void run() {
 			if (folder.exists() && folder.isDirectory()) {
 				List<String> prods = new ArrayList<String>();
-				prods.addAll(Arrays.asList("0", "1", "2", "3", "4", "productInfo"));
 				File files[] = null;
 				int i = 10;
-				while (prods.size() > 0) {
-					if (i < 0) {
-						logger.info("folder  " + folder.getAbsolutePath() + "  doesn't  contain right files");
-						return;
+				Product product=new Product();
+				List<ProductProperties> productProperties=new ArrayList<ProductProperties>();
+				List<String> imgs=null;
+				while(true) {
+					files=folder.listFiles();
+					if(files!=null&&files.length>0) {
+						for(File file:files) {
+							try {
+								if(file.getName().equalsIgnoreCase("productInfo.properties")) {
+									Properties properties = new Properties();
+									Path path = file.toPath();
+						            Stream <String> lines = Files.lines(path);
+						            List <String> replaced = lines.map(line -> line.replaceAll("：", ":")).collect(Collectors.toList());
+						            Files.write(path, replaced);
+						            lines.close();
+						            FileInputStream fInputStream=new FileInputStream(file);
+									properties.load(new InputStreamReader(fInputStream, "UTF-8"));	
+									Set<String> keys=properties.stringPropertyNames();
+									for(String key:keys) {
+										String value=properties.getProperty(key);
+										if (key.equalsIgnoreCase("name")) {
+											product.setName(value);
+											continue;
+										}
+										if(key.equalsIgnoreCase("price")) {
+											product.setSellPrice(Float.parseFloat(value));
+											continue;
+										}
+										if(key.equalsIgnoreCase("brand")) {
+											product.setBrand(value);
+											product.setSearchKeywords(value);
+											continue;
+										}
+										if(key.equalsIgnoreCase("imgs")) {
+											imgs=Splitter.on(",").splitToList(value);
+											continue;
+										}
+										if(key.equalsIgnoreCase("id")&&NumberUtils.isCreatable(value)) {
+											Product product2=productService.getProductById(Long.parseLong(value));
+											if (product2!=null) {
+												product.setId(product2.getId());
+												product.setSearchKeywords(product2.getSearchKeywords());
+											}
+											continue;
+										}
+										ProductProperties pro=new ProductProperties();
+										pro.setProduct(product);
+										pro.setPropKey(key);
+										pro.setPropValue(value);
+										productProperties.add(pro);
+									}
+									fInputStream.close();
+									break;
+								}
+							} catch (Exception e) {
+								logger.error("",e);
+							}
+						}
 					}
-					files = folder.listFiles();
-					for (File file : files) {
-						String baseName = FilenameUtils.getBaseName(file.getName());
-						prods.remove(baseName);
-					}
-					if (prods.size() > 0) {
+					i--;
+					if(imgs!=null||i==0) {
+						break;
+					}else {
 						try {
-							Thread.sleep(5 * 1000);
-							i--;
+							logger.info("wait productInfo.properties   ");
+							Thread.sleep(3*1000);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
 					}
 				}
-				if (files != null) {
+				
+				if (imgs != null) {
 					Map<String, byte[]> images = new HashMap<String, byte[]>();
-					Product product=new Product();
-					List<ProductProperties> productProperties=new ArrayList<ProductProperties>();
-					for (File file : files) {
-						try {
-							if (FilenameUtils.getExtension(file.getName()).equalsIgnoreCase("jpg")) {
-								images.put(file.getName(), FileUtils.readFileToByteArray(file));
-							} else if (file.getName().equalsIgnoreCase("productInfo.properties")) {
-								Properties properties = new Properties();
-								Path path = file.toPath();
-					            Stream <String> lines = Files.lines(path);
-					            List <String> replaced = lines.map(line -> line.replaceAll("：", ":")).collect(Collectors.toList());
-					            Files.write(path, replaced);
-					            lines.close();
-					            FileInputStream fInputStream=new FileInputStream(file);
-								properties.load(new InputStreamReader(fInputStream, "UTF-8"));	
-								Set<String> keys=properties.stringPropertyNames();
-								for(String key:keys) {
-									String value=properties.getProperty(key);
-									if (key.equalsIgnoreCase("name")) {
-										product.setName(value);
-										continue;
-									}
-									if(key.equalsIgnoreCase("price")) {
-										product.setSellPrice(Float.parseFloat(value));
-										continue;
-									}
-									if(key.equalsIgnoreCase("brand")) {
-										product.setBrand(value);
-										continue;
-									}
-									if(key.equalsIgnoreCase("id")&&NumberUtils.isCreatable(value)) {
-										Product product2=productService.getProductById(Long.parseLong(value));
-										if (product2!=null) {
-											product.setId(product2.getId());
-											product.setSearchKeywords(product2.getSearchKeywords());
-										}
-										continue;
-									}
-									ProductProperties pro=new ProductProperties();
-									pro.setProduct(product);
-									pro.setPropKey(key);
-									pro.setPropValue(value);
-									productProperties.add(pro);
+					waitCopy:while(true) {
+						for (String imgInfo:imgs) {
+							try {
+								List<String> info=Splitter.on("=").splitToList(imgInfo);
+								File imgFile=new File(folder,info.get(0));
+								if (imgFile.length()==Long.parseLong(info.get(1))) {
+									images.put(imgFile.getName(), FileUtils.readFileToByteArray(imgFile));
+								}else {
+									logger.info("wait img copy ");
+									Thread.sleep(1000);
+									continue waitCopy;
 								}
-								fInputStream.close();
+							} catch (Exception e) {
+								logger.error("", e);
 							}
-							
-						} catch (IOException e) {
-							logger.error("", e);
 						}
+						break;
 					}
 					product.setUpdateTime(new Date());
 					try {
