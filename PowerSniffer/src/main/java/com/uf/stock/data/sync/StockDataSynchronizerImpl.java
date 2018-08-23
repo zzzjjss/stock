@@ -13,6 +13,7 @@ import com.uf.stock.data.bean.ConfigInfo;
 import com.uf.stock.data.bean.StockInfo;
 import com.uf.stock.data.bean.StockTradeInfo;
 import com.uf.stock.data.bean.StockTradeInfoWithAnalysisResult;
+import com.uf.stock.data.bean.TradeDetail;
 import com.uf.stock.data.exception.DataSyncException;
 
 public class StockDataSynchronizerImpl implements StockDataSynchronizer {
@@ -69,6 +70,12 @@ public class StockDataSynchronizerImpl implements StockDataSynchronizer {
   public StockTradeInfoWithAnalysisResult syncCurrentStockTradeInfoWithAnalysisResult(String stockSymbol) throws DataSyncException {
     return baiduSyn.syncCurrentStockTradeInfoWithAnalysisResult(stockSymbol);
   }
+
+@Override
+public List<TradeDetail> syncTradeDetail(String stockSymbol, Date tradeDate) {
+	// TODO Auto-generated method stub
+	return null;
+}
 
 
 

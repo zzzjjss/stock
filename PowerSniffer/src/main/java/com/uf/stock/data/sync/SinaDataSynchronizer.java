@@ -3,6 +3,7 @@ package com.uf.stock.data.sync;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -30,6 +31,7 @@ import com.google.gson.JsonParser;
 import com.uf.stock.data.bean.ConfigInfo;
 import com.uf.stock.data.bean.StockInfo;
 import com.uf.stock.data.bean.StockTradeInfo;
+import com.uf.stock.data.bean.TradeDetail;
 import com.uf.stock.data.exception.DataSyncException;
 import com.uf.stock.util.HttpUnit;
 
@@ -98,7 +100,11 @@ public class SinaDataSynchronizer {
     }
     return all;
   }
-
+  public List<TradeDetail> syncTradeDetail(String stockSymbol,Date date){
+	  String pageUrl="http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_Transactions.getAllPageTime?date=2018-08-23&symbol=sz000063";
+	  String getDetailUrl="http://vip.stock.finance.sina.com.cn/quotes_service/view/vMS_tradedetail.php?symbol=sz000063&date=2018-08-23&page=3";
+	  return null;
+  }
 
   public Map<String, StockTradeInfo> syncStocksCurrentTradeInfo(List<String> stockSymbol) {
     Map<String, StockTradeInfo> result = new HashMap<String, StockTradeInfo>();
