@@ -5,6 +5,8 @@ import java.util.List;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -18,6 +20,7 @@ import com.uf.stock.util.HttpUnit;
 public class QqDataSynchronizer {
 	private CloseableHttpClient client;
 	private ConfigInfo configInfo;
+	private Logger logger = LogManager.getLogger(QqDataSynchronizer.class);
 
 	public QqDataSynchronizer(ConfigInfo configInfo) {
 		this.configInfo = configInfo;
@@ -41,6 +44,7 @@ public class QqDataSynchronizer {
 				StockInfo stockInfo = new StockInfo();
 				String symbol = row.getCell(0).getStringCellValue();
 				String name = row.getCell(1).getStringCellValue();
+				logger.info(name);
 				stockInfo.setSymbol(symbol);
 				stockInfo.setName(name);
 				stockInfo.setCode(Integer.parseInt(symbol.substring(2)));
