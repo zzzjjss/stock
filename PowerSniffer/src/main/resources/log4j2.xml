@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="debug" strict="true" >
   <Properties>
-    <Property name="filename">c:/jason/log/restful.log</Property>
+    <Property name="filename">logs/restful.log</Property>
   </Properties>
  
   <Appenders>

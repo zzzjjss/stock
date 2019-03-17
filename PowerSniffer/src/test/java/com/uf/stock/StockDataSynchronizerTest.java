@@ -9,8 +9,11 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.uf.stock.data.bean.ConfigInfo;
+import com.uf.stock.data.bean.StockInfo;
 import com.uf.stock.data.bean.StockTradeInfoWithAnalysisResult;
 import com.uf.stock.data.exception.DataSyncException;
+import com.uf.stock.data.sync.QqDataSynchronizer;
 import com.uf.stock.data.sync.StockDataSynchronizer;
 import com.uf.stock.service.DataSyncService;
 import com.uf.stock.util.SpringBeanFactory;
@@ -35,14 +38,19 @@ public class StockDataSynchronizerTest {
 //      // TODO Auto-generated catch block
 //      e.printStackTrace();
 //    }
-    DataSyncService service = SpringBeanFactory.getBean(DataSyncService.class);
-    DateFormat format=new SimpleDateFormat("yyyyMMdd");
-    try {
-      service.isTradeDate(format.parse("20170224"));
-    } catch (ParseException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+//    DataSyncService service = SpringBeanFactory.getBean(DataSyncService.class);
+//    DateFormat format=new SimpleDateFormat("yyyyMMdd");
+//    try {
+//      service.isTradeDate(format.parse("20170224"));
+//    } catch (ParseException e) {
+//      // TODO Auto-generated catch block
+//      e.printStackTrace();
+//    }
+	  ConfigInfo config=new ConfigInfo();
+	  config.setIsUseProxy(false);
+	  QqDataSynchronizer sync=new QqDataSynchronizer(config);
+	  List<StockInfo> all=sync.syncAllStocksInfo();
+	  System.out.println(all);
   }
 
 }

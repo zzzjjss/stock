@@ -61,11 +61,10 @@ public class DataSyncServiceImpl implements DataSyncService {
     for (StockInfo info : stockInfo) {
       StockInfo old=stockInfoDao.findStockByStockCode(info.getCode());
       if(old!=null){
-        old.setPeRatio(info.getPeRatio());
-        old.setTotalAAmount(info.getTotalAAmount());
-        stockInfoDao.update(old);
+    	  continue;
       }else{
         stockInfoDao.insert(info);
+        logger.info("add  stock "+info.getName());
         add++;
       }
     }

@@ -23,16 +23,18 @@ public class StockDataSynchronizerImpl implements StockDataSynchronizer {
   private SinaDataSynchronizer sinaSync;
   private SoHuDataSynchronizer sohuSyn;
   private BaiduDataSynchronizer baiduSyn;
+  private QqDataSynchronizer qqSyn;
   @PostConstruct
   private void afterConstruct() {
     sinaSync = new SinaDataSynchronizer(configInfo);
     sohuSyn = new SoHuDataSynchronizer(configInfo);
     baiduSyn=new BaiduDataSynchronizer(configInfo);
+    qqSyn=new QqDataSynchronizer(configInfo);
   }
 
   public List<StockInfo> syncAllStocksInfo() {
 
-    return sinaSync.syncAllStocksInfo();
+    return qqSyn.syncAllStocksInfo(); 
   }
 
   public StockInfo syncStockInfo(String stockCode) {
