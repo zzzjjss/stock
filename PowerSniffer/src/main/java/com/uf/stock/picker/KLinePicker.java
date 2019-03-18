@@ -21,7 +21,7 @@ public class KLinePicker {
     PickResult pickResult=new PickResult();
     if (service.isTradeDate(tradeDate)) {
       DateFormat format=new SimpleDateFormat("yyyy-MM-dd");
-      List<StockInfo> stocks=service.findStocksPeRatioBetween(-1f, 100000f);
+      List<StockInfo> stocks=service.findAllStocks();
       float tmpDownPower=Float.MAX_VALUE;
       for (StockInfo stockInfo : stocks) {
         if (stockInfo.getName().contains("ST")) {

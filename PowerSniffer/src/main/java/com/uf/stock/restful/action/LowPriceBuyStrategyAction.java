@@ -2,9 +2,7 @@ package com.uf.stock.restful.action;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -21,24 +19,17 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.uf.stock.data.bean.AlarmStock;
 import com.uf.stock.data.bean.StockInfo;
 import com.uf.stock.data.bean.StockTradeInfo;
-import com.uf.stock.data.sync.StockDataSynchronizer;
 import com.uf.stock.restful.bean.LowPriceBuyStrategyResponse;
 import com.uf.stock.restful.bean.LowPriceBuyStrategyResponseData;
 import com.uf.stock.restful.bean.ResponseError;
 import com.uf.stock.restful.bean.RestfulResponse;
 import com.uf.stock.service.DataSyncService;
 import com.uf.stock.service.StockAnalysisService;
-import com.uf.stock.service.bean.StableStage;
-import com.uf.stock.service.bean.StableStageDefinition;
-import com.uf.stock.service.bean.StageDefinition;
-import com.uf.stock.service.bean.StockStage;
 import com.uf.stock.util.SpringBeanFactory;
 
 @Singleton
@@ -54,7 +45,7 @@ private StockAnalysisService analyseService=SpringBeanFactory.getBean(StockAnaly
     LowPriceBuyStrategyResponse response=new LowPriceBuyStrategyResponse(); 
     try{
       List<LowPriceBuyStrategyResponseData> data=new LinkedList<LowPriceBuyStrategyResponseData>();
-      List<StockInfo> stocks=service.findStocksPeRatioBetween(-1f, Float.MAX_VALUE);
+      List<StockInfo> stocks=service.findAllStocks();
       List<String> stockSymbols=new ArrayList<String>();
       for(StockInfo stock:stocks){
         stockSymbols.add(stock.getSymbol());
@@ -101,7 +92,7 @@ private StockAnalysisService analyseService=SpringBeanFactory.getBean(StockAnaly
   public String getAlarmStocks(){
     StringBuilder alarmInfo=new StringBuilder();
     try{
-      List<StockInfo> stocks=service.findStocksPeRatioBetween(-1f, Float.MAX_VALUE);
+      List<StockInfo> stocks=service.findAllStocks();
       List<String> stockSymbols=new ArrayList<String>();
       for(StockInfo stock:stocks){
         stockSymbols.add(stock.getSymbol());
@@ -149,7 +140,7 @@ private StockAnalysisService analyseService=SpringBeanFactory.getBean(StockAnaly
   @Path("/calculatePeriodicLowPriceStocks")
   public String calculatePeriodicLowPriceStocks(@QueryParam("periodicDays") final int periodicDays, @QueryParam("maxDownPercentToLowest") final float maxDownPercentToLowest) {
     List<StockInfo> stocks = new ArrayList<StockInfo>();
-    List<StockInfo> allStocks = service.findStocksPeRatioBetween(1f, Float.MAX_VALUE);
+    List<StockInfo> allStocks = service.findAllStocks();
     ExecutorService pool = Executors.newCachedThreadPool();
     List<Future<StockInfo>> results = new ArrayList<Future<StockInfo>>();
     for (final StockInfo stock : allStocks) {

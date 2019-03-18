@@ -58,6 +58,7 @@
 			<div class="row">
 				<button type="button" class="btn btn-default " id="getDownPercentBtn">查询</button>
 				<button type="button" class="btn btn-default " id="syncAllStocksBtn">同步所有股票</button>
+				<button type="button" class="btn btn-default " id="syncDailyTrade">同步日交易</button>
 				<button type="button" class="btn btn-default " data-toggle="modal" data-target="#periodLowestModal">阶段性底价</button>
 			</div>
 			<table id="lowPriceBuyTb" class="display" width="100%"></table>
@@ -196,6 +197,18 @@
 				alertCommonResponse(data);
 			});
 		});
+		$("#syncDailyTrade").on("click", function() {
+			var btn = $(this);
+			$(this).prop('disabled', true);
+
+			$.ajax({
+				url : restfulContext + "/data/syncDailyTrade"
+			}).done(function(data) {
+				btn.prop('disabled', false);
+				alertCommonResponse(data);
+			});
+		});
+		
 		$("#syncTradeInfoBtn").on("click", function() {
 			var btn = $(this);
 			$(this).prop('disabled', true);

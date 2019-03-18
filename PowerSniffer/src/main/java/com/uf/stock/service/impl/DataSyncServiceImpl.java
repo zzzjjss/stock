@@ -5,8 +5,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Ordering;
 import com.uf.stock.bean.UpDownPower;
 import com.uf.stock.data.bean.AlarmStock;
 import com.uf.stock.data.bean.StockInfo;
@@ -490,5 +487,10 @@ public List<StockTradeInfo> findAllTradeInfosOrderByDateAscByCache(Integer stock
     cache.put(stockCode, infos);
     return infos;
   }
+}
+
+@Override
+public List<StockInfo> findAllStocks() {
+    return (List<StockInfo>) stockInfoDao.findAll(StockInfo.class);
 }
 }

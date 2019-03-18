@@ -38,7 +38,7 @@ public class Schedule {
             long begin=System.currentTimeMillis();
             service.syncAllStocksBaseInfo();
             int syncCount=0;
-            List<StockInfo> allStocks=service.findStocksPeRatioBetween(-1f, Float.MAX_VALUE);
+            List<StockInfo> allStocks=service.findAllStocks();
             ExecutorService pool = Executors.newFixedThreadPool(5);
             int total=service.syncAllStocksBaseInfo();
             System.out.println("total sync new stock:"+total);

@@ -18,8 +18,6 @@ import javax.ws.rs.core.MediaType;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.gson.Gson;
-import com.uf.stock.bean.UpDownPower;
-import com.uf.stock.data.bean.AlarmStock;
 import com.uf.stock.data.bean.StockInfo;
 import com.uf.stock.restful.bean.GoUpStrategyResponse;
 import com.uf.stock.restful.bean.GoUpStrategyResponseData;
@@ -27,12 +25,7 @@ import com.uf.stock.restful.bean.ResponseError;
 import com.uf.stock.restful.bean.RestfulResponse;
 import com.uf.stock.service.DataSyncService;
 import com.uf.stock.service.StockAnalysisService;
-import com.uf.stock.service.bean.StableStage;
-import com.uf.stock.service.bean.StableStageDefinition;
-import com.uf.stock.service.bean.StageDefinition;
-import com.uf.stock.service.bean.StockStage;
 import com.uf.stock.util.SpringBeanFactory;
-import com.uf.stock.util.StockUtil;
 
 @Singleton
 @Path("/goUpStrategy")
@@ -89,7 +82,7 @@ public class GoUpStrategyAction {
     try{
     	int syncCount=0;
       if(isSyncAll){
-    		List<StockInfo> allStocks=service.findStocksPeRatioBetween(-1f, Float.MAX_VALUE);
+    		List<StockInfo> allStocks=service.findAllStocks();
     		ExecutorService pool = Executors.newFixedThreadPool(5);
     		List<Future<Integer>> results=new ArrayList<Future<Integer>>(); 
     		for(StockInfo stock:allStocks){
@@ -139,7 +132,7 @@ public class GoUpStrategyAction {
   @Path("/analyseAvgPrice")
   public String analyseAvgPrice(@QueryParam("analysicDays") final int analysicDays, @QueryParam("downPercentToLowestPrice") final float downPercentToLowestPrice, @QueryParam("shortTerm") final int shortTerm, @QueryParam("mediumTerm") final int mediumTerm, @QueryParam("longTerm") final int longTerm) {
     List<StockInfo> stocks = new ArrayList<StockInfo>();
-    List<StockInfo> allStocks = service.findStocksPeRatioBetween(1f, Float.MAX_VALUE);
+    List<StockInfo> allStocks = service.findAllStocks();
     ExecutorService pool = Executors.newCachedThreadPool();
     List<Future<StockInfo>> results = new ArrayList<Future<StockInfo>>();
     for (final StockInfo stock : allStocks) {

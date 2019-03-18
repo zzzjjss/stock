@@ -57,7 +57,7 @@ public class StockAnalysisAction {
 		try {
 			List<PriceSpeedAnalysisResultData> datas = new ArrayList<PriceSpeedAnalysisResultData>();
 //			List<StockInfo> stocks = service.findStocksPeRatioBetween(minPeRatio, maxPeRation);
-			List<StockInfo> stocks = service.findStocksPeRatioBetween(-1f, Float.MAX_VALUE);
+			List<StockInfo> stocks = service.findAllStocks();
 			KLineTFilter tFilter=new KLineTFilter(0.2f);
 			if (stocks != null && stocks.size() > 0) {
 			  Map<String, StockTradeInfo> currentTradeInfos=null;
